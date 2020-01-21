@@ -1,6 +1,9 @@
 #!/bin/bash
 
-whiptail --title "This is the script you are about to install:" --textbox --scrolltext $0 40 120
+whiptail --title "This is the script you are about to install:" --textbox --scrolltext $0 36 90
+
+#copy "dotfiles" into place
+sudo cp -r .config/ ~/
 
 #set the fucking keyboard, fuck!
 sed -i 's/gb/US/g' /etc/default/keyboard
@@ -8,19 +11,23 @@ sed -i 's/gb/US/g' /etc/default/keyboard
 #update
 #sudo apt-get update 
 #force iv4?
-sudo apt-get -o Acquire::ForceIPv4=true update
+#sudo apt-get -o Acquire::ForceIPv4=true update
 
-# List of apps that will need to be installed
-APPLIST="build-essential cmake cmake-data pkg-config python3-sphinx libcairo2-dev libxcb1-dev libxcb-util0-dev libxcb-randr0-dev libxcb-composite0-dev python-xcbgen xcb-proto libxcb-image0-dev libxcb-ewmh-dev libxcb-icccm4-dev
-xorg xserver-xorg xinit git make dh-autoreconf cmake lxappearance"
+sudo apt update
 
 #we aint got all night budy
 #sudo apt-get upgrade -y 
 
-#install all the apps
-sudo apt install -y $APPLIST
+#install some apps
+sudo apt install -y xorg xserver-xorg xinit git cmake lxappearance
 
-#im sure this isnt the best place to install new programs but ill figure it out
+#my daily apps
+sudo apt install -y feh compton cmatrix nmon chromium-browser geany ranger
+
+#more apps
+sudo apt install -y sysbench florence mixxx nemo ttyrec realvnc-vnc-sever real-vnc-viewer
+
+#this is the install directory for any software we need to build from source
 cd /opt/
 
 #installing i3-gaps window manager from source
@@ -37,28 +44,28 @@ sudo make install
 cd
 
 #now to get polybar like the rest of the coool kids
-sudo mkdir ~/Downloads
-cd ~/Downloads/
-sudo wget https://github.com/polybar/polybar/releases/download/3.4.2/polybar-3.4.2.tar
-sudo tar -x -f polybar-3.4.2.tar
-sudo mkdir /opt/polybar/
-sudo mv polybar /opt/
-cd /opt/polybar/
-sudo mkdir build
-cd build/
-sudo cmake ..
-sudo make -j8
-sudo make install
-cd
+#sudo apt install build-essential git cmake cmake-data pkg-config python3-sphinx libcairo2-dev libxcb1-dev libxcb-util0-dev libxcb-randr0-dev libxcb-composite0-dev python-xcbgen xcb-proto libxcb-image0-dev libxcb-ewmh-dev libxcb-icccm4-dev
+#the dependencies below are marked as optional so try removing them and seeing what happens
+#sudo apt install libxcb-xkb-dev libxcb-xrm-dev libxcb-cursor-dev libasound2-dev libpulse-dev i3-wm libjsoncpp-dev libmpdclient-dev libcurl4-openssl-dev libnl-genl-3-dev
+#sudo mkdir ~/Downloads
+#cd ~/Downloads/
+#sudo wget https://github.com/polybar/polybar/releases/download/3.4.2/polybar-3.4.2.tar
+#sudo tar -x -f polybar-3.4.2.tar
+#sudo mkdir /opt/polybar/
+#sudo mv polybar /opt/
+#cd /opt/polybar/
+#sudo mkdir build
+#cd build/
+#sudo cmake ..
+#sudo make -j8
+#sudo make install
+#cd
 
 #gif-for-cli, was looking cute, might delete
-sudo apt install -y python3-pip ffmpeg zlib* libjpeg* python3-setuptools
-pip3 install --user wheel
-pip3 install --user gif-for-cli
-gif-for-cli &
-
-#copy "dotfiles" into place
-sudo cp -r -/.config/ ~/
+#sudo apt install -y python3-pip ffmpeg zlib* libjpeg* python3-setuptools
+#pip3 install --user wheel
+#pip3 install --user gif-for-cli
+#gif-for-cli &
 
 #copy wallpapers
 #sudo cp -r Pictures ~/
@@ -72,8 +79,7 @@ sudo wget http://getwallpapers.com/wallpaper/full/e/8/7/702136-rainforest-backgr
 sudo wget http://getwallpapers.com/wallpaper/full/a/6/e/702131-beautiful-rainforest-backgrounds-1920x1080-for-iphone-6.jpg
 sudo wget http://getwallpapers.com/wallpaper/full/a/a/9/702126-rainforest-backgrounds-2560x1600-for-computer.jpg
 
-#my daily apps
-sudo apt install -y feh compton cmatrix nmon chromium-browser geany ranger sysbench florence mixxx nemo ttyrec realvnc-vnc-sever real-vnc-viewer
+
 
 #sudo reboot
 
@@ -94,7 +100,7 @@ sudo apt install -y feh compton cmatrix nmon chromium-browser geany ranger sysbe
 #-provide vnc desktop
 #/#
 
-raspi-config nonint do_ssh 1
+raspi-config nonint do_ssh 0
 raspi-config nonint do_vnc 0
 raspi-config nonint do_wifi_country US
-clear
+#clear
