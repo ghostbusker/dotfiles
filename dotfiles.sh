@@ -2,9 +2,6 @@
 
 whiptail --title "This is the script you are about to install:" --textbox --scrolltext $0 36 90
 
-#copy "dotfiles" into place
-sudo cp -r .config/ ~/
-
 #set the fucking keyboard, fuck!
 sed -i 's/gb/US/g' /etc/default/keyboard
 
@@ -19,13 +16,13 @@ sudo apt update
 #sudo apt-get upgrade -y 
 
 #install some apps
-sudo apt install -y xorg xserver-xorg xinit git cmake lxappearance
+sudo apt install -Y xorg xserver-xorg xinit git cmake lxappearance
 
 #my daily apps
-sudo apt install -y feh compton cmatrix nmon chromium-browser geany ranger
+sudo apt install -Y feh compton cmatrix nmon chromium-browser geany ranger
 
 #more apps
-sudo apt install -y sysbench florence mixxx nemo ttyrec realvnc-vnc-sever real-vnc-viewer
+sudo apt install -Y sysbench florence mixxx nemo ttyrec realvnc-vnc-sever real-vnc-viewer
 
 #this is the install directory for any software we need to build from source
 cd /opt/
@@ -99,6 +96,9 @@ sudo wget http://getwallpapers.com/wallpaper/full/a/a/9/702126-rainforest-backgr
 #-provide filesharing in both use-cases
 #-provide vnc desktop
 #/#
+
+#copy "dotfiles" into place
+sudo cp -r .config/ ~/
 
 raspi-config nonint do_ssh 0
 raspi-config nonint do_vnc 0
