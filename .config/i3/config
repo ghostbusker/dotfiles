@@ -12,6 +12,7 @@ exec xterm htop
 #exec xterm echo cmnd | nmon -f 
 exec xterm nmon
 exec xterm cmatrix
+exec xterm nemo
 exec xterm florence
 exec feh https://s.w-x.co/staticmaps/wu/wxtype/county_loc/csg/animate.png
 #exec gif-for-cli --display-mode=truecolor -l 0 "Keyword here!" &
