@@ -221,8 +221,8 @@ bar {
         status_command i3status
         tray_output primary
         workspace_buttons yes
-        strip_workspace_numbers yes|no
-        separator_symbol “⁞”
+#        strip_workspace_numbers yes|no
+        separator_symbol |
         colors {
                 background #000000
                 statusline #ffffff
