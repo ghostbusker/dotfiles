@@ -25,6 +25,8 @@ sudo apt install -y i3blocks feh compton cmatrix nmon chromium-browser geany ran
 #more apps
 sudo apt install -y sysbench florence mixxx nemo ttyrec realvnc-vnc-sever real-vnc-viewer
 
+###Setup New Encrypted User#################################################################################################
+
 #install apps needed to encrypt the user folder
 sudo apt install -y ecryptfs-utils lsof cryptsetup
 
@@ -34,6 +36,9 @@ sudo ecryptfs-migrate-home -u $USER
 #add new user to sudoers group
 sudo usermod -a -G sudo $USER
 
+#add user to all the groups that user pi was a part of
+sudo usermod -G adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,input,netdev,spi,i2c,gpio $USER
+
 #copy "dotfiles" into place
 sudo cp -r .config/ /home/$USER/
 
@@ -41,7 +46,7 @@ sudo cp -r .config/ /home/$USER/
 cd /opt/
 
 #installing i3-gaps window manager from source
-sudo apt install i3 gcc make dh-autoreconf libxcb-keysyms1-dev libpango1.0-dev libxcb-util0-dev xcb libxcb1-dev libxcb-icccm4-dev libyajl-dev libev-dev libxcb-xkb-dev libxcb-cursor-dev libxkbcommon-dev libxcb-xinerama0-dev libxkbcommon-x11-dev libstartup-notification0-dev libxcb-randr0-dev libxcb-xrm0 libxcb-xrm-dev libxcb-shape0 libxcb-shape0-dev
+sudo apt install -y i3 gcc make dh-autoreconf libxcb-keysyms1-dev libpango1.0-dev libxcb-util0-dev xcb libxcb1-dev libxcb-icccm4-dev libyajl-dev libev-dev libxcb-xkb-dev libxcb-cursor-dev libxkbcommon-dev libxcb-xinerama0-dev libxkbcommon-x11-dev libstartup-notification0-dev libxcb-randr0-dev libxcb-xrm0 libxcb-xrm-dev libxcb-shape0 libxcb-shape0-dev
 sudo git clone https://www.github.com/Airblader/i3 i3-gaps
 cd i3-gaps
 sudo autoreconf --force --install
@@ -94,5 +99,5 @@ raspi-config nonint do_wifi_country US
 #Disable Swap with : sudo swapoff -a -v
 #fix permissions: sudo chmod 0750 -R /home/bob/*
 #set new root password: sudo passwd root
-#delete pi user :userdel -r -f pi
+#delete pi user :sudo userdel --remove-all-files pi
 #List groups wich pi is belonging: sudo cat/etc/group | grep pi
