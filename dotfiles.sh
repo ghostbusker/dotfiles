@@ -2,16 +2,12 @@
 
 whiptail --title "This is the script you are about to install:" --textbox --scrolltext $0 36 90
 
-#Let's prompt for and create a new user (defualt name is 'user')
+#Create new username and password
 USER=username
 USER=$(whiptail --inputbox "Enter new user name. User 'pi' should be deleted for security reasons. No spaces please." 8 78 $USER --title "New User Name" 3>&1 1>&2 2>&3)
 sudo adduser $USER
 
-#set the fucking keyboard, fuck!
-sed -i 's/gb/US/g' /etc/default/keyboard
-
-#update
-#sudo apt-get update 
+#update 
 #force iv4?
 #sudo apt-get -o Acquire::ForceIPv4=true update
 sudo apt update
@@ -39,11 +35,21 @@ sudo usermod -a -G sudo $USER
 #add user to all the groups that user pi was a part of
 sudo usermod -G adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,input,netdev,spi,i2c,gpio $USER
 
+###Install the desktop environment##########################################################################################
+
+#set the fucking keyboard, fuck!
+sed -i 's/gb/US/g' /etc/default/keyboard
+
+#enable  shh, vnc, set WiFi
+raspi-config nonint do_ssh 0
+raspi-config nonint do_vnc 0
+raspi-config nonint do_wifi_country US
+
 #copy "dotfiles" into place
 sudo cp -r .config/ /home/$USER/
 
 #this is the install directory for any software we need to build from source
-cd /opt/
+cd /opt/ 
 
 #installing i3-gaps window manager from source
 sudo apt install -y i3 gcc make dh-autoreconf libxcb-keysyms1-dev libpango1.0-dev libxcb-util0-dev xcb libxcb1-dev libxcb-icccm4-dev libyajl-dev libev-dev libxcb-xkb-dev libxcb-cursor-dev libxkbcommon-dev libxcb-xinerama0-dev libxkbcommon-x11-dev libstartup-notification0-dev libxcb-randr0-dev libxcb-xrm0 libxcb-xrm-dev libxcb-shape0 libxcb-shape0-dev
@@ -59,7 +65,6 @@ sudo make install
 cd
 
 #copy wallpapers
-#sudo cp -r Pictures ~/
 sudo mkdir /home/$USER/Pictures
 sudo mkdir /home/$USER/Pictures/Wallpapers
 cd /home/$USER/Pictures/Wallpapers
@@ -70,9 +75,6 @@ sudo wget http://getwallpapers.com/wallpaper/full/e/8/7/702136-rainforest-backgr
 sudo wget http://getwallpapers.com/wallpaper/full/a/6/e/702131-beautiful-rainforest-backgrounds-1920x1080-for-iphone-6.jpg
 sudo wget http://getwallpapers.com/wallpaper/full/a/a/9/702126-rainforest-backgrounds-2560x1600-for-computer.jpg
 
-raspi-config nonint do_ssh 0
-raspi-config nonint do_vnc 0
-raspi-config nonint do_wifi_country US
 #clear?
 #sudo reboot?
 
