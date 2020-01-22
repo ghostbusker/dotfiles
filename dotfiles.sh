@@ -5,7 +5,7 @@ whiptail --title "This is the script you are about to install:" --textbox --scro
 #Let's prompt for and create a new user (defualt name is 'user')
 USER=username
 USER=$(whiptail --inputbox "Enter new user name. User 'pi' should be deleted for security reasons. No spaces please." 8 78 $USER --title "New User Name" 3>&1 1>&2 2>&3)
-sudo adduser ($USER)
+sudo adduser $USER
 
 #encrypt new user home directory
 sudo ecryptfs-migrate-home -u $USER
