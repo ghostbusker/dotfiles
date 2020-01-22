@@ -235,3 +235,8 @@ bar {
         }
 
 }
+
+#We're going dual bars here ppl, better buckle upgrade
+bar {
+  status_command i3blocks
+}

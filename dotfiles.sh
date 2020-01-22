@@ -7,15 +7,6 @@ USER=username
 USER=$(whiptail --inputbox "Enter new user name. User 'pi' should be deleted for security reasons. No spaces please." 8 78 $USER --title "New User Name" 3>&1 1>&2 2>&3)
 sudo adduser $USER
 
-#encrypt new user home directory
-sudo ecryptfs-migrate-home -u $USER
-
-#add new user to sudoers group
-sudo usermod -a -G sudo $USER
-
-#copy "dotfiles" into place
-sudo cp -r .config/ /home/$USER/
-
 #set the fucking keyboard, fuck!
 sed -i 's/gb/US/g' /etc/default/keyboard
 
@@ -29,13 +20,22 @@ sudo apt update
 sudo apt install -y xorg xserver-xorg xinit git cmake lxappearance
 
 #my daily apps
-sudo apt install -y feh compton cmatrix nmon chromium-browser geany ranger
+sudo apt install -y i3blocks feh compton cmatrix nmon chromium-browser geany ranger
 
 #more apps
 sudo apt install -y sysbench florence mixxx nemo ttyrec realvnc-vnc-sever real-vnc-viewer
 
 #install apps needed to encrypt the user folder
 sudo apt install -y ecryptfs-utils lsof cryptsetup
+
+#encrypt new user home directory
+sudo ecryptfs-migrate-home -u $USER
+
+#add new user to sudoers group
+sudo usermod -a -G sudo $USER
+
+#copy "dotfiles" into place
+sudo cp -r .config/ /home/$USER/
 
 #this is the install directory for any software we need to build from source
 cd /opt/
