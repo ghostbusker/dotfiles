@@ -6,17 +6,31 @@
 set $mod Mod4
 
 exec compton
-exec ~/.config/polybar/launch.sh
+#exec ~/.config/polybar/launch.sh
 exec watch -n 900 feh --randomize --bg-fill ~/Pictures/Wallpapers/*
-exec xterm htop
-#exec xterm echo cmnd | nmon -f 
-exec xterm nmon
-exec xterm cmatrix
-exec xterm nemo
-exec xterm florence
+
+
+#Setup Workspace 1
+exec xterm -e htop
+exec xterm -e "echo cmnd | nmon -f" 
+exec xterm -e "cmatrix -a"
 exec feh https://s.w-x.co/staticmaps/wu/wxtype/county_loc/csg/animate.png
+exec --no-startup-id "i3-msg 'workspace 1; append_layout ~/.config/i3/workspace-1.json'"
+
+#exec xterm nemo
+#exec xterm florence
 #exec gif-for-cli --display-mode=truecolor -l 0 "Keyword here!" &
-exec --no-startup-id chromium-browser
+#exec --no-startup-id chromium-browser
+
+# Start iceweasel on workspace 3, then switch back to workspace 1
+# (Being a command-line utility, i3-msg does not support startup notifications,
+#  hence the exec --no-startup-id.)
+# (Starting iceweasel with i3’s exec command is important in order to make i3
+#  create a startup notification context, without which the iceweasel window(s)
+#  cannot be matched onto the workspace on which the command was started.)
+#exec --no-startup-id i3-msg 'workspace 3; exec iceweasel; workspace 1'
+
+
 
 #limits all chrome windows to workspace3. not really desired after testing
 #assign [class="Chromium"] $ws3
@@ -113,16 +127,16 @@ bindsym $mod+a focus parent
 
 # Define names for default workspaces for which we configure key bindings later on.
 # We use variables to avoid repeating the names in multiple places.
-set $ws1 "1"
-set $ws2 "2"
-set $ws3 "3"
-set $ws4 "4"
-set $ws5 "5"
-set $ws6 "6"
-set $ws7 "7"
-set $ws8 "8"
-set $ws9 "9"
-set $ws10 "10"
+set $ws1 "1:System"
+set $ws2 "2:@"
+set $ws3 "3:$"
+set $ws4 "4:%"
+set $ws5 "5:^"
+set $ws6 "6:&"
+set $ws7 "7:*"
+set $ws8 "8:("
+set $ws9 "9:)"
+set $ws10 "10:_"
 
 # switch to workspace
 bindsym $mod+1 workspace $ws1
@@ -221,7 +235,7 @@ bar {
         status_command i3status
         tray_output primary
         workspace_buttons yes
-#        strip_workspace_numbers yes|no
+        strip_workspace_numbers yes
         separator_symbol |
         colors {
                 background #000000

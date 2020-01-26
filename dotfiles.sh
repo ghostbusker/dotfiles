@@ -33,7 +33,7 @@ sudo ecryptfs-migrate-home -u $USER
 sudo usermod -a -G sudo $USER
 
 #add user to all the groups that user pi was a part of
-sudo usermod -G adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,input,netdev,spi,i2c,gpio $USER
+sudo usermod -G adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,input,netdev,spi,i2c,gpio,$USER $USER
 
 ###Install the desktop environment##########################################################################################
 
