@@ -25,7 +25,7 @@
 # The top properties below are applied to every block, but can be overridden.
 # Each block command defaults to the script name to avoid boilerplate.
 #command=/usr/lib/i3blocks/$BLOCK_NAME
-command=~/code/shell/i3-blocks/blocks/$BLOCK_NAME
+command=/usr/share/i3blocks/$BLOCK_NAME
 separator_block_width=15
 markup=none
 
@@ -51,10 +51,28 @@ color=#91E78B
 command=date +%T
 interval=5
 
-[cpu_usage]
-command=$SCRIPT_DIR/cpu_usage
-interval=10
-LABEL=CPU 
+# text demo from vivien.github.io
+[simple]
+full_text=This is a looong white on red text
+short_text=Short white on red text
+background=#FF0000
+color=#FFFFFF
+
+# Block with a fixed width
+[aligned]
+full_text=Here.
+min_width=100
+align=center
+
+# Fancy text with multiple colors and shapes
+[funky]
+full_text=<span foreground="red" size="x-large">Roses</span> and <i><span color="#EE37B8">violets</span></i>!
+markup=pango
+
+#[cpu_usage]
+#command=$SCRIPT_DIR/cpu_usage
+#interval=10
+#LABEL=CPU 
 #min_width=CPU: 100.00%
 #T_WARN=50
 #T_CRIT=80
@@ -155,10 +173,10 @@ LABEL=CPU
 #instance=~/.gmx-private
 #interval=60
 
-#[memory]
-#label=
-#instance=mem;free
-#interval=30
+[memory]
+label=mem:
+instance=mem;free
+interval=30
 
 #[memory]
 #label=

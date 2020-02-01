@@ -7,7 +7,7 @@
     "nodes": [
 
       // the dumped workspace layout goes here
-
+      {  
           "border": "pixel",
           "current_border_width": 2,
           "floating": "auto_off",

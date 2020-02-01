@@ -44,5 +44,5 @@ load {
 }
 
 disk "/" {
-        format = "Disk" %avail"
+        format = "Disk %avail"
 }
