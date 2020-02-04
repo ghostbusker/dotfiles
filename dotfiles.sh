@@ -16,7 +16,7 @@ sudo apt update
 sudo apt install -y xorg xserver-xorg xinit git cmake lxappearance
 
 #my daily apps
-sudo apt install -y i3blocks feh compton cmatrix nmon chromium-browser geany ranger
+sudo apt install -y i3blocks feh compton cmatrix nmon geany ranger
 
 #more apps
 sudo apt install -y sysbench florence mixxx nemo ttyrec realvnc-vnc-sever real-vnc-viewer
@@ -103,3 +103,8 @@ sudo wget http://getwallpapers.com/wallpaper/full/a/a/9/702126-rainforest-backgr
 #set new root password: sudo passwd root
 #delete pi user :sudo userdel --remove-all-files pi
 #List groups wich pi is belonging: sudo cat/etc/group | grep pi
+
+#delete pi user?
+#sudo pkill -u pi
+#sudo deluser pi
+#sudo apt install --yes chromium-browser
