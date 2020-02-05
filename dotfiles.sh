@@ -18,9 +18,6 @@ sudo apt install -y xorg xserver-xorg xinit git cmake lxappearance
 #my daily apps
 sudo apt install -y i3blocks feh compton cmatrix nmon geany ranger
 
-#more apps
-sudo apt install -y sysbench florence mixxx nemo ttyrec realvnc-vnc-sever real-vnc-viewer
-
 ###Setup New Encrypted User#################################################################################################
 
 #install apps needed to encrypt the user folder
@@ -29,11 +26,18 @@ sudo apt install -y ecryptfs-utils lsof cryptsetup
 #encrypt new user home directory
 sudo ecryptfs-migrate-home -u $USER
 
+#copy "dotfiles" into place
+sudo cp -r .config/ /home/$USER/
+
 #add new user to sudoers group
 sudo usermod -a -G sudo $USER
 
 #add user to all the groups that user pi was a part of
-sudo usermod -G adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,input,netdev,spi,i2c,gpio,$USER $USER
+sudo usermod -a -G adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,input,netdev,spi,i2c,gpio, $USER
+
+#take ownership and set permissions of user folder:
+sudo -u $USER chmod 750 -R /home/$USER/
+sudo chown -R $USER:$USER /home/$USER/
 
 ###Install the desktop environment##########################################################################################
 
@@ -45,8 +49,6 @@ raspi-config nonint do_ssh 0
 raspi-config nonint do_vnc 0
 raspi-config nonint do_wifi_country US
 
-#copy "dotfiles" into place
-sudo cp -r .config/ /home/$USER/
 
 #this is the install directory for any software we need to build from source
 cd /opt/ 
@@ -82,7 +84,7 @@ sudo wget http://getwallpapers.com/wallpaper/full/a/a/9/702126-rainforest-backgr
 # try putting 'pi' as the new user name and see if anything breaks, or if the home folder gets encrypted
 # try putting in a username with a space as well, i bet it breaks things
 #use more whiptial
-#	- ask for keyword for system theme (background, motd, colors?)
+#ask for keyword for system theme (background, motd, colors?)
 #fix localization (keyboard, timezone, wifi), current solution is insufficient 
 #create new user (not "pi") with encrypted file system (https://technicalustad.com/how-to-encrypt-raspberry-pi-home-folder/)
 #make i3bar show temp/cpu/ram/ the way i want
@@ -94,17 +96,30 @@ sudo wget http://getwallpapers.com/wallpaper/full/a/a/9/702126-rainforest-backgr
 #-provide filesharing in both use-cases
 #-provide vnc desktop
 #
+
 #NEW USER STUFF 
 #show encryption password with command: ecryptfs-unwrap-passphrase
 #show backup of home folder with command: $USER. zyxxc: ls /home
 #then remove backed up home folder with: sudo rm -r -f $FOLDERNAMEGOESHERE
 #Disable Swap with : sudo swapoff -a -v
-#fix permissions: sudo chmod 0750 -R /home/bob/*
+#breaks all permissions somehow?!?: sudo chmod 0750 -R /home/newuser/*
 #set new root password: sudo passwd root
 #delete pi user :sudo userdel --remove-all-files pi
 #List groups wich pi is belonging: sudo cat/etc/group | grep pi
+#Update list of default apps (terminal, browser, etc.): update-alternatives --all
+#/etc/skel is the skeleton user, all new users get their home dir guts copied from right here
+#consider making this an option in the menu
 
 #delete pi user?
 #sudo pkill -u pi
 #sudo deluser pi
-#sudo apt install --yes chromium-browser
+
+#AFTER LOGGIN IN AS NEW USER / RUN-FIRST SCRIPT FOR NEW USER
+#make a user config folder for chrome to use
+#sudo mkdir /home/$USER/.config/chromium/
+#to make chromium work use command:
+#chromium-browser --user-data-dir=~/.config/chromium
+
+#more apps
+sudo apt install -y sysbench florence mixxx nemo ttyrec realvnc-vnc-sever real-vnc-viewer chromium-browser
+

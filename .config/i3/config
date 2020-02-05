@@ -15,7 +15,7 @@ exec xterm -e htop
 exec xterm -e "echo cmnd | nmon -f" 
 exec xterm -e "cmatrix -a"
 exec feh https://s.w-x.co/staticmaps/wu/wxtype/county_loc/csg/animate.png
-exec --no-startup-id "i3-msg 'workspace 1; append_layout ~/.config/i3/workspace-1.json'"
+#exec --no-startup-id "i3-msg 'workspace 1; append_layout ~/.config/i3/workspace-1.json'"
 
 #exec xterm nemo
 #exec xterm florence

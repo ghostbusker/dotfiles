@@ -36,9 +36,21 @@ color=#F79494
 
 # Guess the weather hourly
 [weather]
-command=curl -Ss 'https://wttr.in?0&T&Q' | cut -c 16- | head -2 | xargs echo
+command=curl -Ss 'https://wttr.in/30032?0&T&Q' | cut -c 16- | head -2 | xargs echo
 interval=3600
 color=#A4C2F4
+
+#pi cpu temp
+[temp]
+command=sed "s/\(...\)$/.\1°C/" < /sys/class/thermal/thermal_zone0/temp
+interval=5
+color=#FF00FF
+
+# show current uptime
+[uptime]
+command=uptime -p
+interval=60
+color=#FFFFFF
 
 # Query my default IP address only on startup
 [ip]
@@ -55,13 +67,13 @@ interval=5
 [simple]
 full_text=This is a looong white on red text
 short_text=Short white on red text
-background=#FF0000
+#background=#FF0000
 color=#FFFFFF
 
 # Block with a fixed width
 [aligned]
-full_text=Here.
-min_width=100
+full_text=A E S TH E t I C.
+min_width=200
 align=center
 
 # Fancy text with multiple colors and shapes
@@ -177,106 +189,3 @@ markup=pango
 label=mem:
 instance=mem;free
 interval=30
-
-#[memory]
-#label=
-#instance=swap;total
-#interval=30
-
-# Part 7
-
-#[microphone]
-#label=
-#interval=5
-
-#[network]
-#label=
-#instance=enp4s0f2
-#interval=10
-
-#[network]
-#label=
-#instance=wlp3s0
-#interval=10
-
-#[packages]
-#label=
-#interval=300
-
-# Part 8
-
-#[playerctl]
-#label=
-#instance=rhythmbox
-#interval=5
-
-#[process]
-#instance=http
-#label=
-#interval=10
-
-#[space]
-#label=
-#interval=30
-
-#[space]
-#label=
-#instance=/pub
-#interval=30
-
-# Part 9
-
-#[ssid]
-#label=
-#interval=60
-
-#[temperature]
-#instance=Core
-#label=
-#interval=5
-
-#[user]
-#label=
-#interval=once
-
-# Part 10
-
-#[vpn]
-#label=
-#interval=5
-
-#[weather]
-#instance=2910831
-#interval=60
-
-#[webcam]
-#label=
-#interval=5
-
-# Part 11
-#[usb]
-#instance=PhotoSmart
-#label=
-#interval=10
-
-#[trash]
-#label=
-#interval=10
-
-#[cmus]
-#command=~/.i3-blocks/blocks/scroll $BLOCK_NAME
-#label=
-#markup=pango
-#interval=repeat
-
-# Part 12
-
-#[window]
-#command=~/.i3-blocks/blocks/scroll $BLOCK_NAME
-#label=
-#markup=pango
-#interval=repeat
-
-[keymap]
-label=
-interval=10
