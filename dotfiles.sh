@@ -12,11 +12,23 @@ sudo adduser $USER
 #sudo apt-get -o Acquire::ForceIPv4=true update
 sudo apt update
 
-#install some apps
+#install some apps needed to make UI
 sudo apt install -y xorg xserver-xorg xinit git cmake lxappearance
 
-#my daily apps
-sudo apt install -y i3blocks feh compton cmatrix nmon geany ranger
+#install apps that will be part of desktop composition
+sudo apt install -y i3blocks feh compton clipit
+
+#termnial upgrade + terminal candy)
+sudo apt install -y terminator lolcat figlet cmatrix thefuck howdoi
+
+#system utilities and monitors
+sudo apt install -y	nmon conky htop sysbench
+
+#file browsers
+sudo apt install -y ranger nemo
+
+#MUSIC apps
+sudo apt install -y cmus vis playerctl mixxx
 
 ###Setup New Encrypted User#################################################################################################
 
@@ -35,14 +47,15 @@ sudo usermod -a -G sudo $USER
 #add user to all the groups that user pi was a part of
 sudo usermod -a -G adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,input,netdev,spi,i2c,gpio, $USER
 
+#this next part made all the difference, chome and a bunch of other apps were broken otherwise
 #take ownership and set permissions of user folder:
 sudo -u $USER chmod 750 -R /home/$USER/
 sudo chown -R $USER:$USER /home/$USER/
 
 ###Install the desktop environment##########################################################################################
 
-#set the fucking keyboard, fuck!
-sed -i 's/gb/US/g' /etc/default/keyboard
+#set the ducking keyboard, duck!
+sed -i 's/gb/us/g' /etc/default/keyboard
 
 #enable  shh, vnc, set WiFi
 raspi-config nonint do_ssh 0
@@ -54,7 +67,7 @@ raspi-config nonint do_wifi_country US
 cd /opt/ 
 
 #installing i3-gaps window manager from source
-sudo apt install -y i3 gcc make dh-autoreconf libxcb-keysyms1-dev libpango1.0-dev libxcb-util0-dev xcb libxcb1-dev libxcb-icccm4-dev libyajl-dev libev-dev libxcb-xkb-dev libxcb-cursor-dev libxkbcommon-dev libxcb-xinerama0-dev libxkbcommon-x11-dev libstartup-notification0-dev libxcb-randr0-dev libxcb-xrm0 libxcb-xrm-dev libxcb-shape0 libxcb-shape0-dev
+sudo apt install -y i3 gcc make autoconf dh-autoreconf libxcb-keysyms1-dev libpango1.0-dev libxcb-util0-dev xcb libxcb1-dev libxcb-icccm4-dev libyajl-dev libev-dev libxcb-xkb-dev libxcb-cursor-dev libxkbcommon-dev libxcb-xinerama0-dev libxkbcommon-x11-dev libstartup-notification0-dev libxcb-randr0-dev libxcb-xrm0 libxcb-xrm-dev libxcb-shape0 libxcb-shape0-dev
 sudo git clone https://www.github.com/Airblader/i3 i3-gaps
 cd i3-gaps
 sudo autoreconf --force --install
@@ -64,7 +77,17 @@ cd build/
 sudo ../configure --prefix=/usr --sysconfdir=/etc --disable-sanitizers
 sudo make -j8
 sudo make install
-cd
+#done installing i3-gaps
+
+cd /opt/
+
+#install cool-retro-term {the cool-ness CANNOT be overstated}
+sudo apt install build-essential qmlscene qt5-qmake qt5-default qtdeclarative5-dev qml-module-qtquick-controls qml-module-qtgraphicaleffects qml-module-qtquick-dialogs qml-module-qtquick-localstorage qml-module-qtquick-window2 qml-module-qt-labs-settings qml-module-qt-labs-folderlistmodel
+git clone --recursive https://github.com/Swordfish90/cool-retro-term.git
+cd cool-retro-term
+qmake && make
+#done installing cool-retro-term
+
 
 #copy wallpapers
 sudo mkdir /home/$USER/Pictures
@@ -121,5 +144,4 @@ sudo wget http://getwallpapers.com/wallpaper/full/a/a/9/702126-rainforest-backgr
 #chromium-browser --user-data-dir=~/.config/chromium
 
 #more apps
-sudo apt install -y sysbench florence mixxx nemo ttyrec realvnc-vnc-sever real-vnc-viewer chromium-browser
-
+sudo apt install -y florence ttyrec realvnc-vnc-server realvnc-vnc-viewer chromium-browser

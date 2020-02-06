@@ -46,6 +46,16 @@ command=sed "s/\(...\)$/.\1°C/" < /sys/class/thermal/thermal_zone0/temp
 interval=5
 color=#FF00FF
 
+[PublicIP]
+command=curl 'https://api.ipify.org' | awk '{ print "Public:" $1 }'
+interval=300
+color=#91E78B
+
+[capslock?]
+command=xset q | grep Caps | tr -s ' ' | cut -d ' ' -f 5,9,13 | sed 's/on/▣/g' | sed 's/of
+interval=5
+color=#00FFFF
+
 # show current uptime
 [uptime]
 command=uptime -p
@@ -53,9 +63,9 @@ interval=60
 color=#FFFFFF
 
 # Query my default IP address only on startup
-[ip]
+[LocalIP]
 command=hostname -i | awk '{ print "IP:" $1 }'
-interval=once
+interval=300
 color=#91E78B
 
 # Update time every 5 seconds

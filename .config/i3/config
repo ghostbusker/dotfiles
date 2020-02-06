@@ -7,18 +7,20 @@ set $mod Mod4
 
 exec compton
 #exec ~/.config/polybar/launch.sh
-exec watch -n 900 feh --randomize --bg-fill ~/Pictures/Wallpapers/*
+exec watch -n 120 feh --randomize --bg-fill ~/Pictures/Wallpapers/*
 
+#get the clipboard manager running
+exec --no-startup-id clipit
 
 #Setup Workspace 1
-exec xterm -e htop
-exec xterm -e "echo cmnd | nmon -f" 
-exec xterm -e "cmatrix -a"
+exec terminator-e htop
+exex  -e "echo cmnd | nmon -f" 
+exec terminator -e "cmatrix -a"
 exec feh https://s.w-x.co/staticmaps/wu/wxtype/county_loc/csg/animate.png
 #exec --no-startup-id "i3-msg 'workspace 1; append_layout ~/.config/i3/workspace-1.json'"
 
-#exec xterm nemo
-#exec xterm florence
+#exec terminator nemo
+#exec terminator florence
 #exec gif-for-cli --display-mode=truecolor -l 0 "Keyword here!" &
 #exec --no-startup-id chromium-browser
 
@@ -28,8 +30,21 @@ exec feh https://s.w-x.co/staticmaps/wu/wxtype/county_loc/csg/animate.png
 # (Starting iceweasel with i3’s exec command is important in order to make i3
 #  create a startup notification context, without which the iceweasel window(s)
 #  cannot be matched onto the workspace on which the command was started.)
-#exec --no-startup-id i3-msg 'workspace 3; exec iceweasel; workspace 1'
+exec --no-startup-id i3-msg 'workspace 3; exec chromium-browser; workspace 1'
 
+# enable floating mode for all terminator windows
+#for_window [class="terminator"] floating enable
+
+# Make all urxvts use a 1-pixel border:
+#for_window [class="urxvt"] border pixel 1
+
+# A less useful, but rather funny example:
+# makes the window floating as soon as I change
+# directory to ~/work
+#for_window [title="x200: ~/work"] floating enable
+
+focus_follows_mouse no
+mouse_warping output
 
 
 #limits all chrome windows to workspace3. not really desired after testing
@@ -63,10 +78,11 @@ font pango:ANONYMOUS PRO 10
 floating_modifier $mod
 
 # start a terminal
-bindsym $mod+Return exec lxterm
+bindsym $mod+Return exec terminator
 
 # kill focused window
 bindsym $mod+Shift+q kill
+bindsym $mod+F4 kill
 
 # start dmenu (a program launcher)
 bindsym $mod+d exec dmenu_run
@@ -198,6 +214,8 @@ mode "resize" {
         # back to normal: Enter or Escape or $mod+r
         bindsym Return mode "default"
         bindsym Escape mode "default"
+        bindsym $mod mode "default"
+        bindsym Tab mode "default"
         bindsym $mod+r mode "default"
 }
 
@@ -211,30 +229,45 @@ bindsym $mod+r mode "resize"
 bindsym $mod+b bar mode toggle
 ##########################################
 
+#We're going dual bars here ppl, better buckle upgrade
+#first the  top bar
+bar {
+        position top
+        status_command i3blocks -c ~/.config/i3blocks/config
+        tray_output primary
+        workspace_buttons no
+        #strip_workspace_numbers yes 
+        mode hide
+        hidden_state hide
+        modifier $mod
+        colors {
+                background #ffffff
+                statusline #000000
+        }
+
+}
+
+
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
 bar {
+        position bottom
         status_command i3status -c ~/.config/i3status/config
         tray_output primary
-        workspace_buttons no
-        #strip_workspace_numbers yes
-        separator_symbol |
-#        colors {
-#                background #000000
-#                statusline #ffffff
-#                separator #666666
-#                focused_workspace  #4c7899 #285577 #ffffff
-#                active_workspace   #333333 #5f676a #ffffff
-#                inactive_workspace #333333 #222222 #888888
-#                urgent_workspace   #2f343a #900000 #ffffff
-#                binding_mode       #2f343a #900000 #ffffff
-#        }
-}
-
-#We're going dual bars here ppl, better buckle upgrade
-bar {
-        status_command i3blocks -c ~/.config/i3blocks/config
-        tray_output primary
         workspace_buttons yes
-        strip_workspace_numbers yes  
+        strip_workspace_numbers yes
+        separator_symbol |
+        mode dock
+        #hidden_state show
+        modifier $mod
+        colors {
+                background #000000
+                statusline #ffffff
+                separator #666666
+                focused_workspace  #4c7899 #285577 #ffffff
+                active_workspace   #333333 #5f676a #ffffff
+                inactive_workspace #333333 #222222 #888888
+                urgent_workspace   #2f343a #900000 #ffffff
+                binding_mode       #2f343a #900000 #ffffff
+        }
 }
