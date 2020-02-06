@@ -16,10 +16,10 @@ sudo apt update
 sudo apt install -y xorg xserver-xorg xinit git cmake lxappearance
 
 #install apps that will be part of desktop composition
-sudo apt install -y i3blocks feh compton clipit
+sudo apt install -y i3blocks feh compton clipit arandr mplayer
 
 #termnial upgrade + terminal candy)
-sudo apt install -y terminator lolcat figlet cmatrix thefuck howdoi
+sudo apt install -y terminator lolcat figlet cmatrix hollywood libaa-bin thefuck howdoi
 
 #system utilities and monitors
 sudo apt install -y	nmon conky htop sysbench
@@ -27,7 +27,7 @@ sudo apt install -y	nmon conky htop sysbench
 #file browsers
 sudo apt install -y ranger nemo
 
-#MUSIC apps
+#MEDIA apps
 sudo apt install -y cmus vis playerctl mixxx
 
 ###Setup New Encrypted User#################################################################################################
@@ -144,4 +144,4 @@ sudo wget http://getwallpapers.com/wallpaper/full/a/a/9/702126-rainforest-backgr
 #chromium-browser --user-data-dir=~/.config/chromium
 
 #more apps
-sudo apt install -y florence ttyrec realvnc-vnc-server realvnc-vnc-viewer chromium-browser
+sudo apt install -y screenkey ttyrec realvnc-vnc-server realvnc-vnc-viewer chromium-browser
