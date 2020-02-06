@@ -40,6 +40,8 @@ sudo ecryptfs-migrate-home -u $USER
 
 #copy "dotfiles" into place
 sudo cp -r .config/ /home/$USER/
+sudo cp -r .bashrc /home/$USER/
+sudo cp -r .profile /home/$USER/
 
 #add new user to sudoers group
 sudo usermod -a -G sudo $USER
@@ -82,10 +84,11 @@ sudo make install
 cd /opt/
 
 #install cool-retro-term {the cool-ness CANNOT be overstated}
-sudo apt install build-essential qmlscene qt5-qmake qt5-default qtdeclarative5-dev qml-module-qtquick-controls qml-module-qtgraphicaleffects qml-module-qtquick-dialogs qml-module-qtquick-localstorage qml-module-qtquick-window2 qml-module-qt-labs-settings qml-module-qt-labs-folderlistmodel
+sudo apt install -y build-essential qmlscene qt5-qmake qt5-default qtdeclarative5-dev qml-module-qtquick-controls qml-module-qtgraphicaleffects qml-module-qtquick-dialogs qml-module-qtquick-localstorage qml-module-qtquick-window2 qml-module-qt-labs-settings qml-module-qt-labs-folderlistmodel
 git clone --recursive https://github.com/Swordfish90/cool-retro-term.git
 cd cool-retro-term
 qmake && make
+sudo cp cool-retro-term.desktop /usr/share/applications
 #done installing cool-retro-term
 
 
