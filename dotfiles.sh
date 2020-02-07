@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# redirect stdout/stderr to a file
+exec &> install_log.txt
+
+#update apt
+#to force iv4 use:
+#sudo apt-get -o Acquire::ForceIPv4=true update
+sudo apt update
+
 whiptail --title "This is the script you are about to install:" --textbox --scrolltext $0 36 90
 
 ###Setup New Encrypted User#################################################################################################
@@ -21,7 +29,7 @@ sudo ecryptfs-migrate-home -u $USER
 #copy "dotfiles" into place
 sudo cp -r .config/ /home/$USER/
 sudo cp -r .bashrc /home/$USER/
-sudo cp -r .profile /home/$USER/
+#sudo cp -r .profile /home/$USER/ #Consider removing this default file
 
 #add new user to sudoers group
 sudo usermod -a -G sudo $USER
@@ -47,21 +55,15 @@ sudo chown -R $USER:$USER /home/$USER/
 #sudo dphys-swapfile swapon
 
 #Alternatively... Disable Swap 
-sudo swapoff -a -v
+#sudo swapoff -a -v
 
 #add GPIO pin3 shutdown to /boot/config.txt
 sudo sed -i '$a dtoverlay=gpio-shutdown,gpio_pin=3,active_low=1,gpio_pull=up' /boot/config.txt
 
 ###Install the desktop environment##########################################################################################
 
-#update 
-#force iv4?
-#sudo apt-get -o Acquire::ForceIPv4=true update
-sudo apt update
-
 #install some apps needed to make UI
 sudo apt install -y xorg xserver-xorg xinit git cmake lxappearance
-
 
 #installing i3-gaps window manager from source
 cd /opt/ 
@@ -81,7 +83,7 @@ sudo make install
 sudo apt install -y i3blocks feh compton clipit arandr mpv florence nemo
 
 #termnial upgrade + terminal candy)
-sudo apt install -y terminator neofetc figlet lolcat cmatrix hollywood libaa-bin thefuck howdoi
+sudo apt install -y terminator tilda neofetch figlet lolcat cmatrix hollywood libaa-bin thefuck howdoi
 
 #system utilities and monitors
 sudo apt install -y	nmon conky htop sysbench ranger
@@ -91,8 +93,6 @@ sudo apt install -y cmus vis playerctl mixxx
 
 #more apps
 sudo apt install -y screenkey ttyrec realvnc-vnc-server realvnc-vnc-viewer chromium-browser
-
-
 
 #set the ducking keyboard, duck!
 sed -i 's/gb/us/g' /etc/default/keyboard
@@ -131,7 +131,7 @@ sudo wget http://getwallpapers.com/wallpaper/full/a/6/e/702131-beautiful-rainfor
 sudo wget http://getwallpapers.com/wallpaper/full/a/a/9/702126-rainforest-backgrounds-2560x1600-for-computer.jpg
 
 echo install complete
-echo log out and log in as new user no
+echo log out and log in as new user now
 #just a little section to layout my thougts on this config.
 # try putting 'pi' as the new user name and see if anything breaks, or if the home folder gets encrypted
 # try putting in a username with a space as well, i bet it breaks things

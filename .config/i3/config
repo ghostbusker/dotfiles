@@ -13,33 +13,46 @@ exec watch -n 120 feh --randomize --bg-fill ~/Pictures/Wallpapers/*
 
 #fetch a new weather image every 15 minutes and rename it weather.png
 exec watch -n 900 wget -O /tmp/weather.png https://s.w-x.co/staticmaps/wu/wxtype/county_loc/csg/animate.png
-exec --no-startup-id mpv --loop /tmp/weather.png 
 for_window [class="mpv"] floating enable
 
 #get the clipboard manager and OSK running (and floating!)
+exec --no-startup-id tilda
 exec --no-startup-id clipit
 exec --no-startup-id florence --use-config=~/.config/florence.conf
 for_window [class="florence"] floating enable
 
 #Setup Workspace 1
-exec terminator -e htop
-exec terminator -e "echo cmnd | nmon -f" 
-exec terminator -e "cmatrix -a"
-#exec feh https://s.w-x.co/staticmaps/wu/wxtype/county_loc/csg/animate.png
-#exec --no-startup-id "i3-msg 'workspace 1; append_layout ~/.config/i3/workspace-1.json'"
+exec i3-msg $ws1
+exec xterm -e htop
+exec i3-msg split v
+exec xterm -e "export Cmnd | nmon" 
+exec i3-msg split h
+exec xterm -e "cmatrix -ab"
+exec i3-msg split v
+exec xterm -e "cmatrix -ab -C orange"
 
-#exec terminator nemo
-#exec terminator florence
+#Setup Workspace 2
+exec i3-msg $ws2
+exec xterm -e ranger
+exec i3-msg split h
+exec xterm -e "curl wttr.in/30032" 
+exec i3-msg split v
+exec xterm -e "pipes.sh -d 0"
+exec i3-msg split h
+exec xterm -e "cmatrix -ab -C orange"
+exec --no-startup-id mpv --loop --no-osc --framedrop=vo /tmp/weather.png 
+
+#Setup Workspace 3
+exec i3-msg $ws2
 #exec gif-for-cli --display-mode=truecolor -l 0 "Keyword here!" &
-#exec --no-startup-id chromium-browser
-
+#exec chromium-browser
 # Start iceweasel on workspace 3, then switch back to workspace 1
 # (Being a command-line utility, i3-msg does not support startup notifications,
 #  hence the exec --no-startup-id.)
 # (Starting iceweasel with i3’s exec command is important in order to make i3
 #  create a startup notification context, without which the iceweasel window(s)
 #  cannot be matched onto the workspace on which the command was started.)
-exec --no-startup-id i3-msg 'workspace 3; exec chromium-browser; workspace 1'
+exec --no-startup-id i3-msg '$ws3; exec chromium-browser; $ws1'
 
 # Make all urxvts use a 1-pixel border:
 #for_window [class="urxvt"] border pixel 1
@@ -71,13 +84,6 @@ font pango:ANONYMOUS PRO 10
 # This font is widely installed, provides lots of unicode glyphs, right-to-left
 # text rendering and scalability on retina/hidpi displays (thanks to pango).
 #font pango:DejaVu Sans Mono 8
-
-# Before i3 v4.8, we used to recommend this one as the default:
-# font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
-# The font above is very space-efficient, that is, it looks good, sharp and
-# clear in small sizes. However, its unicode glyph coverage is limited, the old
-# X core fonts rendering does not support right-to-left and this being a bitmap
-# font, it doesn’t scale on retina/hidpi displays.
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
@@ -118,7 +124,7 @@ bindsym $mod+Shift+Up move up
 bindsym $mod+Shift+Right move right
 
 # split in horizontal or vertical orientation
-bindsym $mod+v split vertical
+#bindsym $mod+v split vertical
 #bindsym $mod+h split horizontal
 bindsym $mod+t split toggle
 
@@ -132,6 +138,8 @@ bindsym $mod+e layout toggle split
 
 # toggle tiling / floating
 bindsym $mod+Shift+space floating toggle
+bindsym $mod+w floating toggle
+
 
 # change focus between tiling / floating windows
 bindsym $mod+space focus mode_toggle
@@ -244,10 +252,9 @@ bar {
         hidden_state hide
         modifier $mod
         colors {
-                background #ffffff
+                background #ff7700
                 statusline #000000
         }
-
 }
 
 
@@ -261,12 +268,12 @@ bar {
         strip_workspace_numbers yes
         separator_symbol |
         mode dock
-        #hidden_state show
+        hidden_state show
         modifier $mod
         colors {
-                background #000000
+                background #007700
                 statusline #ffffff
-                separator #666666
+                separator #a0a0a0a0
                 focused_workspace  #4c7899 #285577 #ffffff
                 active_workspace   #333333 #5f676a #ffffff
                 inactive_workspace #333333 #222222 #888888
