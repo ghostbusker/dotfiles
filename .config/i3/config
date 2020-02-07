@@ -24,21 +24,21 @@ for_window [class="florence"] floating enable
 #Setup Workspace 1
 exec i3-msg workspace $ws1
 exec xterm -e htop
-exec i3-msg split v
+exec i3-msg layout splitv
 exec xterm -e "export Cmnd | nmon" 
-exec i3-msg split h
+exec i3-msg layout splith
 exec xterm -e "cmatrix -ab"
-exec i3-msg split v
+exec i3-msg layout splitv
 exec xterm -e "cmatrix -ab -C orange"
 
 #Setup Workspace 2
 exec i3-msg workspace $ws2
 exec xterm -e ranger
-exec i3-msg split h
+exec i3-msg layout splith
 exec xterm -e "curl wttr.in/30032" 
-exec i3-msg split v
+exec i3-msg layout splitv
 exec xterm -e "pipes.sh -d 0"
-exec i3-msg split h
+exec i3-msg layout splith
 exec xterm -e "cmatrix -ab -C orange"
 exec --no-startup-id mpv --loop --no-osc --framedrop=vo /tmp/weather.png 
 
@@ -53,6 +53,10 @@ exec i3-msg workspace $ws3
 #  create a startup notification context, without which the iceweasel window(s)
 #  cannot be matched onto the workspace on which the command was started.)
 exec --no-startup-id i3-msg 'workspace $ws3; exec chromium-browser; workspace $ws1'
+
+# toggle split direction for each new window
+default_orientation vertical
+for_window [class="^"] split toggle
 
 # Make all urxvts use a 1-pixel border:
 #for_window [class="urxvt"] border pixel 1
@@ -132,14 +136,13 @@ bindsym $mod+t split toggle
 bindsym $mod+f fullscreen toggle
 
 # change container layout (stacked, tabbed, toggle split)
-bindsym $mod+s layout stacking
-bindsym $mod+w layout tabbed
+bindsym $mod+s layout stacking toggle
+#bindsym $mod+w layout tabbed
 bindsym $mod+e layout toggle split
 
 # toggle tiling / floating
-bindsym $mod+Shift+space floating toggle
+#bindsym $mod+Shift+space floating toggle
 bindsym $mod+w floating toggle
-
 
 # change focus between tiling / floating windows
 bindsym $mod+space focus mode_toggle
@@ -252,7 +255,7 @@ bar {
         hidden_state hide
         modifier $mod
         colors {
-                background #ff7700
+                background #663300
                 statusline #000000
         }
 }
@@ -271,7 +274,7 @@ bar {
         hidden_state show
         modifier $mod
         colors {
-                background #007700
+                background #006600
                 statusline #ffffff
                 separator #a0a0a0a0
                 focused_workspace  #4c7899 #285577 #ffffff
