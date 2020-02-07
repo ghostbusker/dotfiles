@@ -13,8 +13,8 @@ exec watch -n 120 feh --randomize --bg-fill ~/Pictures/Wallpapers/*
 
 #fetch a new weather image every 15 minutes and rename it weather.png
 exec watch -n 900 wget -O /tmp/weather.png https://s.w-x.co/staticmaps/wu/wxtype/county_loc/csg/animate.png
-exec --no-startup-id mplayer -l
-
+exec --no-startup-id mpv --loop /tmp/weather.png 
+for_window [class="mpv"] floating enable
 
 #get the clipboard manager and OSK running (and floating!)
 exec --no-startup-id clipit
@@ -56,8 +56,8 @@ mouse_warping output
 #assign [class="Chromium"] $ws3
 
 #Needed for i3-gaps
-#hide_edge_borders both - changed from 2 to 8
-for_window [class="^.*"] border pixel 8 
+#hide_edge_borders both
+for_window [class="^.*"] border pixel 2 
 gaps inner 15 
 gaps outer 15
 

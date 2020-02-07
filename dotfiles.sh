@@ -2,52 +2,12 @@
 
 whiptail --title "This is the script you are about to install:" --textbox --scrolltext $0 36 90
 
+###Setup New Encrypted User#################################################################################################
+
 #Create new username and password
 USER=username
 USER=$(whiptail --inputbox "Enter new user name. User 'pi' should be deleted for security reasons. No spaces please." 8 78 $USER --title "New User Name" 3>&1 1>&2 2>&3)
 sudo adduser $USER
-
-#update 
-#force iv4?
-#sudo apt-get -o Acquire::ForceIPv4=true update
-sudo apt update
-
-#install some apps needed to make UI
-sudo apt install -y xorg xserver-xorg xinit git cmake lxappearance
-
-#installing i3-gaps window manager from source
-cd /opt/ 
-sudo apt install -y i3 gcc make autoconf dh-autoreconf libxcb-keysyms1-dev libpango1.0-dev libxcb-util0-dev xcb libxcb1-dev libxcb-icccm4-dev libyajl-dev libev-dev libxcb-xkb-dev libxcb-cursor-dev libxkbcommon-dev libxcb-xinerama0-dev libxkbcommon-x11-dev libstartup-notification0-dev libxcb-randr0-dev libxcb-xrm0 libxcb-xrm-dev libxcb-shape0 libxcb-shape0-dev
-sudo git clone https://www.github.com/Airblader/i3 i3-gaps
-cd i3-gaps
-sudo autoreconf --force --install
-sudo rm -rf build/
-sudo mkdir -p build 
-cd build/
-sudo ../configure --prefix=/usr --sysconfdir=/etc --disable-sanitizers
-sudo make -j8
-sudo make install
-#done installing i3-gaps
-
-#install apps that will be part of desktop composition
-sudo apt install -y i3blocks feh compton clipit arandr mplayer
-
-#termnial upgrade + terminal candy)
-sudo apt install -y terminator lolcat figlet cmatrix hollywood libaa-bin thefuck howdoi
-
-#system utilities and monitors
-sudo apt install -y	nmon conky htop sysbench
-
-#file browsers
-sudo apt install -y ranger nemo
-
-#MEDIA apps
-sudo apt install -y cmus vis playerctl mixxx
-
-#more apps
-sudo apt install -y screenkey ttyrec realvnc-vnc-server realvnc-vnc-viewer chromium-browser
-
-###Setup New Encrypted User#################################################################################################
 
 #install apps needed to encrypt the user folder
 sudo apt install -y ecryptfs-utils lsof cryptsetup
@@ -94,6 +54,46 @@ sudo sed -i '$a dtoverlay=gpio-shutdown,gpio_pin=3,active_low=1,gpio_pull=up' /b
 
 ###Install the desktop environment##########################################################################################
 
+#update 
+#force iv4?
+#sudo apt-get -o Acquire::ForceIPv4=true update
+sudo apt update
+
+#install some apps needed to make UI
+sudo apt install -y xorg xserver-xorg xinit git cmake lxappearance
+
+
+#installing i3-gaps window manager from source
+cd /opt/ 
+sudo apt install -y i3 gcc make autoconf dh-autoreconf libxcb-keysyms1-dev libpango1.0-dev libxcb-util0-dev xcb libxcb1-dev libxcb-icccm4-dev libyajl-dev libev-dev libxcb-xkb-dev libxcb-cursor-dev libxkbcommon-dev libxcb-xinerama0-dev libxkbcommon-x11-dev libstartup-notification0-dev libxcb-randr0-dev libxcb-xrm0 libxcb-xrm-dev libxcb-shape0 libxcb-shape0-dev
+sudo git clone https://www.github.com/Airblader/i3 i3-gaps
+cd i3-gaps
+sudo autoreconf --force --install
+sudo rm -rf build/
+sudo mkdir -p build 
+cd build/
+sudo ../configure --prefix=/usr --sysconfdir=/etc --disable-sanitizers
+sudo make -j8
+sudo make install
+#done installing i3-gaps
+
+#install apps that will be part of desktop composition and daily apps
+sudo apt install -y i3blocks feh compton clipit arandr mpv florence nemo
+
+#termnial upgrade + terminal candy)
+sudo apt install -y terminator neofetc figlet lolcat cmatrix hollywood libaa-bin thefuck howdoi
+
+#system utilities and monitors
+sudo apt install -y	nmon conky htop sysbench ranger
+
+#MEDIA apps
+sudo apt install -y cmus vis playerctl mixxx
+
+#more apps
+sudo apt install -y screenkey ttyrec realvnc-vnc-server realvnc-vnc-viewer chromium-browser
+
+
+
 #set the ducking keyboard, duck!
 sed -i 's/gb/us/g' /etc/default/keyboard
 
@@ -112,6 +112,12 @@ sudo cp cool-retro-term.desktop /usr/share/applications
 sudo ln -s /opt/cool-retro-term/cool-retro-term /usr/local/bin/cool-retro-term
 #done installing cool-retro-term
 
+#install pipeseroni's pipes.sh from source (installs to /usr/local by default, works)
+cd /opt/
+sudo git clone https://github.com/pipeseroni/pipes.sh
+cd pipes.sh
+sudo make install
+#done installing pipes.sh
 
 #copy wallpapers
 sudo mkdir /home/$USER/Pictures
