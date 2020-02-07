@@ -101,7 +101,7 @@ sed -i 's/gb/us/g' /etc/default/keyboard
 raspi-config nonint do_ssh 0
 raspi-config nonint do_vnc 0
 raspi-config nonint do_wifi_country US
-sudo apt install -y pi-bluetooth blueman
+sudo apt install -y pi-bluetooth blueman blueman-applet network-manager-applet
 
 #install cool-retro-term {the cool cannot be overstated}
 cd /opt/ 

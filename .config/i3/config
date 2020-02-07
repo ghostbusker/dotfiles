@@ -37,7 +37,7 @@ exec xterm -e ranger
 exec i3-msg layout splith
 exec xterm -e "curl wttr.in/30032" 
 exec i3-msg layout splitv
-exec xterm -e "pipes.sh -d 0"
+exec xterm -e "pipes.sh -p 10 -f 30 -r 20000"
 exec i3-msg layout splith
 exec xterm -e "cmatrix -ab -C orange"
 exec --no-startup-id mpv --loop --no-osc --framedrop=vo /tmp/weather.png 
