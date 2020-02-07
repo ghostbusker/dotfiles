@@ -22,7 +22,7 @@ exec --no-startup-id florence --use-config=~/.config/florence.conf
 for_window [class="florence"] floating enable
 
 #Setup Workspace 1
-exec i3-msg $ws1
+exec i3-msg workspace $ws1
 exec xterm -e htop
 exec i3-msg split v
 exec xterm -e "export Cmnd | nmon" 
@@ -32,7 +32,7 @@ exec i3-msg split v
 exec xterm -e "cmatrix -ab -C orange"
 
 #Setup Workspace 2
-exec i3-msg $ws2
+exec i3-msg workspace $ws2
 exec xterm -e ranger
 exec i3-msg split h
 exec xterm -e "curl wttr.in/30032" 
@@ -43,7 +43,7 @@ exec xterm -e "cmatrix -ab -C orange"
 exec --no-startup-id mpv --loop --no-osc --framedrop=vo /tmp/weather.png 
 
 #Setup Workspace 3
-exec i3-msg $ws2
+exec i3-msg workspace $ws3
 #exec gif-for-cli --display-mode=truecolor -l 0 "Keyword here!" &
 #exec chromium-browser
 # Start iceweasel on workspace 3, then switch back to workspace 1
@@ -52,7 +52,7 @@ exec i3-msg $ws2
 # (Starting iceweasel with i3’s exec command is important in order to make i3
 #  create a startup notification context, without which the iceweasel window(s)
 #  cannot be matched onto the workspace on which the command was started.)
-exec --no-startup-id i3-msg '$ws3; exec chromium-browser; $ws1'
+exec --no-startup-id i3-msg 'workspace $ws3; exec chromium-browser; workspace $ws1'
 
 # Make all urxvts use a 1-pixel border:
 #for_window [class="urxvt"] border pixel 1
@@ -152,16 +152,16 @@ bindsym $mod+a focus parent
 
 # Define names for default workspaces for which we configure key bindings later on.
 # We use variables to avoid repeating the names in multiple places.
-set $ws1 "1:System"
-set $ws2 "2:Term"
-set $ws3 "3:Browse"
-set $ws4 "4:Edit"
-set $ws5 "5:Extra"
-set $ws6 "6:Bonus"
-set $ws7 "7:More"
-set $ws8 "8:Excess"
-set $ws9 "9:Nauseum"
-set $ws10 "10:Fin"
+set $ws1 "1: System"
+set $ws2 "2: Term"
+set $ws3 "3: Browse"
+set $ws4 "4: Edit"
+set $ws5 "5: Extra"
+set $ws6 "6: Bonus"
+set $ws7 "7: More"
+set $ws8 "8: Excess"
+set $ws9 "9: Nauseum"
+set $ws10 "10: Fin"
 
 # switch to workspace
 bindsym $mod+1 workspace $ws1
