@@ -97,10 +97,11 @@ sudo apt install -y screenkey ttyrec realvnc-vnc-server realvnc-vnc-viewer chrom
 #set the ducking keyboard, duck!
 sed -i 's/gb/us/g' /etc/default/keyboard
 
-#enable  shh, vnc, set WiFi
+#enable  shh, vnc, WiFi, bluetooth
 raspi-config nonint do_ssh 0
 raspi-config nonint do_vnc 0
 raspi-config nonint do_wifi_country US
+sudo apt install -y pi-bluetooth blueman
 
 #install cool-retro-term {the cool cannot be overstated}
 cd /opt/ 

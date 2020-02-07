@@ -39,6 +39,8 @@ color=#F79494
 command=curl -Ss 'https://wttr.in/30032?0&T&Q' | cut -c 16- | head -2 | xargs echo
 interval=3600
 color=#A4C2F4
+min_width=200
+align=center
 
 #pi cpu temp
 [temp]
