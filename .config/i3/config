@@ -13,14 +13,16 @@ exec watch -n 120 feh --randomize --bg-fill ~/Pictures/Wallpapers/*
 
 #fetch a new weather image every 15 minutes and rename it weather.png
 exec watch -n 900 wget -O /tmp/weather.png https://s.w-x.co/staticmaps/wu/wxtype/county_loc/csg/animate.png
-for_window [class="mpv"] floating enable
+#for_window [class="mpv"] floating enable
 
+############Invisible background apps###############
 #get the clipboard manager and OSK running (and floating!)
 exec --no-startup-id tilda
 exec --no-startup-id clipit
 exec --no-startup-id florence --use-config=~/.config/florence.conf
 for_window [class="florence"] floating enable
 
+#############Visible desktop stuff##############
 #Setup Workspace 1
 exec --no-startup-id i3-msg workspace $ws1
 exec xterm -e htop
@@ -52,7 +54,11 @@ exec i3-msg workspace $ws3
 # (Starting iceweasel with i3’s exec command is important in order to make i3
 #  create a startup notification context, without which the iceweasel window(s)
 #  cannot be matched onto the workspace on which the command was started.)
-exec --no-startup-id i3-msg 'workspace $ws3; exec chromium-browser; workspace $ws1'
+# exec --no-startup-id i3-msg 'workspace $ws3; exec chromium-browser; workspace $ws1'
+
+for_window [class="chromium"] move container to workspace 2
+#exec --no-startup-id chromium
+
 
 # toggle split direction for each new window
 default_orientation vertical
