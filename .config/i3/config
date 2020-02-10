@@ -6,7 +6,7 @@
 set $mod Mod4
 
 #transparancy effect
-exec compton
+exec compton -f -b
 
 #change the wallpaper every -n seconds
 exec watch -n 120 feh --randomize --bg-fill ~/Pictures/Wallpapers/*
@@ -19,7 +19,8 @@ exec watch -n 900 wget -O /tmp/weather.png https://s.w-x.co/staticmaps/wu/wxtype
 #get the clipboard manager and OSK running (and floating!)
 exec --no-startup-id tilda
 exec --no-startup-id clipit
-exec --no-startup-id florence --use-config=~/.config/florence.conf
+exec --no-startup-id dhcpcd-gtk
+exec --no-startup-id florence --use-config=.config/florence.conf
 for_window [class="florence"] floating enable
 
 #############Visible desktop stuff##############
@@ -42,7 +43,7 @@ exec --no-startup-id i3-msg layout splitv
 exec xterm -e "pipes.sh -p 10 -f 30 -r 20000"
 exec --no-startup-id i3-msg layout splith
 exec xterm -e "cmatrix -ab -C orange"
-exec mpv --loop --no-osc --framedrop=vo /tmp/weather.png 
+exec mpv --loop --no-osc --background=0/0/0/0 --framedrop=vo /tmp/weather.png 
 
 #Setup Workspace 3
 exec i3-msg workspace $ws3

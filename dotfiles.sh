@@ -8,14 +8,16 @@ exec &> install_log.txt
 #sudo apt-get -o Acquire::ForceIPv4=true update
 sudo apt update
 
-whiptail --title "This is the script you are about to install:" --textbox --scrolltext $0 36 90
+whiptail --title "This is the script you are about to install:" --textbox --scrolltext $0 24 78
 
 ###Setup New Encrypted User#################################################################################################
 
 #Create new username and password
 USER=username
 USER=$(whiptail --inputbox "Enter new user name. User 'pi' should be deleted for security reasons. No spaces please." 8 78 $USER --title "New User Name" 3>&1 1>&2 2>&3)
-sudo adduser $USER
+
+#create new user and add them to the sudo group, prompts for a new password
+sudo adduser -G sudo $USER
 
 #install apps needed to encrypt the user folder
 sudo apt install -y ecryptfs-utils lsof cryptsetup
@@ -31,34 +33,14 @@ sudo cp -r .config/ /home/$USER/
 sudo cp -r .bashrc /home/$USER/
 #sudo cp -r .profile /home/$USER/ #Consider removing this default file
 
-#add new user to sudoers group
-sudo usermod -a -G sudo $USER
-
-#add user to all the groups that user pi was a part of
-sudo usermod -a -G adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,input,netdev,spi,i2c,gpio $USER
-
 #this next part made all the difference, chome and a bunch of other apps were broken otherwise
 #take ownership and set permissions of user folder:
 sudo -u $USER chmod 750 -R /home/$USER/
 sudo chown -R $USER:$USER /home/$USER/
-
-#set new root password?
-#sudo passwd root
+sudo umask 0027
 
 #/etc/skel is the skeleton user, all new users get their home dir from here
 
-#Andreas Speiss recomends these swap file changes
-#sudo sed -i '/CONF_SWAPFILE/c\CONF_SWAPFILE=/var/swap' /etc/dphys-swapfile 
-#sudo sed -i '/CONF_SWAPFACTOR/c\CONF_SWAPFACTOR=2' /etc/dphys-swapfile 
-#sudo sed -i '/CONF_SWAPSIZE/c\#CONF_SWAPSIZE=100' /etc/dphys-swapfile 
-#sudo dphys-swapfile setup
-#sudo dphys-swapfile swapon
-
-#Alternatively... Disable Swap 
-#sudo swapoff -a -v
-
-#add GPIO pin3 shutdown to /boot/config.txt
-sudo sed -i '$a dtoverlay=gpio-shutdown,gpio_pin=3,active_low=1,gpio_pull=up' /boot/config.txt
 
 ###Install the desktop environment##########################################################################################
 
@@ -80,7 +62,7 @@ sudo make install
 #done installing i3-gaps
 
 #install apps that will be part of desktop composition and daily apps
-sudo apt install -y i3blocks feh compton clipit arandr mpv florence nemo
+sudo apt install -y i3blocks feh compton clipit arandr mpv florence nemo geany
 
 #termnial upgrade + terminal candy)
 sudo apt install -y terminator tilda neofetch figlet lolcat cmatrix hollywood libaa-bin thefuck howdoi
@@ -93,15 +75,6 @@ sudo apt install -y cmus vis playerctl mixxx
 
 #more apps
 sudo apt install -y screenkey ttyrec realvnc-vnc-server realvnc-vnc-viewer chromium-browser
-
-#set the ducking keyboard, duck!
-sed -i 's/gb/us/g' /etc/default/keyboard
-
-#enable  shh, vnc, WiFi, bluetooth
-raspi-config nonint do_ssh 0
-raspi-config nonint do_vnc 0
-raspi-config nonint do_wifi_country US
-sudo apt install -y pi-bluetooth blueman blueman-applet network-manager-applet
 
 #install cool-retro-term {the cool cannot be overstated}
 cd /opt/ 
@@ -131,8 +104,6 @@ sudo wget http://getwallpapers.com/wallpaper/full/e/8/7/702136-rainforest-backgr
 sudo wget http://getwallpapers.com/wallpaper/full/a/6/e/702131-beautiful-rainforest-backgrounds-1920x1080-for-iphone-6.jpg
 sudo wget http://getwallpapers.com/wallpaper/full/a/a/9/702126-rainforest-backgrounds-2560x1600-for-computer.jpg
 
-echo install complete
-echo log out and log in as new user now
 #just a little section to layout my thougts on this config.
 # try putting 'pi' as the new user name and see if anything breaks, or if the home folder gets encrypted
 # try putting in a username with a space as well, i bet it breaks things
@@ -154,3 +125,39 @@ echo log out and log in as new user now
 #delete pi user?
 #sudo pkill -u pi
 #sudo userdel --remove-all-files pi
+
+
+##############Raspberry Pi specific stuff##################
+#Andreas Speiss recomends these swap file changes
+#sudo sed -i '/CONF_SWAPFILE/c\CONF_SWAPFILE=/var/swap' /etc/dphys-swapfile 
+#sudo sed -i '/CONF_SWAPFACTOR/c\CONF_SWAPFACTOR=2' /etc/dphys-swapfile 
+#sudo sed -i '/CONF_SWAPSIZE/c\#CONF_SWAPSIZE=100' /etc/dphys-swapfile 
+#sudo dphys-swapfile setup
+#sudo dphys-swapfile swapon
+
+#Alternatively... Disable Swap 
+#sudo swapoff -a -v
+
+#add user to all the groups that user pi was a part of
+sudo usermod -a -G adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,input,netdev,spi,i2c,gpio $USER
+
+#add GPIO pin3 shutdown to /boot/config.txt
+sudo sed -i '$a dtoverlay=gpio-shutdown,gpio_pin=3,active_low=1,gpio_pull=up' /boot/config.txt
+
+#enable UART so that phisical GPIO pin 8 acts as power LED 
+sudo sed -i 'enable_uart=1' /boot/config.txt
+
+#set the ducking keyboard, duck!
+sed -i 's/gb/us/g' /etc/default/keyboard
+
+#this is getting kind of personal
+sudo timedatectl set-timezone US/Eastern
+
+#enable  shh, vnc, WiFi, bluetooth
+raspi-config nonint do_ssh 0
+raspi-config nonint do_vnc 0
+raspi-config nonint do_wifi_country US
+sudo apt install -y pi-bluetooth blueman blueman-applet network-manager-applet dhcpcd-gtk
+
+echo install complete
+echo log out and log in as new user now
