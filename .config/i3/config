@@ -24,11 +24,12 @@ exec --no-startup-id florence --use-config=.config/florence.conf
 for_window [class="florence"] floating enable
 
 #############Visible desktop stuff##############
+#Note: delays are needed to make these apps start in the correct order/location :(
 #Setup Workspace 1
 exec --no-startup-id i3-msg workspace $ws1
 exec xterm -e htop
 exec --no-startup-id i3-msg layout splitv
-exec xterm -e "export Cmnd | nmon" 
+exec xterm -e "nmon" 
 exec --no-startup-id i3-msg layout splith
 exec xterm -e "cmatrix -ab"
 exec --no-startup-id i3-msg layout splitv
