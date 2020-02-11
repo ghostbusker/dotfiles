@@ -28,22 +28,22 @@ for_window [class="florence"] floating enable
 #Setup Workspace 1
 exec --no-startup-id i3-msg workspace $ws1
 exec xterm -e htop
-exec --no-startup-id i3-msg layout splitv
-exec xterm -e "nmon" 
 exec --no-startup-id i3-msg layout splith
-exec xterm -e "cmatrix -ab"
+exec xterm -e "nmon" 
 exec --no-startup-id i3-msg layout splitv
-exec xterm -e "cmatrix -ab -C orange"
+exec xterm -e "cmatrix -ab"
+exec --no-startup-id i3-msg layout splith
+exec xterm -e "cmatrix -ab -C yellow"
 
 #Setup Workspace 2
 exec --no-startup-id i3-msg workspace $ws2
 exec xterm -e ranger
-exec --no-startup-id i3-msg layout splith
-exec xterm -e "curl wttr.in/30032" 
 exec --no-startup-id i3-msg layout splitv
-exec xterm -e "pipes.sh -p 10 -f 30 -r 20000"
+exec xterm -e "curl wttr.in/30032" 
 exec --no-startup-id i3-msg layout splith
-exec xterm -e "cmatrix -ab -C orange"
+exec xterm -e "pipes.sh -p 10 -f 30 -r 20000"
+exec --no-startup-id i3-msg layout splitv
+exec xterm -e "cmatrix -ab -C magenta"
 exec mpv --loop --no-osc --background=0/0/0/0 --framedrop=vo /tmp/weather.png 
 
 #Setup Workspace 3
