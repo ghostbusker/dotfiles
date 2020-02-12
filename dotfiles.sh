@@ -174,5 +174,14 @@ cd RetroPie-Setup
 sudo ./retropie_setup.sh
 #done installing retropie
 
+#show overclock and overlay info
+echo "Current /boot/config.txt settings:"
+vcgencmd get_config int
+
+#show codec info
+for codec in H264 MPG2 WVC1 MPG4 MJPG WMV9 ; do \
+	echo -e "$codec:\t$(vcgencmd codec_enabled $codec)" ; \
+done
+
 echo install complete
 echo log out and log in as new user now
