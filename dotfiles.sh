@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# redirect stdout/stderr to a file
-exec &> install_log.txt
+# redirect stdout/stderr to a file - not working!
+#exec &> install_log.txt
 
 #update apt
 #to force iv4 use:
@@ -17,7 +17,8 @@ USER=username
 USER=$(whiptail --inputbox "Enter new user name. User 'pi' should be deleted for security reasons. No spaces please." 8 78 $USER --title "New User Name" 3>&1 1>&2 2>&3)
 
 #create new user and add them to the sudo group, prompts for a new password
-sudo adduser -G sudo $USER
+sudo adduser $USER
+sudo usermod -a -G sudo $USER
 
 #install apps needed to encrypt the user folder
 sudo apt install -y ecryptfs-utils lsof cryptsetup
@@ -62,13 +63,13 @@ sudo make install
 #done installing i3-gaps
 
 #install apps that will be part of desktop composition and daily apps
-sudo apt install -y i3blocks feh compton clipit arandr mpv florence nemo geany
+sudo apt install -y i3blocks feh compton clipit arandr mpv florence nemo geany locate
 
 #termnial upgrade + terminal candy)
 sudo apt install -y terminator tilda neofetch figlet lolcat cmatrix hollywood libaa-bin thefuck howdoi
 
 #system utilities and monitors
-sudo apt install -y	nmon conky htop sysbench ranger
+sudo apt install -y	nmon conky htop ranger
 
 #MEDIA apps
 sudo apt install -y cmus vis playerctl mixxx
@@ -126,6 +127,11 @@ sudo wget http://getwallpapers.com/wallpaper/full/a/a/9/702126-rainforest-backgr
 #sudo pkill -u pi
 #sudo userdel --remove-all-files pi
 
+#install retropie 
+
+#view cpu scaling freq:
+#cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq 
+
 
 ##############Raspberry Pi specific stuff##################
 #Andreas Speiss recomends these swap file changes
@@ -158,6 +164,15 @@ raspi-config nonint do_ssh 0
 raspi-config nonint do_vnc 0
 raspi-config nonint do_wifi_country US
 sudo apt install -y pi-bluetooth blueman blueman-applet network-manager-applet dhcpcd-gtk
+
+#for stress testing
+sudo apt install -y stress sysbench
+
+#install retropie
+sudo git clone --depth=1 https://github.com/RetroPie/RetroPie-Setup.git
+cd RetroPie-Setup
+sudo ./retropie_setup.sh
+#done installing retropie
 
 echo install complete
 echo log out and log in as new user now

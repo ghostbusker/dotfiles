@@ -5,15 +5,18 @@
 
 set $mod Mod4
 
-#transparancy effect
-exec compton -f -b
-
 #change the wallpaper every -n seconds
 exec watch -n 120 feh --randomize --bg-fill ~/Pictures/Wallpapers/*
+
+#transparancy effect
+exec compton -f -b
 
 #fetch a new weather image every 15 minutes and rename it weather.png
 exec watch -n 900 wget -O /tmp/weather.png https://s.w-x.co/staticmaps/wu/wxtype/county_loc/csg/animate.png
 #for_window [class="mpv"] floating enable
+
+#hoping that moving this closer to top of file makes it work better.
+for_window [class="florence"] floating enable
 
 ############Invisible background apps###############
 #get the clipboard manager and OSK running (and floating!)
@@ -21,9 +24,12 @@ exec --no-startup-id tilda
 exec --no-startup-id clipit
 exec --no-startup-id dhcpcd-gtk
 exec --no-startup-id florence --use-config=.config/florence.conf
-for_window [class="florence"] floating enable
 
-#############Visible desktop stuff##############
+# switch to workspace with urgent window automatically
+for_window [urgent=latest] focus
+
+
+############# Workspace Setup ##############
 #Note: delays are needed to make these apps start in the correct order/location :(
 #Setup Workspace 1
 exec --no-startup-id i3-msg workspace $ws1
@@ -59,12 +65,8 @@ exec i3-msg workspace $ws3
 # exec --no-startup-id i3-msg 'workspace $ws3; exec chromium-browser; workspace $ws1'
 
 for_window [class="chromium"] move container to workspace 2
+
 #exec --no-startup-id chromium
-
-
-# toggle split direction for each new window
-default_orientation vertical
-for_window [class="^"] split toggle
 
 # Make all urxvts use a 1-pixel border:
 #for_window [class="urxvt"] border pixel 1
@@ -74,13 +76,25 @@ for_window [class="^"] split toggle
 # directory to ~/work
 #for_window [title="x200: ~/work"] floating enable
 
-focus_follows_mouse no
-mouse_warping output
-
 #limits all chrome windows to workspace3. not really desired after testing
 #assign [class="Chromium"] $ws3
 
-#Needed for i3-gaps
+############Mouse#############
+
+focus_follows_mouse no
+mouse_warping output
+
+#################App Launch Hotkeys###################
+
+# start a terminal
+bindsym $mod+Return exec terminator
+
+# start dmenu (a program launcher)
+bindsym $mod+d exec dmenu_run
+
+#Tilda terminal navtively uses F1 as a hotkey, no need to duplicate here
+
+###################Needed for i3-gaps####################################
 #hide_edge_borders both
 for_window [class="^.*"] border pixel 2 
 gaps inner 15 
@@ -89,6 +103,7 @@ gaps outer 15
 bindsym $mod+z		gaps outer current plus 5
 bindsym $mod+Shift+z	gaps outer current minus 5
 
+####################Fonts #################################
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
 font pango:ANONYMOUS PRO 10
@@ -97,19 +112,39 @@ font pango:ANONYMOUS PRO 10
 # text rendering and scalability on retina/hidpi displays (thanks to pango).
 #font pango:DejaVu Sans Mono 8
 
+####################Window Control##########################
+
+default_orientation vertical
+
+# toggle split direction for each new window
+for_window [class="^"] split toggle
+
+# toggle tiling / floating
+#bindsym $mod+Shift+space floating toggle
+bindsym $mod+w floating toggle
+
+# change focus between tiling / floating windows
+bindsym $mod+space focus mode_toggle
+
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
 
-# start a terminal
-bindsym $mod+Return exec terminator
+# enter fullscreen mode for the focused container
+bindsym $mod+f fullscreen toggle
+
+# reload the configuration file
+bindsym $mod+Shift+c reload
+
+# restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
+bindsym $mod+Shift+r restart
+
+# exit i3 (logs you out of your X session)
+bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -B 'Yes, exit i3' 'i3-msg exit'"
 
 # kill focused window
 bindsym $mod+Shift+q kill
 bindsym $mod+F4 kill
 bindsym $mod+q kill
-
-# start dmenu (a program launcher)
-bindsym $mod+d exec dmenu_run
 
 # change focus
 bindsym $mod+h focus left
@@ -140,23 +175,13 @@ bindsym $mod+Shift+Right move right
 #bindsym $mod+h split horizontal
 bindsym $mod+t split toggle
 
-# enter fullscreen mode for the focused container
-bindsym $mod+f fullscreen toggle
-
 # change container layout (stacked, tabbed, toggle split)
 bindsym $mod+s layout stacking toggle
 #bindsym $mod+w layout tabbed
 bindsym $mod+e layout toggle split
 
-# toggle tiling / floating
-#bindsym $mod+Shift+space floating toggle
-bindsym $mod+w floating toggle
-
-# change focus between tiling / floating windows
-bindsym $mod+space focus mode_toggle
-
 # focus the parent container
-bindsym $mod+a focus parent
+#bindsym $mod+a focus parent
 
 # focus the child container
 #bindsym $mod+d focus child
@@ -202,16 +227,6 @@ bindsym Mod1+Tab workspace next
 bindsym Mod1+Shift+Tab workspace prev
 bindsym $mod+Tab workspace back_and_forth
 
-# switch to workspace with urgent window automatically
-for_window [urgent=latest] focus
-
-# reload the configuration file
-bindsym $mod+Shift+c reload
-# restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
-bindsym $mod+Shift+r restart
-# exit i3 (logs you out of your X session)
-bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -B 'Yes, exit i3' 'i3-msg exit'"
-
 # resize window (you can also use the mouse for that)
 mode "resize" {
         # These bindings trigger as soon as you enter the resize mode
@@ -249,6 +264,7 @@ exec --no-startup-id conky --config=~/.config/conkybar.conf
 
 # bar toggle, hide or show 
 bindsym $mod+b bar mode toggle
+
 ##########################################
 
 #We're going dual bars here ppl, better buckle upgrade
