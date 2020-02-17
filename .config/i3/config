@@ -23,7 +23,12 @@ for_window [class="florence"] floating enable
 exec --no-startup-id tilda
 exec --no-startup-id clipit
 exec --no-startup-id dhcpcd-gtk
+exec --no-startup-id nm-tray
+exec --no-startup-id blueman-applet
 exec --no-startup-id florence --use-config=.config/florence.conf
+
+################launch ovpn and connect
+exec --no-startup-id openvpn ~./location/of/ovpn-file.ovpn
 
 # switch to workspace with urgent window automatically
 for_window [urgent=latest] focus

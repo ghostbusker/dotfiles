@@ -3,12 +3,12 @@
 # redirect stdout/stderr to a file - not working!
 #exec &> install_log.txt
 
+whiptail --title "This is the script you are about to install:" --textbox --scrolltext $0 24 78
+
 #update apt
 #to force iv4 use:
 #sudo apt-get -o Acquire::ForceIPv4=true update
 sudo apt update
-
-whiptail --title "This is the script you are about to install:" --textbox --scrolltext $0 24 78
 
 ###Setup New Encrypted User#################################################################################################
 
@@ -41,7 +41,6 @@ sudo chown -R $USER:$USER /home/$USER/
 sudo umask 0027
 
 #/etc/skel is the skeleton user, all new users get their home dir from here
-
 
 ###Install the desktop environment##########################################################################################
 
@@ -127,11 +126,18 @@ sudo wget http://getwallpapers.com/wallpaper/full/a/a/9/702126-rainforest-backgr
 #sudo pkill -u pi
 #sudo userdel --remove-all-files pi
 
+#maybe try the following line to intsall apps 1 by 1 for testing
+#for i in package1 package2 package3; do sudo apt-get install -y $i; done
+
 #install retropie 
 
 #view cpu scaling freq:
 #cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq 
 
+###########################OpenVPN Setup####################
+#This is where we install OpenVPN for tunneling back "home"
+sudo apt install openvpn
+#runs with: sudo openvpn ~./location/of/ovpn-file.ovpn
 
 ##############Raspberry Pi specific stuff##################
 #Andreas Speiss recomends these swap file changes
@@ -158,17 +164,19 @@ sed -i 's/gb/us/g' /etc/default/keyboard
 
 #this is getting kind of personal
 sudo timedatectl set-timezone US/Eastern
+#Alternatively use command: sudo dpkg-reconfigure tzdat
 
 #enable  shh, vnc, WiFi, bluetooth
 raspi-config nonint do_ssh 0
 raspi-config nonint do_vnc 0
 raspi-config nonint do_wifi_country US
-sudo apt install -y pi-bluetooth blueman blueman-applet network-manager-applet dhcpcd-gtk
+sudo apt install -y pi-bluetooth blueman dhcpcd-gtk bluealsa network-manager
 
 #for stress testing
 sudo apt install -y stress sysbench
 
 #install retropie
+cd /opt/
 sudo git clone --depth=1 https://github.com/RetroPie/RetroPie-Setup.git
 cd RetroPie-Setup
 sudo ./retropie_setup.sh
@@ -182,6 +190,12 @@ vcgencmd get_config int
 for codec in H264 MPG2 WVC1 MPG4 MJPG WMV9 ; do \
 	echo -e "$codec:\t$(vcgencmd codec_enabled $codec)" ; \
 done
+
+#did this earlier in the install but need to run again late to make Wallpapers folder belong to new user
+#take ownership and set permissions of user folder:
+sudo -u $USER chmod 750 -R /home/$USER/
+sudo chown -R $USER:$USER /home/$USER/
+sudo umask 0027
 
 echo install complete
 echo log out and log in as new user now

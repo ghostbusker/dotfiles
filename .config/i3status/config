@@ -26,6 +26,12 @@ ethernet _first_ {
         format_down = "E: down"
 }
 
+order += "path_exists VPN"
+path_exists VPN {
+     # path exists when a VPN tunnel launched by nmcli/nm-applet is active
+     path = "/proc/sys/net/ipv4/conf/tun0"
+}
+
 order += "disk /"
 disk "/" {
         format = "%avail"
