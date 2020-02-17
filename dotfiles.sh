@@ -171,6 +171,7 @@ raspi-config nonint do_ssh 0
 raspi-config nonint do_vnc 0
 raspi-config nonint do_wifi_country US
 sudo apt install -y pi-bluetooth blueman dhcpcd-gtk bluealsa network-manager
+sudo apt install -y nmap macchanger wireshark
 
 #for stress testing
 sudo apt install -y stress sysbench
