@@ -5,7 +5,7 @@
 # The following line should contain a sharp s:
 # ß
 # If the above line is not correctly displayed, fix your editor first!
-
+	
 general {
         colors = true
         interval = 5
@@ -28,8 +28,7 @@ ethernet _first_ {
 
 order += "path_exists VPN"
 path_exists VPN {
-     # path exists when a VPN tunnel launched by nmcli/nm-applet is active
-     path = "/proc/sys/net/ipv4/conf/tun0"
+		path = "/proc/sys/net/ipv4/conf/tun0"
 }
 
 order += "disk /"

@@ -5,11 +5,12 @@
 
 set $mod Mod4
 
-#change the wallpaper every -n seconds
-exec watch -n 120 feh --randomize --bg-fill ~/Pictures/Wallpapers/*
-
 #transparancy effect
 exec compton -f -b
+
+#set wallpaper, then change every -n seconds, maybe add some imagemagick to script to make unique
+exec feh --randomize --bg-fill ~/Pictures/Wallpapers/*
+exec watch -n 15 feh --randomize --bg-fill ~/Pictures/Wallpapers/*
 
 #fetch a new weather image every 15 minutes and rename it weather.png
 exec watch -n 900 wget -O /tmp/weather.png https://s.w-x.co/staticmaps/wu/wxtype/county_loc/csg/animate.png
@@ -27,41 +28,27 @@ exec --no-startup-id nm-tray
 exec --no-startup-id blueman-applet
 exec --no-startup-id florence --use-config=.config/florence.conf
 
-################launch ovpn and connect
+#launch ovpn and connect
 exec --no-startup-id openvpn ~./location/of/ovpn-file.ovpn
 
 # switch to workspace with urgent window automatically
 for_window [urgent=latest] focus
 
-
 ############# Workspace Setup ##############
-#Note: delays are needed to make these apps start in the correct order/location :(
-#Setup Workspace 1
-exec --no-startup-id i3-msg workspace $ws1
+#exec --no-startup-id i3-msg workspace $ws1
 exec xterm -e htop
-exec --no-startup-id i3-msg layout splith
-exec xterm -e "nmon" 
-exec --no-startup-id i3-msg layout splitv
-exec xterm -e "cmatrix -ab"
-exec --no-startup-id i3-msg layout splith
-exec xterm -e "cmatrix -ab -C yellow"
-
-#Setup Workspace 2
-exec --no-startup-id i3-msg workspace $ws2
-exec xterm -e ranger
-exec --no-startup-id i3-msg layout splitv
-exec xterm -e "curl wttr.in/30032" 
-exec --no-startup-id i3-msg layout splith
+#exec xterm -e "nmon" 
+#exec xterm -e "cmatrix -ab"
+#exec xterm -e "cmatrix -ab -C yellow"
+#exec --no-startup-id i3-msg workspace $ws2
+#exec xterm -e ranger
+exec xterm -e "curl wttr.in/30032 | $" 
 exec xterm -e "pipes.sh -p 10 -f 30 -r 20000"
-exec --no-startup-id i3-msg layout splitv
 exec xterm -e "cmatrix -ab -C magenta"
 exec mpv --loop --no-osc --background=0/0/0/0 --framedrop=vo /tmp/weather.png 
+#exec i3-msg workspace $ws3
+exec chromium-browser
 
-#Setup Workspace 3
-exec i3-msg workspace $ws3
-#exec gif-for-cli --display-mode=truecolor -l 0 "Keyword here!" &
-#exec chromium-browser
-# Start iceweasel on workspace 3, then switch back to workspace 1
 # (Being a command-line utility, i3-msg does not support startup notifications,
 #  hence the exec --no-startup-id.)
 # (Starting iceweasel with i3’s exec command is important in order to make i3
@@ -69,9 +56,8 @@ exec i3-msg workspace $ws3
 #  cannot be matched onto the workspace on which the command was started.)
 # exec --no-startup-id i3-msg 'workspace $ws3; exec chromium-browser; workspace $ws1'
 
-for_window [class="chromium"] move container to workspace 2
-
-#exec --no-startup-id chromium
+#this doesnt work
+#for_window [class="chromium"] move container to workspace 2
 
 # Make all urxvts use a 1-pixel border:
 #for_window [class="urxvt"] border pixel 1
@@ -82,7 +68,7 @@ for_window [class="chromium"] move container to workspace 2
 #for_window [title="x200: ~/work"] floating enable
 
 #limits all chrome windows to workspace3. not really desired after testing
-#assign [class="Chromium"] $ws3
+assign [class="Chromium"] $ws3
 
 ############Mouse#############
 
@@ -263,10 +249,6 @@ bindsym $mod+r mode "resize"
 
 
 ################### BAR ######################
-
-#psuedo conky bar? sure, why not
-exec --no-startup-id conky --config=~/.config/conkybar.conf
-
 # bar toggle, hide or show 
 bindsym $mod+b bar mode toggle
 

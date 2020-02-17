@@ -34,6 +34,14 @@ full_text=Click me!
 command=echo "Got clicked with button $button"
 color=#F79494
 
+#[compton_toggle]
+#full_text=Opacity
+#color=#F79494
+
+[keymap]
+command=xkb-switch;xkb-switch -W
+interval=persist
+
 # Guess the weather hourly
 [weather]
 command=curl -Ss 'https://wttr.in/30032?0&T&Q' | cut -c 16- | head -2 | xargs echo
@@ -49,14 +57,14 @@ interval=5
 color=#FF00FF
 
 [PublicIP]
-command=curl 'https://api.ipify.org' | awk '{ print "Public:" $1 }'
+command=curl -s 'https://api.ipify.org' | awk '{ print "Public:" $1 }'
 interval=300
 color=#91E78B
 
-[capslock?]
-command=xset q | grep Caps | tr -s ' ' | cut -d ' ' -f 5,9,13 | sed 's/on/▣/g' | sed 's/of
-interval=5
-color=#00FFFF
+#[capslock?]
+#command=xset q | grep Caps | tr -s ' ' | cut -d ' ' -f 5,9,13 | sed 's/on/▣/g' | sed 's/of
+#interval=5
+#color=#00FFFF
 
 # show current uptime
 [uptime]
@@ -65,10 +73,10 @@ interval=60
 color=#FFFFFF
 
 # Query my default IP address only on startup
-[LocalIP]
-command=hostname -i | awk '{ print "IP:" $1 }'
-interval=300
-color=#91E78B
+#[LocalIP]
+#command=hostname -i | awk '{ print "IP:" $1 }'
+#interval=300
+#color=#91E78B
 
 # Update time every 5 seconds
 [time]
@@ -76,11 +84,11 @@ command=date +%T
 interval=5
 
 # text demo from vivien.github.io
-[simple]
-full_text=This is a looong white on red text
-short_text=Short white on red text
-#background=#FF0000
-color=#FFFFFF
+#[simple]
+#full_text=This is a looong white on red text
+#short_text=Short white on red text
+######background=#FF0000
+#color=#FFFFFF
 
 # Block with a fixed width
 [aligned]
@@ -92,6 +100,16 @@ align=center
 [funky]
 full_text=<span foreground="red" size="x-large">Roses</span> and <i><span color="#EE37B8">violets</span></i>!
 markup=pango
+
+#[primary]
+#label=<span color='gray'></span>
+#command=echo "$(clipit -o |  grep -o '^.\{0,9\}' | sed -e 's/[^a-zA-Z0-9\-]/_/g')"
+#interval=5
+
+#[clipboard]
+#label=<span color='gray'></span>
+#command=echo "$(clipit -o -selection "clipboard" | grep -o '^.\{0,9\}' | sed -e 's/[^a-zA-Z0-9\-]/_/g')"
+#interval=5
 
 #[cpu_usage]
 #command=$SCRIPT_DIR/cpu_usage
