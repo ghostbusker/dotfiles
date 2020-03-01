@@ -37,15 +37,17 @@ for_window [urgent=latest] focus
 ############# Workspace Setup ##############
 #exec --no-startup-id i3-msg workspace $ws1
 exec xterm -e htop
-#exec xterm -e "nmon" 
-#exec xterm -e "cmatrix -ab"
-#exec xterm -e "cmatrix -ab -C yellow"
-#exec --no-startup-id i3-msg workspace $ws2
-#exec xterm -e ranger
-exec xterm -e "curl wttr.in/30032 | $" 
+exec xterm -e "while true; do curl wttr.in/30032 && read -p 'press enter to refresh' i; clear; done" 
 exec xterm -e "pipes.sh -p 10 -f 30 -r 20000"
 exec xterm -e "cmatrix -ab -C magenta"
 exec mpv --loop --no-osc --background=0/0/0/0 --framedrop=vo /tmp/weather.png 
+
+#exec --no-startup-id i3-msg workspace $ws2
+#exec xterm -e "nmon" 
+#exec xterm -e "cmatrix -ab"
+#exec xterm -e "cmatrix -ab -C yellow"
+#exec xterm -e ranger
+
 #exec i3-msg workspace $ws3
 exec chromium-browser
 
