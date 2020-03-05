@@ -65,16 +65,19 @@ sudo make install
 sudo apt install -y i3blocks feh compton clipit arandr mpv florence nemo geany locate
 
 #termnial upgrade + terminal candy)
-sudo apt install -y terminator tilda neofetch figlet lolcat cmatrix hollywood libaa-bin thefuck howdoi
+sudo apt install -y terminator tilda ranger neofetch figlet lolcat cmatrix hollywood caca-utils libaa-bin thefuck howdoi
 
 #system utilities and monitors
-sudo apt install -y	nmon conky htop ranger
+sudo apt install -y	glances nmon conky htop
 
 #MEDIA apps
-sudo apt install -y cmus vis playerctl mixxx
+sudo apt install -y cmus vis playerctl vlc
 
 #more apps
 sudo apt install -y screenkey ttyrec realvnc-vnc-server realvnc-vnc-viewer chromium-browser
+
+#creative suite
+sudo apt install -y mixxx kdenlive blender audacity gimp
 
 #install cool-retro-term {the cool cannot be overstated}
 cd /opt/ 
@@ -93,6 +96,17 @@ cd pipes.sh
 sudo make install
 #done installing pipes.sh
 
+#more matrix stuff apparently
+cd /opt/
+sudo git clone https://github.com/mayfrost/ncmatrix           ▐▌
+cd ncmatrix
+sudo chmod +x configure
+sudo ./configure                                                                ▐▌
+sudo make check                                                                 ▐▌
+sudo make install   
+#probs done installing NMmatrix   
+
+
 #copy wallpapers
 sudo mkdir /home/$USER/Pictures
 sudo mkdir /home/$USER/Pictures/Wallpapers
@@ -103,6 +117,12 @@ sudo wget http://getwallpapers.com/wallpaper/full/8/0/e/702147-rainforest-backgr
 sudo wget http://getwallpapers.com/wallpaper/full/e/8/7/702136-rainforest-backgrounds-1920x1080-for-mobile.jpg
 sudo wget http://getwallpapers.com/wallpaper/full/a/6/e/702131-beautiful-rainforest-backgrounds-1920x1080-for-iphone-6.jpg
 sudo wget http://getwallpapers.com/wallpaper/full/a/a/9/702126-rainforest-backgrounds-2560x1600-for-computer.jpg
+
+#make other common folders
+sudo mkdir /home/$USER/Documents
+sudo mkdir /home/$USER/Downloads
+sudo mkdir /home/$USER/Music
+sudo mkdir /home/$USER/Videos
 
 #just a little section to layout my thougts on this config.
 # try putting 'pi' as the new user name and see if anything breaks, or if the home folder gets encrypted
@@ -136,8 +156,9 @@ sudo wget http://getwallpapers.com/wallpaper/full/a/a/9/702126-rainforest-backgr
 
 ###########################OpenVPN Setup####################
 #This is where we install OpenVPN for tunneling back "home"
-sudo apt install openvpn
+sudo apt install -y openvpn
 #runs with: sudo openvpn ~./location/of/ovpn-file.ovpn
+#launched by i3, see ~/.config/i3/config
 
 ##############Raspberry Pi specific stuff##################
 #Andreas Speiss recomends these swap file changes
@@ -153,11 +174,8 @@ sudo apt install openvpn
 #add user to all the groups that user pi was a part of
 sudo usermod -a -G adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,input,netdev,spi,i2c,gpio $USER
 
-#add GPIO pin3 shutdown to /boot/config.txt
-sudo sed -i '$a dtoverlay=gpio-shutdown,gpio_pin=3,active_low=1,gpio_pull=up' /boot/config.txt
-
-#enable UART so that phisical GPIO pin 8 acts as power LED 
-sudo sed -i 'enable_uart=1' /boot/config.txt
+#add GPIO pin3 shutdown to /boot/config.txt AND enable UART so that phisical GPIO pin 8 acts as power LED 
+sudo sed -i '$a dtoverlay=gpio-shutdown,gpio_pin=3,active_low=1,gpio_pull=up\ enable_uart=1\' /boot/config.txt
 
 #set the ducking keyboard, duck!
 sed -i 's/gb/us/g' /etc/default/keyboard
@@ -167,10 +185,10 @@ sudo timedatectl set-timezone US/Eastern
 #Alternatively use command: sudo dpkg-reconfigure tzdat
 
 #enable  shh, vnc, WiFi, bluetooth
-raspi-config nonint do_ssh 0
-raspi-config nonint do_vnc 0
-raspi-config nonint do_wifi_country US
-sudo apt install -y pi-bluetooth blueman dhcpcd-gtk bluealsa network-manager
+sudo raspi-config nonint do_ssh 0
+sudo raspi-config nonint do_vnc 0
+sudo raspi-config nonint do_wifi_country US
+sudo apt install -y pi-bluetooth blueman dhcpcd-gtk bluealsa network-manager wpagui
 sudo apt install -y nmap macchanger wireshark
 
 #for stress testing
@@ -192,11 +210,21 @@ for codec in H264 MPG2 WVC1 MPG4 MJPG WMV9 ; do \
 	echo -e "$codec:\t$(vcgencmd codec_enabled $codec)" ; \
 done
 
+#this is not working, consider removing?
 #did this earlier in the install but need to run again late to make Wallpapers folder belong to new user
 #take ownership and set permissions of user folder:
 sudo -u $USER chmod 750 -R /home/$USER/
 sudo chown -R $USER:$USER /home/$USER/
 sudo umask 0027
 
+#credit where credit is due
+wget -O /home/$USER/.conkyrc https://raw.githubusercontent.com/novaspirit/rpi_conky/master/rpi3_conkyrc
+
+#install Log2Ram for raspi, must be done last and requires reboot
+echo "deb http://packages.azlux.fr/debian/ buster main" | sudo tee /etc/apt/sources.list.d/azlux.list
+wget -qO - https://azlux.fr/repo.gpg.key | sudo apt-key add -
+apt update
+apt install log2ram
+
 echo install complete
-echo log out and log in as new user now
+echo reboot and login as new user

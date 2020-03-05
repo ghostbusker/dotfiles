@@ -21,7 +21,7 @@ for_window [class="florence"] floating enable
 
 ############Invisible background apps###############
 #get the clipboard manager and OSK running (and floating!)
-exec --no-startup-id tilda
+exec --no-startup-id tilda --config ~/.config/tilda
 exec --no-startup-id clipit
 exec --no-startup-id dhcpcd-gtk
 exec --no-startup-id nm-tray
@@ -37,7 +37,7 @@ for_window [urgent=latest] focus
 ############# Workspace Setup ##############
 #exec --no-startup-id i3-msg workspace $ws1
 exec xterm -e htop
-exec xterm -e "while true; do curl wttr.in/30032 && read -p 'press enter to refresh' i; clear; done" 
+exec xterm -e ~/.config/scripts/weather.sh
 exec xterm -e "pipes.sh -p 10 -f 30 -r 20000"
 exec xterm -e "cmatrix -ab -C magenta"
 exec mpv --loop --no-osc --background=0/0/0/0 --framedrop=vo /tmp/weather.png 
@@ -84,6 +84,9 @@ bindsym $mod+Return exec terminator
 
 # start dmenu (a program launcher)
 bindsym $mod+d exec dmenu_run
+
+# run script to toggle compton transpancy on all windows.
+bindsym $mod+F12 exec ~/.config/scripts/compton_toggle.sh
 
 #Tilda terminal navtively uses F1 as a hotkey, no need to duplicate here
 
@@ -256,7 +259,7 @@ bindsym $mod+b bar mode toggle
 
 ##########################################
 
-#We're going dual bars here ppl, better buckle upgrade
+#We're going dual bars here ppl, better buckle up
 #first the  top bar
 bar {
         position top
