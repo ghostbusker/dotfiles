@@ -1,18 +1,33 @@
 #!/bin/bash
 
-# redirect stdout/stderr to a file - not working!
-#exec &> install_log.txt
+#check for "--help" or "-h" flags
+if [ ${#@} -ne 0 ] && [ "${@#"--help"}" = "" ]
+then
+  printf -- 'there is no help.\n'
+  sleep 3
+  printf -- 'only zuul.\n'
+  exit 0
+fi
 
-whiptail --title "This is the script you are about to install:" --textbox --scrolltext $0 24 78
+#set whiptail colors
+export NEWT_COLORS='
+window=,red
+border=white,red
+textbox=white,red
+button=black,white
+'
+#inform user and prompt for consent
+whiptail --title "This is the script you are about to install:" --textbox --scrolltext $0 20 78
 
-#update apt
-#to force iv4 use:
-#sudo apt-get -o Acquire::ForceIPv4=true update
-sudo apt update
+#backup then temporarily change terminal colors
+DEFAULT=$PS1
+
+#update package list, force use of IPv4 if failure to connect
+sudo apt update || sudo apt-get -o Acquire::ForceIPv4=true update
 
 ###Setup New Encrypted User#################################################################################################
 
-#Create new username and password
+#Create new username
 USER=username
 USER=$(whiptail --inputbox "Enter new user name. User 'pi' should be deleted for security reasons. No spaces please." 8 78 $USER --title "New User Name" 3>&1 1>&2 2>&3)
 
@@ -20,27 +35,27 @@ USER=$(whiptail --inputbox "Enter new user name. User 'pi' should be deleted for
 sudo adduser $USER
 sudo usermod -a -G sudo $USER
 
+#starting script timer
+sudo printf -- 'Starting script timer...\n'
+STOPWATCH=0
+
 #install apps needed to encrypt the user folder
 sudo apt install -y ecryptfs-utils lsof cryptsetup
 
 #encrypt new user home directory
 sudo ecryptfs-migrate-home -u $USER
 
-#show encryption password with command: 
-#ecryptfs-unwrap-passphrase
+#show encryption password with command: ecryptfs-unwrap-passphrase
 
 #copy "dotfiles" into place
 sudo cp -r .config/ /home/$USER/
 sudo cp -r .bashrc /home/$USER/
-#sudo cp -r .profile /home/$USER/ #Consider removing this default file
 
 #this next part made all the difference, chome and a bunch of other apps were broken otherwise
 #take ownership and set permissions of user folder:
 sudo -u $USER chmod 750 -R /home/$USER/
 sudo chown -R $USER:$USER /home/$USER/
 sudo umask 0027
-
-#/etc/skel is the skeleton user, all new users get their home dir from here
 
 ###Install the desktop environment##########################################################################################
 
@@ -62,7 +77,10 @@ sudo make install
 #done installing i3-gaps
 
 #install apps that will be part of desktop composition and daily apps
-sudo apt install -y i3blocks feh compton clipit arandr mpv florence nemo geany locate
+sudo apt install -y i3blocks feh compton clipit arandr mpv florence nemo locate
+
+#install productivity apps
+sudo apt install -y geany neovim
 
 #termnial upgrade + terminal candy)
 sudo apt install -y terminator tilda ranger neofetch figlet lolcat cmatrix hollywood caca-utils libaa-bin thefuck howdoi
@@ -106,7 +124,6 @@ sudo make check                                                                 
 sudo make install   
 #probs done installing NMmatrix   
 
-
 #copy wallpapers
 sudo mkdir /home/$USER/Pictures
 sudo mkdir /home/$USER/Pictures/Wallpapers
@@ -131,14 +148,13 @@ sudo mkdir /home/$USER/Videos
 #ask for keyword for system theme (background, motd, colors?)
 #fix localization (keyboard, timezone, wifi), current solution is insufficient 
 #create new user (not "pi") with encrypted file system (https://technicalustad.com/how-to-encrypt-raspberry-pi-home-folder/)
-#make i3bar show temp/cpu/ram/ the way i want
 #fetch backgrounds based on keyword
 
 #I want this pi to have as many use-cases as possible. 
 #-provide wifi hotspot if plugged into internet via ethernet
-#-provide internet via ethernet if connected to wifi
+#-provide internet via ethernet port if connected to wifi
 #-provide filesharing in both use-cases
-#-provide vnc desktop for access via phone/tablet/laptop/refridgerator
+#-provide vnc desktop for access via phone/tablet/laptop/fredidgerator
 
 #new user first login script?
 #Update list of default apps (terminal, browser, etc.): update-alternatives --all
@@ -148,8 +164,6 @@ sudo mkdir /home/$USER/Videos
 
 #maybe try the following line to intsall apps 1 by 1 for testing
 #for i in package1 package2 package3; do sudo apt-get install -y $i; done
-
-#install retropie 
 
 #view cpu scaling freq:
 #cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq 
@@ -161,15 +175,6 @@ sudo apt install -y openvpn
 #launched by i3, see ~/.config/i3/config
 
 ##############Raspberry Pi specific stuff##################
-#Andreas Speiss recomends these swap file changes
-#sudo sed -i '/CONF_SWAPFILE/c\CONF_SWAPFILE=/var/swap' /etc/dphys-swapfile 
-#sudo sed -i '/CONF_SWAPFACTOR/c\CONF_SWAPFACTOR=2' /etc/dphys-swapfile 
-#sudo sed -i '/CONF_SWAPSIZE/c\#CONF_SWAPSIZE=100' /etc/dphys-swapfile 
-#sudo dphys-swapfile setup
-#sudo dphys-swapfile swapon
-
-#Alternatively... Disable Swap 
-#sudo swapoff -a -v
 
 #add user to all the groups that user pi was a part of
 sudo usermod -a -G adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,input,netdev,spi,i2c,gpio $USER
@@ -201,34 +206,52 @@ cd RetroPie-Setup
 sudo ./retropie_setup.sh
 #done installing retropie
 
-#show overclock and overlay info
-echo "Current /boot/config.txt settings:"
-vcgencmd get_config int
-
-#show codec info
-for codec in H264 MPG2 WVC1 MPG4 MJPG WMV9 ; do \
-	echo -e "$codec:\t$(vcgencmd codec_enabled $codec)" ; \
-done
-
 #this is not working, consider removing?
 #did this earlier in the install but need to run again late to make Wallpapers folder belong to new user
 #take ownership and set permissions of user folder:
-sudo -u $USER chmod 750 -R /home/$USER/
-sudo chown -R $USER:$USER /home/$USER/
-sudo umask 0027
+#sudo -u $USER chmod 750 -R /home/$USER/
+#sudo chown -R $USER:$USER /home/$USER/
+#sudo umask 0027
 
 #credit where credit is due
-wget -O /home/$USER/.conkyrc https://raw.githubusercontent.com/novaspirit/rpi_conky/master/rpi3_conkyrc
+#wget -O /home/$USER/.conkyrc https://raw.githubusercontent.com/novaspirit/rpi_conky/master/rpi3_conkyrc
 
 #change swap file from 100mb to something bigger, need to make this optional
 sudo sed -i 's/^CONF_SWAPSIZE=[0-9]*$/CONF_SWAPSIZE=2048/' /etc/dphys-swapfile
 sudo dphys-swapfile setup
+#Andreas Speiss recomends these swap file changes
+#sudo sed -i '/CONF_SWAPFILE/c\CONF_SWAPFILE=/var/swap' /etc/dphys-swapfile 
+#sudo sed -i '/CONF_SWAPFACTOR/c\CONF_SWAPFACTOR=2' /etc/dphys-swapfile 
+#sudo sed -i '/CONF_SWAPSIZE/c\#CONF_SWAPSIZE=100' /etc/dphys-swapfile 
+#sudo dphys-swapfile setup
+#sudo dphys-swapfile swapon
+
+#Alternatively... Disable Swap 
+#sudo swapoff -a -v
 
 #install Log2Ram for raspi, must be done last and requires reboot
-echo "deb http://packages.azlux.fr/debian/ buster main" | sudo tee /etc/apt/sources.list.d/azlux.list
+printf -- 'deb http://packages.azlux.fr/debian/ buster main'| sudo tee /etc/apt/sources.list.d/azlux.list
 wget -qO - https://azlux.fr/repo.gpg.key | sudo apt-key add -
 apt update
 apt install log2ram
 
-echo install complete
-echo reboot and login as new user
+#######Script finished, show some helpful info ##############
+
+#show overclock and overlay info from /boot/config.txt
+printf -- 'Current /boot/config.txt settings:\n'
+vcgencmd get_config int
+
+#show codec info
+for codec in H264 MPG2 WVC1 MPG4 MJPG WMV9 ; do \
+	printf -- '$codec:\t$(vcgencmd codec_enabled $codec)' ; \
+done
+
+#ta ta fa na
+printf -- 'install complete\n' | lolcat
+printf -- 'reboot and login as new user\n' | lolcat
+
+#print script elapsed runtime
+ELAPSED="Elapsed: $(($STOPWATCH / 3600))hrs $((($STOPWATCH / 60) % 60))min $(($STOPWATCH % 60))sec"
+printf -- '$ELAPSED\n' | lolcat
+
+exit 0
