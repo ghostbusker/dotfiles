@@ -175,10 +175,10 @@ sudo apt install -y openvpn
 sudo usermod -a -G adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,input,netdev,spi,i2c,gpio $USER
 
 #add GPIO pin3 shutdown to /boot/config.txt AND enable UART so that phisical GPIO pin 8 acts as power LED 
-sudo sed -i '$a dtoverlay=gpio-shutdown,gpio_pin=3,active_low=1,gpio_pull=up\ enable_uart=1\' /boot/config.txt
+sudo sed -i '$a dtoverlay=gpio-shutdown,gpio_pin=3,active_low=1,gpio_pull=up\nenable_uart=1\' /boot/config.txt
 
 #set the ducking keyboard, duck!
-sed -i 's/gb/us/g' /etc/default/keyboard
+sudo sed -i 's/gb/us/g' /etc/default/keyboard
 
 #this is getting kind of personal
 sudo timedatectl set-timezone US/Eastern
@@ -219,6 +219,10 @@ sudo umask 0027
 
 #credit where credit is due
 wget -O /home/$USER/.conkyrc https://raw.githubusercontent.com/novaspirit/rpi_conky/master/rpi3_conkyrc
+
+#change swap file from 100mb to something bigger, need to make this optional
+sudo sed -i 's/^CONF_SWAPSIZE=[0-9]*$/CONF_SWAPSIZE=2048/' /etc/dphys-swapfile
+sudo dphys-swapfile setup
 
 #install Log2Ram for raspi, must be done last and requires reboot
 echo "deb http://packages.azlux.fr/debian/ buster main" | sudo tee /etc/apt/sources.list.d/azlux.list

@@ -23,6 +23,7 @@ for_window [class="florence"] floating enable
 #get the clipboard manager and OSK running (and floating!)
 exec --no-startup-id tilda --config ~/.config/tilda
 exec --no-startup-id clipit
+exec --no-startup-id conky
 exec --no-startup-id dhcpcd-gtk
 exec --no-startup-id nm-tray
 exec --no-startup-id blueman-applet
@@ -38,8 +39,8 @@ for_window [urgent=latest] focus
 #exec --no-startup-id i3-msg workspace $ws1
 exec xterm -e htop
 exec xterm -e ~/.config/scripts/weather.sh
-exec xterm -e "pipes.sh -p 10 -f 30 -r 20000"
-exec xterm -e "cmatrix -ab -C magenta"
+#exec xterm -e "pipes.sh -p 10 -f 30 -r 20000"
+#exec xterm -e "cmatrix -ab -C magenta"
 exec mpv --loop --no-osc --background=0/0/0/0 --framedrop=vo /tmp/weather.png 
 
 #exec --no-startup-id i3-msg workspace $ws2
