@@ -19,14 +19,34 @@ button=black,white
 #inform user and prompt for consent
 whiptail --title "This is the script you are about to install:" --textbox --scrolltext $0 20 78
 
+#let user choose which modules to run
+NAME=$(whiptail --title "Choose your own adventure" --checklist --separate-output \
+  "Modules:" 20 30 15 \
+  "mod1" "New Encrypted User" on \
+  "mod2" "Copy Dotfiles to Home Directory" on \
+  "mod3" "Take Ownership of Home Directory" on \
+  "mod4" "Becky" off \
+  "mod5" "Cheryl" off \
+  "mod6" "Michelle" off \
+  3>&1 1>&2 2>&3)
+
 #backup then temporarily change terminal colors
-DEFAULT=$PS1
+TEMP1=$PS1
+TEMP2=$PS2
+TEMP2=$PS3
+export PS1="\e[0;32m\]"
+export PS2="\e[0;31m\]"
+export PS3="\e[0;35m\]"
+
+#enable colored output for git
+sudo git config --global color.ui auto
 
 #update package list, force use of IPv4 if failure to connect
 sudo apt update || sudo apt-get -o Acquire::ForceIPv4=true update
 
 ###Setup New Encrypted User#################################################################################################
 
+!
 #Create new username
 USER=username
 USER=$(whiptail --inputbox "Enter new user name. User 'pi' should be deleted for security reasons. No spaces please." 8 78 $USER --title "New User Name" 3>&1 1>&2 2>&3)
@@ -47,18 +67,32 @@ sudo ecryptfs-migrate-home -u $USER
 
 #show encryption password with command: ecryptfs-unwrap-passphrase
 
+!
 #copy "dotfiles" into place
 sudo cp -r .config/ /home/$USER/
 sudo cp -r .bashrc /home/$USER/
 
+!
 #this next part made all the difference, chome and a bunch of other apps were broken otherwise
 #take ownership and set permissions of user folder:
 sudo -u $USER chmod 750 -R /home/$USER/
 sudo chown -R $USER:$USER /home/$USER/
 sudo umask 0027
 
-###Install the desktop environment##########################################################################################
+!
+#######INSTALL DEFAULT TERMINAL ENVIRONMENT################################
+#termnial upgrade + terminal candy)
+sudo apt install -y terminator locate tilda neovim ranger trash-cli neofetch figlet lolcat cmatrix hollywood caca-utils libaa-bin thefuck howdoi cowsay fortune
 
+#system utilities and monitors
+sudo apt install -y	glances nmon htop
+
+#MEDIA apps
+sudo apt install -y cmus vis playerctl vlc
+
+
+!
+###Install the desktop environment##########################################################################################
 #install some apps needed to make UI
 sudo apt install -y xorg xserver-xorg xinit git cmake lxappearance
 
@@ -77,54 +111,18 @@ sudo make install
 #done installing i3-gaps
 
 #install apps that will be part of desktop composition and daily apps
-sudo apt install -y i3blocks feh compton clipit arandr mpv florence nemo locate
+sudo apt install -y i3blocks feh compton clipit arandr mpv florence nemo conky
+
+#more common apps
+sudo apt install -y screenkey ttyrec realvnc-vnc-server realvnc-vnc-viewer chromium-browser
 
 #install productivity apps
 sudo apt install -y geany neovim
 
-#termnial upgrade + terminal candy)
-sudo apt install -y terminator tilda ranger neofetch figlet lolcat cmatrix hollywood caca-utils libaa-bin thefuck howdoi
 
-#system utilities and monitors
-sudo apt install -y	glances nmon conky htop
 
-#MEDIA apps
-sudo apt install -y cmus vis playerctl vlc
-
-#more apps
-sudo apt install -y screenkey ttyrec realvnc-vnc-server realvnc-vnc-viewer chromium-browser
-
-#creative suite
-sudo apt install -y mixxx kdenlive blender audacity gimp
-
-#install cool-retro-term {the cool cannot be overstated}
-cd /opt/ 
-sudo apt install -y build-essential qmlscene qt5-qmake qt5-default qtdeclarative5-dev qml-module-qtquick-controls qml-module-qtgraphicaleffects qml-module-qtquick-dialogs qml-module-qtquick-localstorage qml-module-qtquick-window2 qml-module-qt-labs-settings qml-module-qt-labs-folderlistmodel
-git clone --recursive https://github.com/Swordfish90/cool-retro-term.git
-cd cool-retro-term
-qmake && make
-sudo cp cool-retro-term.desktop /usr/share/applications
-sudo ln -s /opt/cool-retro-term/cool-retro-term /usr/local/bin/cool-retro-term
-#done installing cool-retro-term
-
-#install pipeseroni's pipes.sh from source (installs to /usr/local by default, works)
-cd /opt/
-sudo git clone https://github.com/pipeseroni/pipes.sh
-cd pipes.sh
-sudo make install
-#done installing pipes.sh
-
-#more matrix stuff apparently
-cd /opt/
-sudo git clone https://github.com/mayfrost/ncmatrix           ▐▌
-cd ncmatrix
-sudo chmod +x configure
-sudo ./configure                                                                ▐▌
-sudo make check                                                                 ▐▌
-sudo make install   
-#probs done installing NMmatrix   
-
-#copy wallpapers
+!
+#############copy wallpapers####################
 sudo mkdir /home/$USER/Pictures
 sudo mkdir /home/$USER/Pictures/Wallpapers
 cd /home/$USER/Pictures/Wallpapers
@@ -135,11 +133,13 @@ sudo wget http://getwallpapers.com/wallpaper/full/e/8/7/702136-rainforest-backgr
 sudo wget http://getwallpapers.com/wallpaper/full/a/6/e/702131-beautiful-rainforest-backgrounds-1920x1080-for-iphone-6.jpg
 sudo wget http://getwallpapers.com/wallpaper/full/a/a/9/702126-rainforest-backgrounds-2560x1600-for-computer.jpg
 
-#make other common folders
+!
+##############make common folders################
 sudo mkdir /home/$USER/Documents
 sudo mkdir /home/$USER/Downloads
 sudo mkdir /home/$USER/Music
 sudo mkdir /home/$USER/Videos
+
 
 #just a little section to layout my thougts on this config.
 # try putting 'pi' as the new user name and see if anything breaks, or if the home folder gets encrypted
@@ -168,6 +168,7 @@ sudo mkdir /home/$USER/Videos
 #view cpu scaling freq:
 #cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq 
 
+!
 ###########################OpenVPN Setup####################
 #This is where we install OpenVPN for tunneling back "home"
 sudo apt install -y openvpn
@@ -175,13 +176,15 @@ sudo apt install -y openvpn
 #launched by i3, see ~/.config/i3/config
 
 ##############Raspberry Pi specific stuff##################
-
+!
 #add user to all the groups that user pi was a part of
 sudo usermod -a -G adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,input,netdev,spi,i2c,gpio $USER
 
+!
 #add GPIO pin3 shutdown to /boot/config.txt AND enable UART so that phisical GPIO pin 8 acts as power LED 
 sudo sed -i '$a dtoverlay=gpio-shutdown,gpio_pin=3,active_low=1,gpio_pull=up\nenable_uart=1\' /boot/config.txt
 
+!
 #set the ducking keyboard, duck!
 sudo sed -i 's/gb/us/g' /etc/default/keyboard
 
@@ -189,6 +192,7 @@ sudo sed -i 's/gb/us/g' /etc/default/keyboard
 sudo timedatectl set-timezone US/Eastern
 #Alternatively use command: sudo dpkg-reconfigure tzdat
 
+!
 #enable  shh, vnc, WiFi, bluetooth
 sudo raspi-config nonint do_ssh 0
 sudo raspi-config nonint do_vnc 0
@@ -199,12 +203,17 @@ sudo apt install -y nmap macchanger wireshark
 #for stress testing
 sudo apt install -y stress sysbench
 
+############OPTIONAL SOFTWARES LIST##########################
+
+!
 #install retropie
 cd /opt/
 sudo git clone --depth=1 https://github.com/RetroPie/RetroPie-Setup.git
 cd RetroPie-Setup
 sudo ./retropie_setup.sh
 #done installing retropie
+
+
 
 #this is not working, consider removing?
 #did this earlier in the install but need to run again late to make Wallpapers folder belong to new user
@@ -217,7 +226,7 @@ sudo ./retropie_setup.sh
 #wget -O /home/$USER/.conkyrc https://raw.githubusercontent.com/novaspirit/rpi_conky/master/rpi3_conkyrc
 
 #change swap file from 100mb to something bigger, need to make this optional
-sudo sed -i 's/^CONF_SWAPSIZE=[0-9]*$/CONF_SWAPSIZE=2048/' /etc/dphys-swapfile
+sudo sed -i 's/^CONF_SWAPSIZE=[0-9]*$/CONF_SWAPSIZE=512/' /etc/dphys-swapfile
 sudo dphys-swapfile setup
 #Andreas Speiss recomends these swap file changes
 #sudo sed -i '/CONF_SWAPFILE/c\CONF_SWAPFILE=/var/swap' /etc/dphys-swapfile 
@@ -253,5 +262,12 @@ printf -- 'reboot and login as new user\n' | lolcat
 #print script elapsed runtime
 ELAPSED="Elapsed: $(($STOPWATCH / 3600))hrs $((($STOPWATCH / 60) % 60))min $(($STOPWATCH % 60))sec"
 printf -- '$ELAPSED\n' | lolcat
+
+#return terminal colors to normal
+PS1=$TEMP1
+PS2=$TEMP2
+PS3=$TEMP3
+#alternatley/additionally, reload bash?
+bash
 
 exit 0
