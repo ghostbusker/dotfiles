@@ -82,7 +82,7 @@ sudo umask 0027
 !
 #######INSTALL DEFAULT TERMINAL ENVIRONMENT################################
 #termnial upgrade + terminal candy)
-sudo apt install -y terminator locate tilda neovim ranger trash-cli neofetch figlet lolcat cmatrix hollywood caca-utils libaa-bin thefuck howdoi cowsay fortune
+sudo apt install -y terminator locate tilda neovim ranger trash-cli neofetch figlet lolcat cmatrix hollywood funny-manpages caca-utils libaa-bin thefuck howdoi cowsay fortune
 
 #system utilities and monitors
 sudo apt install -y	glances nmon htop
@@ -90,6 +90,11 @@ sudo apt install -y	glances nmon htop
 #MEDIA apps
 sudo apt install -y cmus vis playerctl vlc
 
+#for stress testing
+sudo apt install -y stress sysbench
+
+#network tools
+sudo apt install -y nmap macchanger tshark
 
 !
 ###Install the desktop environment##########################################################################################
@@ -111,7 +116,7 @@ sudo make install
 #done installing i3-gaps
 
 #install apps that will be part of desktop composition and daily apps
-sudo apt install -y i3blocks feh compton clipit arandr mpv florence nemo conky
+sudo apt install -y i3blocks feh compton clipit arandr mpv florence nemo conky dhcpcd-gtk wpagui
 
 #more common apps
 sudo apt install -y screenkey ttyrec realvnc-vnc-server realvnc-vnc-viewer chromium-browser
@@ -119,11 +124,27 @@ sudo apt install -y screenkey ttyrec realvnc-vnc-server realvnc-vnc-viewer chrom
 #install productivity apps
 sudo apt install -y geany neovim
 
+#install netwkork gui tools
+sudo apt install -y zenmap wireshark
+
+##################install Log2Ram for raspi, must be done last and requires reboot
+printf -- 'deb http://packages.azlux.fr/debian/ buster main'| sudo tee /etc/apt/sources.list.d/azlux.list
+wget -qO - https://azlux.fr/repo.gpg.key | sudo apt-key add -
+apt update
+apt install log2ram
 
 
 !
-#############copy wallpapers####################
+##############make common folders################
+sudo mkdir /home/$USER/Documents
+sudo mkdir /home/$USER/Downloads
+sudo mkdir /home/$USER/Music
+sudo mkdir /home/$USER/Videos
 sudo mkdir /home/$USER/Pictures
+
+!
+#############copy wallpapers####################
+
 sudo mkdir /home/$USER/Pictures/Wallpapers
 cd /home/$USER/Pictures/Wallpapers
 sudo wget http://getwallpapers.com/wallpaper/full/2/2/3/702223-free-rainforest-backgrounds-2560x1440.jpg
@@ -132,14 +153,6 @@ sudo wget http://getwallpapers.com/wallpaper/full/8/0/e/702147-rainforest-backgr
 sudo wget http://getwallpapers.com/wallpaper/full/e/8/7/702136-rainforest-backgrounds-1920x1080-for-mobile.jpg
 sudo wget http://getwallpapers.com/wallpaper/full/a/6/e/702131-beautiful-rainforest-backgrounds-1920x1080-for-iphone-6.jpg
 sudo wget http://getwallpapers.com/wallpaper/full/a/a/9/702126-rainforest-backgrounds-2560x1600-for-computer.jpg
-
-!
-##############make common folders################
-sudo mkdir /home/$USER/Documents
-sudo mkdir /home/$USER/Downloads
-sudo mkdir /home/$USER/Music
-sudo mkdir /home/$USER/Videos
-
 
 #just a little section to layout my thougts on this config.
 # try putting 'pi' as the new user name and see if anything breaks, or if the home folder gets encrypted
@@ -185,6 +198,7 @@ sudo usermod -a -G adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,input,
 sudo sed -i '$a dtoverlay=gpio-shutdown,gpio_pin=3,active_low=1,gpio_pull=up\nenable_uart=1\' /boot/config.txt
 
 !
+#########SET TYPICAL LOCALIZATION OPITONS 
 #set the ducking keyboard, duck!
 sudo sed -i 's/gb/us/g' /etc/default/keyboard
 
@@ -192,20 +206,21 @@ sudo sed -i 's/gb/us/g' /etc/default/keyboard
 sudo timedatectl set-timezone US/Eastern
 #Alternatively use command: sudo dpkg-reconfigure tzdat
 
-!
-#enable  shh, vnc, WiFi, bluetooth
-sudo raspi-config nonint do_ssh 0
-sudo raspi-config nonint do_vnc 0
+#enable wifi and bluetooth, install tools
 sudo raspi-config nonint do_wifi_country US
-sudo apt install -y pi-bluetooth blueman dhcpcd-gtk bluealsa network-manager wpagui
-sudo apt install -y nmap macchanger wireshark
+sudo apt install -y pi-bluetooth blueman  bluealsa network-manager
 
-#for stress testing
-sudo apt install -y stress sysbench
 
-############OPTIONAL SOFTWARES LIST##########################
+#enable  shh, vnc, WiFi, bluetooth
+!
+sudo raspi-config nonint do_ssh 0
+!
+sudo raspi-config nonint do_vnc 0
+
+
 
 !
+############OPTIONAL SOFTWARES LIST##########################
 #install retropie
 cd /opt/
 sudo git clone --depth=1 https://github.com/RetroPie/RetroPie-Setup.git
@@ -213,19 +228,55 @@ cd RetroPie-Setup
 sudo ./retropie_setup.sh
 #done installing retropie
 
+#creative suite (heavy)
+sudo apt install -y mixxx kdenlive blender audacity gimp
 
+#install cool-retro-term {the cool cannot be overstated}
+cd /opt/ 
+sudo apt install -y build-essential qmlscene qt5-qmake qt5-default qtdeclarative5-dev qml-module-qtquick-controls qml-module-qtgraphicaleffects qml-module-qtquick-dialogs qml-module-qtquick-localstorage qml-module-qtquick-window2 qml-module-qt-labs-settings qml-module-qt-labs-folderlistmodel
+git clone --recursive https://github.com/Swordfish90/cool-retro-term.git
+cd cool-retro-term
+qmake && make
+sudo cp cool-retro-term.desktop /usr/share/applications
+sudo ln -s /opt/cool-retro-term/cool-retro-term /usr/local/bin/cool-retro-term
+#done installing cool-retro-term
 
-#this is not working, consider removing?
-#did this earlier in the install but need to run again late to make Wallpapers folder belong to new user
-#take ownership and set permissions of user folder:
-#sudo -u $USER chmod 750 -R /home/$USER/
-#sudo chown -R $USER:$USER /home/$USER/
-#sudo umask 0027
+#install pipeseroni's pipes.sh from source (installs to /usr/local by default, works)
+cd /opt/
+sudo git clone https://github.com/pipeseroni/pipes.sh
+cd pipes.sh
+sudo make install
+#done installing pipes.sh
 
-#credit where credit is due
-#wget -O /home/$USER/.conkyrc https://raw.githubusercontent.com/novaspirit/rpi_conky/master/rpi3_conkyrc
+#more matrix stuff apparently
+cd /opt/
+sudo git clone https://github.com/mayfrost/ncmatrix           ▐▌
+cd ncmatrix
+sudo chmod +x configure
+sudo ./configure                                                                ▐▌
+sudo make check                                                                 ▐▌
+sudo make install   
+#probs done installing NMmatrix  
 
-#change swap file from 100mb to something bigger, need to make this optional
+!
+#install asciiaquarium
+sudo apt-get install libcurses-perl
+cd /opt/ 
+sudo wget http://search.cpan.org/CPAN/authors/id/K/KB/KBAUCOM/Term-Animation-2.4.tar.gz
+sudo tar -zxvf Term-Animation-2.4.tar.gz
+sudo cd Term-Animation-2.4/
+sudo perl Makefile.PL &&  make &&   make test
+sudo make install
+cd /opt/
+sudo wget http://www.robobunny.com/projects/asciiquarium/asciiquarium.tar.gz
+sudo tar -zxvf asciiquarium.tar.gz
+sudo cd asciiquarium_1.1/
+sudo cp asciiquarium /usr/local/bin
+sudo chmod 0755 /usr/local/bin/asciiquarium
+#done installing asciiaquarium
+
+!
+##################change swap file from 100mb to something bigger, need to make this optional
 sudo sed -i 's/^CONF_SWAPSIZE=[0-9]*$/CONF_SWAPSIZE=512/' /etc/dphys-swapfile
 sudo dphys-swapfile setup
 #Andreas Speiss recomends these swap file changes
@@ -238,17 +289,14 @@ sudo dphys-swapfile setup
 #Alternatively... Disable Swap 
 #sudo swapoff -a -v
 
-#install Log2Ram for raspi, must be done last and requires reboot
-printf -- 'deb http://packages.azlux.fr/debian/ buster main'| sudo tee /etc/apt/sources.list.d/azlux.list
-wget -qO - https://azlux.fr/repo.gpg.key | sudo apt-key add -
-apt update
-apt install log2ram
-
 #######Script finished, show some helpful info ##############
 
 #show overclock and overlay info from /boot/config.txt
 printf -- 'Current /boot/config.txt settings:\n'
 vcgencmd get_config int
+
+#show directory tree
+sudo tree
 
 #show codec info
 for codec in H264 MPG2 WVC1 MPG4 MJPG WMV9 ; do \
@@ -256,8 +304,9 @@ for codec in H264 MPG2 WVC1 MPG4 MJPG WMV9 ; do \
 done
 
 #ta ta fa na
-printf -- 'install complete\n' | lolcat
-printf -- 'reboot and login as new user\n' | lolcat
+printf -- 'script complete\n' | lolcat
+printf -- 'reboot if needed\n' | lolcat
+printf -- 'login as new user\n' | lolcat
 
 #print script elapsed runtime
 ELAPSED="Elapsed: $(($STOPWATCH / 3600))hrs $((($STOPWATCH / 60) % 60))min $(($STOPWATCH % 60))sec"
