@@ -5,6 +5,9 @@
 
 set $mod Mod4
 
+#rebiuld font list to include user fonts in ~/.fonts/
+fc-cache -v -f
+
 #transparancy effect
 exec compton -f -b
 
