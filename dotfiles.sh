@@ -1,64 +1,63 @@
 #!/bin/bash
 
-# Check for root, must be root to install
-echo ":::"
-if [[ $EUID -eq 0 ]];then
-    echo "::: You are root."
-else
-    echo "::: sudo will be used for the install."
-    # Check if it is actually installed
-    # If it isn't, exit because the install cannot complete
-    if [[ $(dpkg-query -s sudo) ]];then
-        export SUDO="sudo"
-        export SUDOE="sudo -E"
-    else
-        echo "::: Please install sudo or run this as root."
-        exit 1
-    fi
-fi
-
-#check for "--help" or "-h" flags
-if [ ${#@} -ne 0 ] && [ "${@#"--help"}" = "" ]
-then
-  printf -- 'there is no help.\n'
-  sleep 3
-  printf -- 'only zuul.\n'
-  exit 0
-fi
-
-tmpLog="/tmp/dotfiles-install.log"
-
-# Find the rows and columns. Will default to 80x24 if it can not be detected.
+# Detect screen size, default to 80x24
 screen_size=$(stty size 2>/dev/null || echo 24 80)
 rows=$(echo $screen_size | awk '{print $1}')
 columns=$(echo $screen_size | awk '{print $2}')
 
-# Divide by two so the dialogs take up half of the screen, which looks nice.
+#create (r)ow and (c)olumn vairables for whiptail menus
 r=$(( rows / 2 ))
 c=$(( columns / 2 ))
-# Unless the screen is tiny
 r=$(( r < 20 ? 20 : r ))
 c=$(( c < 70 ? 70 : c ))
 
 #set whiptail colors
-export NEWT_COLORS='
-root=,brightred
-window=,red
-border=white,red
-textbox=white,red
-button=black,white
-'
+export NEWT_COLORS="
+root=,red
+roottext=yellow,red"
 
 #inform user and prompt for consent
-whiptail --title "This is the script you are about to install:" --textbox --scrolltext $0 ${r} ${c}
+whiptail --backtitle "ghostbusker's dotfiles installer" \
+--title "This is the script you are about to install:" --textbox --scrolltext $0 ${r} ${c}
 
-####FUCNTIONS######
-###Setup New Encrypted User#################################################################################################
+####FUCNTIONS#####
+
+checkRoot(){
+  echo "Checkinging for root..."
+  if [[ $EUID -eq 0 ]]; then
+      echo "You are root."
+  else
+      echo "Please install sudo or run this as root."
+      exit 1
+      fi
+  fi
+}
+
+checkHelp(){
+  echo "checking for --help or -h flags"
+  if [ ${#@} -ne 0 ] && [ "${@#"--help"}" = "" ]; then
+    printf -- 'there is no help.\n'
+    sleep 3
+    printf -- 'only zuul.\n'
+    exit 0
+  fi
+}
+
 newEncryptedUser(){
-  #Create new username
+  echo "creating new encrypted user"
   USER=username
-  USER=$(whiptail --inputbox "Enter new user name. User 'pi' should be deleted for security reasons. No spaces please." ${r} ${c} $USER --title "New User Name" 3>&1 1>&2 2>&3)
-
+  USER=$(whiptail --backtitle "ghostbusker's dotfiles installer" --title= "New Encrypted User"  \
+  --inputbox "Enter new user name. User 'pi' should be deleted for security reasons. No spaces please." ${r} ${c} $USER 3>&1 1>&2 2>&3)
+  #check if username selection ran correctly
+  exitstatus=$?
+  if [ $exitstatus = 0 ]; then
+    whiptail --backtitle "ghostbusker's dotfiles installer" \
+    --title "New Encrypted User" --infobox "New User: $username" ${r} ${c}
+  else
+    whiptail --backtitle "ghostbusker's dotfiles installer" \
+    --title "New Encrypted User" --infobox "Cancelled" ${r} ${c}
+    exit
+  fi
   #create new user and add them to the sudo group, prompts for a new password
   sudo adduser $USER
   sudo usermod -a -G sudo $USER
@@ -73,7 +72,7 @@ newEncryptedUser(){
 }
 
 copyDotfiles (){
-  #copy "dotfiles" into place
+  echo "copying dotfiles into place"
   sudo cp -r .config/ /home/$USER/
   sudo cp -r .bashrc /home/$USER/
 
@@ -84,11 +83,13 @@ copyDotfiles (){
   sudo umask 0027
 }
 
-#######INSTALL DEFAULT TERMINAL ENVIRONMENT################################
 favoriteApps(){
-  #termnial upgrade + terminal candy)
-  sudo apt install -y terminator locate tilda neovim ranger trash-cli neofetch figlet lolcat cmatrix hollywood funny-manpages caca-utils libaa-bin thefuck howdoi cowsay fortune
+  echo "installing favorite apps and tools"
 
+  #termnial upgrade + terminal candy)
+  sudo apt install -y terminator locate tilda neovim ranger trash-cli neofetch figlet \
+  lolcat cmatrix hollywood funny-manpages caca-utils libaa-bin thefuck howdoi cowsay fortune
+  
   #system utilities and monitors
   sudo apt install -y	glances nmon htop
 
@@ -106,17 +107,18 @@ favoriteApps(){
 
   #install productivity apps
   sudo apt install -y geany neovim
-
 }
 
-###Install the desktop environment##########################################################################################
 desktopFromScratch (){
-  #install some apps needed to make UI
+  echo "installing graphical desktop environment i3-gaps"
+
   sudo apt install -y xorg xserver-xorg xinit git cmake lxappearance
 
   #installing i3-gaps window manager from source
   cd /opt/ 
-  sudo apt install -y i3 gcc make autoconf dh-autoreconf libxcb-keysyms1-dev libpango1.0-dev libxcb-util0-dev xcb libxcb1-dev libxcb-icccm4-dev libyajl-dev libev-dev libxcb-xkb-dev libxcb-cursor-dev libxkbcommon-dev libxcb-xinerama0-dev libxkbcommon-x11-dev libstartup-notification0-dev libxcb-randr0-dev libxcb-xrm0 libxcb-xrm-dev libxcb-shape0 libxcb-shape0-dev
+  sudo apt install -y i3 gcc make autoconf dh-autoreconf libxcb-keysyms1-dev libpango1.0-dev libxcb-util0-dev xcb libxcb1-dev \
+  libxcb-icccm4-dev libyajl-dev libev-dev libxcb-xkb-dev libxcb-cursor-dev libxkbcommon-dev libxcb-xinerama0-dev \
+  libxkbcommon-x11-dev libstartup-notification0-dev libxcb-randr0-dev libxcb-xrm0 libxcb-xrm-dev libxcb-shape0 libxcb-shape0-dev
   sudo git clone https://www.github.com/Airblader/i3 i3-gaps
   cd i3-gaps
   sudo autoreconf --force --install
@@ -126,26 +128,25 @@ desktopFromScratch (){
   sudo ../configure --prefix=/usr --sysconfdir=/etc --disable-sanitizers
   sudo make -j8
   sudo make install
-  #done installing i3-gaps
 
   #install apps that will be part of desktop composition and daily apps
   sudo apt install -y i3blocks feh compton clipit arandr mpv florence nemo conky dhcpcd-gtk wpagui
 
   #install wifi and bluetooth tools
-  sudo apt install -y pi-bluetooth blueman  bluealsa network-manager
+  sudo apt install -y pi-bluetooth blueman bluealsa network-manager
 
 }
 
-##################install Log2Ram for raspi, must be done last and requires reboot
 log2Ram() {
+  echo "installing log2ram" #must be done last and requires reboot
   printf -- 'deb http://packages.azlux.fr/debian/ buster main'| sudo tee /etc/apt/sources.list.d/azlux.list
   wget -qO - https://azlux.fr/repo.gpg.key | sudo apt-key add -
   apt update
   apt install log2ram
 }
 
-##############make common folders################
 makeFolders() {
+  echo "make folders in home directory"
   sudo mkdir /home/$USER/Documents
   sudo mkdir /home/$USER/Downloads
   sudo mkdir /home/$USER/Music
@@ -153,8 +154,8 @@ makeFolders() {
   sudo mkdir /home/$USER/Pictures
 }
 
-#############copy wallpapers####################
 scrapeWallpapers() {
+  echo "scraping wallpapers from the web" #shamelessly
   sudo mkdir /home/$USER/Pictures/Wallpapers
   cd /home/$USER/Pictures/Wallpapers
   sudo wget http://getwallpapers.com/wallpaper/full/2/2/3/702223-free-rainforest-backgrounds-2560x1440.jpg
@@ -165,84 +166,73 @@ scrapeWallpapers() {
   sudo wget http://getwallpapers.com/wallpaper/full/a/a/9/702126-rainforest-backgrounds-2560x1600-for-computer.jpg
 }
 
-#view cpu scaling freq:
-#cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq 
-
-###########################OpenVPN Setup####################
 openVPN() {
-  #This is where we install OpenVPN for tunneling back "home"
+  echo "installing openvpn for tunneling back to home network"
   sudo apt install -y openvpn
   #runs with: sudo openvpn ~./location/of/ovpn-file.ovpn
   #launched by i3, see ~/.config/i3/config
 }
 
-##############Raspberry Pi specific stuff##################
 fixPiGroups() {
-  #add user to all the groups that user pi was a part of
+  echo "adding user to all the groups that user pi was a part of"
   sudo usermod -a -G adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,input,netdev,spi,i2c,gpio $USER
 }
 
-powerButton() {
-  #add GPIO pin3 shutdown to /boot/config.txt AND enable UART so that phisical GPIO pin 8 acts as power LED 
-  sudo sed -i '$a dtoverlay=gpio-shutdown,gpio_pin=3,active_low=1,gpio_pull=up\nenable_uart=1\' /boot/config.txt
+powerButtonLED() {
+  echo "adding GPIO pin3 shutdown to /boot/config.txt AND enabling UART so that pin 8 acts as power LED" 
+  sudo sed -i '$a dtoverlay=gpio-shutdown,gpio_pin=3,active_low=1,gpio_pull=up\' /boot/config.txt
+  sudo sed -i '$a enable_uart=1\' /boot/config.txt
 }
 
-#########SET TYPICAL LOCALIZATION OPITONS 
 localizeEasternUS() {
-  #set the ducking keyboard, duck!
+  echo "setting localization for keyboard, clock, and wifi"
   sudo sed -i 's/gb/us/g' /etc/default/keyboard
-
-  #this is getting kind of personal
   sudo timedatectl set-timezone US/Eastern
-  #Alternatively use command: sudo dpkg-reconfigure tzdat
-
-  #enable wifi and bluetooth, install tools
   sudo raspi-config nonint do_wifi_country US
 }
 
-#enable  shh, vnc, WiFi, bluetooth
 enableSSH() {
+  echo "enabling ssh as a service"
   sudo raspi-config nonint do_ssh 0
 }
 
 enableVNC() {
+  echo "enabling vnc"
   sudo raspi-config nonint do_vnc 0
 }
 
-############OPTIONAL SOFTWARES LIST##########################
 retroPie() {
-  #install retropie
+  echo "installing retropie"
   cd /opt/
   sudo git clone --depth=1 https://github.com/RetroPie/RetroPie-Setup.git
   cd RetroPie-Setup
   sudo ./retropie_setup.sh
-  #done installing retropie
 }
 
 creativeSuite() {
-  #creative suite (heavy)
+  echo "installing ghostbusker's creative suite"
   sudo apt install -y mixxx kdenlive blender audacity gimp
 }
 
 coolRetroTerm() {
-  #install cool-retro-term {the cool cannot be overstated}
+  echo "installing cool retro terminal"
   cd /opt/ 
-  sudo apt install -y build-essential qmlscene qt5-qmake qt5-default qtdeclarative5-dev qml-module-qtquick-controls qml-module-qtgraphicaleffects qml-module-qtquick-dialogs qml-module-qtquick-localstorage qml-module-qtquick-window2 qml-module-qt-labs-settings qml-module-qt-labs-folderlistmodel
+  sudo apt install -y build-essential qmlscene qt5-qmake qt5-default qtdeclarative5-dev qml-module-qtquick-controls \
+  qml-module-qtgraphicaleffects qml-module-qtquick-dialogs qml-module-qtquick-localstorage qml-module-qtquick-window2 \
+  qml-module-qt-labs-settings qml-module-qt-labs-folderlistmodel
   git clone --recursive https://github.com/Swordfish90/cool-retro-term.git
   cd cool-retro-term
   qmake && make
   sudo cp cool-retro-term.desktop /usr/share/applications
   sudo ln -s /opt/cool-retro-term/cool-retro-term /usr/local/bin/cool-retro-term
-  #done installing cool-retro-term
 }
 
 terminalPipes() {
-  #install pipeseroni's pipes.sh from source (installs to /usr/local by default, works)
+  echo "installing pipeseroni's pipes.sh from source"
   cd /opt/
   sudo git clone https://github.com/pipeseroni/pipes.sh
   cd pipes.sh
   sudo make install
-  #done installing pipes.sh
 }
 
 #more matrix stuff apparently
@@ -256,7 +246,7 @@ terminalPipes() {
 #probs done installing NMmatrix  
 
 asciiAquarium(){
-  #install asciiaquarium
+  echo "installing ascii aquarium"
   sudo apt-get install libcurses-perl
   cd /opt/ 
   sudo wget http://search.cpan.org/CPAN/authors/id/K/KB/KBAUCOM/Term-Animation-2.4.tar.gz
@@ -270,11 +260,10 @@ asciiAquarium(){
   sudo cd asciiquarium_1.1/
   sudo cp asciiquarium /usr/local/bin
   sudo chmod 0755 /usr/local/bin/asciiquarium
-  #done installing asciiaquarium
 }
 
-##################change swap file from 100mb to something bigger, need to make this optional
 swapfileChange(){
+  echo "adjusting sawp file size"
   sudo sed -i 's/^CONF_SWAPSIZE=[0-9]*$/CONF_SWAPSIZE=512/' /etc/dphys-swapfile
   sudo dphys-swapfile setup
   #Andreas Speiss recomends these swap file changes
@@ -288,57 +277,74 @@ swapfileChange(){
   #sudo swapoff -a -v
 }
 
+chooseModules(){
+  echo "let user choose which modules to run"
+  MODULES=$(whiptail --backtitle "ghostbusker's dotfiles installer" --title "Choose your own adventure" \
+    --checklist --separate-output "Modules:" ${r} ${c} 20 \
+    "newEncryptedUser" "New Encrypted User" ON \
+    "copyDotfiles" "Copy dotfiles to $USER home Directory" ON \
+    "favoriteApps" "Install Favorite GUI + Terminal Apps" ON \
+    "desktopFromScratch" "Install Destop Environment" ON \
+    "log2Ram" "Install Log2RAM" ON \
+    "makeFolders" "Make Default folders" ON \
+    "scrapeWallpapers" "Scrape Wallpapers from Web" ON \
+    "openVPN" "Install OpenVPN client" OFF \
+    "fixPiGroups" "Fix Pi Groups associations" ON \
+    "powerButtonLED" "Enalbe GPIO Power Button and LED" ON \
+    "localizeEasternUS" "Localize to Eastern US" OFF \
+    "enableSSH" "Enable SSH on boot" OFF \
+    "enableVNC" "Enable VNC on boot" OFF \
+    "retroPie" "Install RetroPie" OFF \
+    "creativeSuite" "Install Creative Suite" OFF \
+    "coolRetroTerm" "Install CoolRetroTerm" ON \
+    "termnialPipes" "Install Pipes for terminal" ON \
+    "asciiAquarium" "Install ASCII Aquarium" ON \
+    "swapfileChange" "Change Swapfile" OFF \
+    3>&1 1>&2 2>&3)
+
+  #check if module selection ran correctly
+   exitstatus=$?
+  if [ $exitstatus = 0 ]; then
+   whiptail --backtitle "ghostbusker's dotfiles installer" \
+   --title "Setup dotfiles" --infobox "Modules selected: $MODULES" ${r} ${c}
+  else
+  whiptail --backtitle "ghostbusker's dotfiles installer" \
+  --title "Setup dotfiles" --infobox "Cancelled" ${r} ${c}
+  exit
+  fi
+}
+
 ################# ACTUAL run scrip, like do allthe stuff in the modules above ########################
 
-#let user choose which modules to run
-MODULES=$(whiptail --title "Choose your own adventure" --checklist --separate-output \
-  "Modules:" ${r} ${c} \
-  "newEncryptedUser" "New Encrypted User" ON \
-  "copyDotfiles" "Copy dotfiles to $USER home Directory" ON \
-  "favoriteApps" "Install Favorite GUI + Terminal Apps" ON \
-  "desktopFromScratch" "Install Destop Environment" ON \
-  "log2Ram" "Install Log2RAM" ON \
-  "makeFolders" "Make Default folders" ON \
-  "scrapeWallpapers" "Scrape Wallpapers from Web" ON \
-  "openVPN" "Install OpenVPN client" OFF \
-  "fixPiGroups" "Fix Pi Groups associations" ON \
-  "powerButton" "Enalbe GPIO Power Button" ON \
-  "localizeEasternUS" "Localize to Eastern US" OFF \
-  "enableSSH" "Enable SSH on boot" OFF \
-  "enableVNC" "Enable VNC on boot" OFF \
-  "retroPie" "Install RetroPie" OFF \
-  "creativeSuite" "Install Creative Suite" OFF \
-  "coolRetroTerm" "Install CoolRetroTerm" ON \
-  "termnialPipes" "Install Pipes for terminal" ON \
-  "asciiAquarium" "Install ASCII Aquarium" YES \
-  "swapfileChange" "Change Swapfile" No \
-  3>&1 1>&2 2>&3)
+checkRoot
+checkHelp
+chooseModules
 
-#turn list into function
-
-runMODULES() {
-  #while read choice do $choice
-  while read $MODULES do 
-} 
 #backup then temporarily change terminal colors
-TEMP1=$PS1
-export PS1="\e[0;32m\]"
+#TEMP1=$PS1
+#export PS1="\e[0;32m\]"
 
 #enable colored output for git
 sudo git config --global color.ui auto
 
 #update package list, force use of IPv4 if failure to connect
+sudo printf -- 'Updating package list...\n'
 sudo apt update || sudo apt-get -o Acquire::ForceIPv4=true update
 
 #starting script timer
 sudo printf -- 'Starting script timer...\n'
 STOPWATCH=0
 
-#run selected modules
-runMODULES | tee ${tmpLog}
+#create installer log file
+tmpLog="/tmp/dotfiles-install.log"
 
-#Move the install log to the local foder
-$SUDO mv ${tmpLog} 
+#run each script selected in MODULES list
+for module in $MODULES ; do \
+  $module | tee -a -i $tmpLog ; \
+done
+
+#Move the install log to the current working directory
+sudo mv $tmpLog $(pwd)
 
 #######Script finished, show some helpful info ##############
 
@@ -355,16 +361,16 @@ for codec in H264 MPG2 WVC1 MPG4 MJPG WMV9 ; do \
 done
 
 #ta ta fa na
-printf -- 'script complete\n' | lolcat
-printf -- 'reboot if needed\n' | lolcat
-printf -- 'login as new user\n' | lolcat
+printf -- 'script complete\n' #| lolcat
+printf -- 'reboot if needed\n' #| lolcat
+printf -- 'login as new user\n' #| lolcat
 
 #print script elapsed runtime
 ELAPSED="Elapsed: $(($STOPWATCH / 3600))hrs $((($STOPWATCH / 60) % 60))min $(($STOPWATCH % 60))sec"
-printf -- '$ELAPSED\n' | lolcat
+printf -- '$ELAPSED\n' #| lolcat
 
 #return terminal colors to normal
-PS1=$TEMP1
+#PS1=$TEMP1
 
 #alternatley/additionally, reload bash?
 bash
@@ -372,10 +378,9 @@ bash
 exit 0
 
 #just a little section to layout my thougts on this config.
-# try putting 'pi' as the new user name and see if anything breaks, or if the home folder gets encrypted
-# try putting in a username with a space as well, i bet it breaks things
-#use more whiptial
-#ask for keyword for system theme (background, motd, colors?)
+#try putting 'pi' as the new user name and see if anything breaks, or if the home folder gets encrypted
+#try putting in a username with a space as well, i bet it breaks things
+#ask for keyword for system theme and auto generate background, motd, colors?
 #fix localization (keyboard, timezone, wifi), current solution is insufficient 
 #create new user (not "pi") with encrypted file system (https://technicalustad.com/how-to-encrypt-raspberry-pi-home-folder/)
 #fetch backgrounds based on keyword
