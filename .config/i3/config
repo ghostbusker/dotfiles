@@ -26,7 +26,7 @@ for_window [class="florence"] floating enable
 #get the clipboard manager and OSK running (and floating!)
 exec --no-startup-id tilda --config ~/.config/tilda
 exec --no-startup-id clipit
-exec --no-startup-id conky
+exec --no-startup-id dunst
 exec --no-startup-id dhcpcd-gtk
 exec --no-startup-id nm-tray
 exec --no-startup-id blueman-applet
@@ -40,6 +40,7 @@ for_window [urgent=latest] focus
 
 ############# Workspace Setup ##############
 #exec --no-startup-id i3-msg workspace $ws1
+exec --no-startup-id conky
 exec xterm -e htop
 exec xterm -e ~/.config/scripts/weather.sh
 #exec xterm -e "pipes.sh -p 10 -f 30 -r 20000"
@@ -80,6 +81,27 @@ assign [class="Chromium"] $ws3
 
 focus_follows_mouse no
 mouse_warping output
+
+#############Main i3 controls#################
+
+# reload the configuration file
+bindsym $mod+Shift+c reload
+
+# restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
+bindsym $mod+Shift+r restart
+
+# exit i3 (logs you out of your X session)
+bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -B 'Yes, exit i3' 'i3-msg exit'"
+
+##########Colors #############################
+# most of these wont be visible when using i3-gaps
+# class                 border  bground text    indicator child_border
+client.focused          #336633 #339933 #F0FFF0 #33CC33   #44DD44
+client.focused_inactive #333333 #5F676A #C0CCC0 #484E50   #5F676A
+client.unfocused        #333333 #222222 #808880 #292D2E   #222222
+client.urgent           #2F343A #900000 #C0CCC0 #900000   #900000
+client.placeholder      #000000 #0C0C0C #C0CCC0 #000000   #0C0C0C
+client.background       #CCFFCC
 
 #################App Launch Hotkeys###################
 
@@ -131,15 +153,6 @@ floating_modifier $mod
 
 # enter fullscreen mode for the focused container
 bindsym $mod+f fullscreen toggle
-
-# reload the configuration file
-bindsym $mod+Shift+c reload
-
-# restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
-bindsym $mod+Shift+r restart
-
-# exit i3 (logs you out of your X session)
-bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -B 'Yes, exit i3' 'i3-msg exit'"
 
 # kill focused window
 bindsym $mod+Shift+q kill
@@ -275,8 +288,8 @@ bar {
         hidden_state hide
         modifier $mod
         colors {
-                background #663300
-                statusline #000000
+                background #003300
+                statusline #CC3300
         }
 }
 
@@ -294,13 +307,14 @@ bar {
         hidden_state show
         modifier $mod
         colors {
-                background #006600
-                statusline #ffffff
-                separator #a0a0a0a0
-                focused_workspace  #4c7899 #285577 #ffffff
-                active_workspace   #333333 #5f676a #ffffff
-                inactive_workspace #333333 #222222 #888888
-                urgent_workspace   #2f343a #900000 #ffffff
-                binding_mode       #2f343a #900000 #ffffff
+                background #003300
+                statusline #CCFFCC
+                separator  #666666
+
+                focused_workspace  #339933 #CC3300 #F0FFF0
+                active_workspace   #006600 #336633 #CCFFCC
+                inactive_workspace #333333 #003300 #808880
+                urgent_workspace   #996633 #CC0000 #CCFFCC
+                binding_mode       #663300 #993300 #CCFFCC
         }
 }

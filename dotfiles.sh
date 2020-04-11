@@ -14,13 +14,52 @@ c=$(( c < 70 ? 70 : c ))
 #set whiptail colors
 export NEWT_COLORS="
 root=,red
-roottext=yellow,red"
+roottext=white,red"
 
 #inform user and prompt for consent
 whiptail --backtitle "ghostbusker's dotfiles installer" \
---title "This is the script you are about to install:" --textbox --scrolltext $0 ${r} ${c}
+--title "This is the script you are about to install:" \
+--textbox --scrolltext $0 ${r} ${c}
 
 ####FUCNTIONS#####
+
+chooseModules(){
+  echo "let user choose which modules to run"
+  MODULES=$(whiptail --backtitle "ghostbusker's dotfiles installer" \
+    --title "Choose your own adventure" \
+    --checklist --separate-output "Modules:" ${r} ${c} 20 \
+    "newEncryptedUser" "New Encrypted User" ON \
+    "favoriteApps" "Install Favorite GUI + Terminal Apps" ON \
+    "desktopFromScratch" "Install Destop Environment" ON \
+    "makeFolders" "Make Default folders" ON \
+    "scrapeWallpapers" "Scrape Wallpapers from Web" ON \
+    "openVPN" "Install OpenVPN client" OFF \
+    "fixPiGroups" "Fix Pi Groups associations" ON \
+    "powerButtonLED" "Enalbe GPIO Power Button and LED" ON \
+    "localizeEasternUS" "Localize to Eastern US" OFF \
+    "enableSSH" "Enable SSH on boot" OFF \
+    "enableVNC" "Enable VNC on boot" OFF \
+    "retroPie" "Install RetroPie" OFF \
+    "creativeSuite" "Install Creative Suite" OFF \
+    "coolRetroTerm" "Install CoolRetroTerm" ON \
+    "termnialPipes" "Install Pipes for terminal" ON \
+    "asciiAquarium" "Install ASCII Aquarium" ON \
+    "swapfileChange" "Change Swapfile" OFF \
+    "log2Ram" "Install Log2RAM" OFF\
+    "copyDotfiles" "Copy dotfiles to $USER home Directory" ON \
+    "deletUserPi" "Delete User Pi? *DANGEROUS*" OFF 3>&1 1>&2 2>&3)
+  exitstatus=$?
+  if [ $exitstatus = 0 ]; then
+    whiptail --backtitle "ghostbusker's dotfiles installer" \
+    --title "Setup dotfiles" \
+    --infobox "Modules selected: $MODULES" ${r} ${c}
+  else
+    whiptail --backtitle "ghostbusker's dotfiles installer" \
+    --title "Setup dotfiles" \
+    --infobox "Cancelled" ${r} ${c}
+    exit
+  fi
+}
 
 checkRoot(){
   echo "Checkinging for root..."
@@ -29,16 +68,15 @@ checkRoot(){
   else
       echo "Please install sudo or run this as root."
       exit 1
-      fi
   fi
 }
 
 checkHelp(){
   echo "checking for --help or -h flags"
   if [ ${#@} -ne 0 ] && [ "${@#"--help"}" = "" ]; then
-    printf -- 'there is no help.\n'
+    echo "there is no help."
     sleep 3
-    printf -- 'only zuul.\n'
+    echo "only zuul."
     exit 0
   fi
 }
@@ -46,20 +84,26 @@ checkHelp(){
 newEncryptedUser(){
   echo "creating new encrypted user"
   USER=username
-  USER=$(whiptail --backtitle "ghostbusker's dotfiles installer" --title= "New Encrypted User"  \
-  --inputbox "Enter new user name. User 'pi' should be deleted for security reasons. No spaces please." ${r} ${c} $USER 3>&1 1>&2 2>&3)
-  #check if username selection ran correctly
+  USER=$(whiptail --backtitle "ghostbusker's dotfiles installer" \
+  --title "New Encrypted User"  \
+  --inputbox "Enter new user name. User 'pi' should be deleted for security reasons. No spaces please." \
+  ${r} ${c} $USER 3>&1 1>&2 2>&3)
   exitstatus=$?
   if [ $exitstatus = 0 ]; then
     whiptail --backtitle "ghostbusker's dotfiles installer" \
-    --title "New Encrypted User" --infobox "New User: $username" ${r} ${c}
+    --title "New Encrypted User" \
+    --infobox "New User: $username" ${r} ${c}
   else
     whiptail --backtitle "ghostbusker's dotfiles installer" \
     --title "New Encrypted User" --infobox "Cancelled" ${r} ${c}
     exit
   fi
-  #create new user and add them to the sudo group, prompts for a new password
-  sudo adduser $USER
+  PASS=$(whiptail --backtitle "ghostbusker's dotfiles installer" \
+  --title "New Encrypted User"  \
+  --passwordbox "Enter password for new user: " ${r} ${c} 3>&1 1>&2 2>&3)
+
+  #create new user and add them to the sudo group
+  echo -e "$PASS\n$PASS\n" | sudo adduser --gecos "" $USER
   sudo usermod -a -G sudo $USER
 
   #install apps needed to encrypt the user folder
@@ -71,50 +115,30 @@ newEncryptedUser(){
   #show encryption password with command: ecryptfs-unwrap-passphrase
 }
 
-copyDotfiles (){
-  echo "copying dotfiles into place"
-  sudo cp -r .config/ /home/$USER/
-  sudo cp -r .bashrc /home/$USER/
-
-  #this next part made all the difference, chome and a bunch of other apps were broken otherwise
-  #take ownership and set permissions of user folder:
-  sudo -u $USER chmod 750 -R /home/$USER/
-  sudo chown -R $USER:$USER /home/$USER/
-  sudo umask 0027
-}
-
 favoriteApps(){
+  #This is going to get an implementation and organization overhaul
   echo "installing favorite apps and tools"
-
-  #termnial upgrade + terminal candy)
+  echo "installing termnial upgrade + terminal candy"
   sudo apt install -y terminator locate tilda neovim ranger trash-cli neofetch figlet \
   lolcat cmatrix hollywood funny-manpages caca-utils libaa-bin thefuck howdoi cowsay fortune
-  
-  #system utilities and monitors
+  echo "installing system utilities and monitors"
   sudo apt install -y	glances nmon htop
-
-  #MEDIA apps
+  echo "installing media apps"
   sudo apt install -y cmus vis playerctl vlc
-
-  #for stress testing
+  echo "installing apps for stress testing and benchmarks"
   sudo apt install -y stress sysbench
-
-  #network tools
+  echo "installing network info tools"
   sudo apt install -y nmap macchanger tshark zenmap wireshark
-
-  #more common apps
+  echo "installing more common apps"
   sudo apt install -y screenkey ttyrec realvnc-vnc-server realvnc-vnc-viewer chromium-browser
-
-  #install productivity apps
+  echo "installing productivity apps"
   sudo apt install -y geany neovim
 }
 
 desktopFromScratch (){
-  echo "installing graphical desktop environment i3-gaps"
-
+  echo "installing graphical desktop environment"
   sudo apt install -y xorg xserver-xorg xinit git cmake lxappearance
-
-  #installing i3-gaps window manager from source
+  echo "installing i3-gaps window manager from source"
   cd /opt/ 
   sudo apt install -y i3 gcc make autoconf dh-autoreconf libxcb-keysyms1-dev libpango1.0-dev libxcb-util0-dev xcb libxcb1-dev \
   libxcb-icccm4-dev libyajl-dev libev-dev libxcb-xkb-dev libxcb-cursor-dev libxkbcommon-dev libxcb-xinerama0-dev \
@@ -128,21 +152,10 @@ desktopFromScratch (){
   sudo ../configure --prefix=/usr --sysconfdir=/etc --disable-sanitizers
   sudo make -j8
   sudo make install
-
-  #install apps that will be part of desktop composition and daily apps
-  sudo apt install -y i3blocks feh compton clipit arandr mpv florence nemo conky dhcpcd-gtk wpagui
-
-  #install wifi and bluetooth tools
+  echo "installing apps that will be part of desktop composition and daily use"
+  sudo apt install -y i3blocks feh compton clipit arandr mpv florence dunst nemo conky dhcpcd-gtk wpagui
+  echo "installing wifi and bluetooth tools"
   sudo apt install -y pi-bluetooth blueman bluealsa network-manager
-
-}
-
-log2Ram() {
-  echo "installing log2ram" #must be done last and requires reboot
-  printf -- 'deb http://packages.azlux.fr/debian/ buster main'| sudo tee /etc/apt/sources.list.d/azlux.list
-  wget -qO - https://azlux.fr/repo.gpg.key | sudo apt-key add -
-  apt update
-  apt install log2ram
 }
 
 makeFolders() {
@@ -277,113 +290,97 @@ swapfileChange(){
   #sudo swapoff -a -v
 }
 
-chooseModules(){
-  echo "let user choose which modules to run"
-  MODULES=$(whiptail --backtitle "ghostbusker's dotfiles installer" --title "Choose your own adventure" \
-    --checklist --separate-output "Modules:" ${r} ${c} 20 \
-    "newEncryptedUser" "New Encrypted User" ON \
-    "copyDotfiles" "Copy dotfiles to $USER home Directory" ON \
-    "favoriteApps" "Install Favorite GUI + Terminal Apps" ON \
-    "desktopFromScratch" "Install Destop Environment" ON \
-    "log2Ram" "Install Log2RAM" ON \
-    "makeFolders" "Make Default folders" ON \
-    "scrapeWallpapers" "Scrape Wallpapers from Web" ON \
-    "openVPN" "Install OpenVPN client" OFF \
-    "fixPiGroups" "Fix Pi Groups associations" ON \
-    "powerButtonLED" "Enalbe GPIO Power Button and LED" ON \
-    "localizeEasternUS" "Localize to Eastern US" OFF \
-    "enableSSH" "Enable SSH on boot" OFF \
-    "enableVNC" "Enable VNC on boot" OFF \
-    "retroPie" "Install RetroPie" OFF \
-    "creativeSuite" "Install Creative Suite" OFF \
-    "coolRetroTerm" "Install CoolRetroTerm" ON \
-    "termnialPipes" "Install Pipes for terminal" ON \
-    "asciiAquarium" "Install ASCII Aquarium" ON \
-    "swapfileChange" "Change Swapfile" OFF \
-    3>&1 1>&2 2>&3)
-
-  #check if module selection ran correctly
-   exitstatus=$?
-  if [ $exitstatus = 0 ]; then
-   whiptail --backtitle "ghostbusker's dotfiles installer" \
-   --title "Setup dotfiles" --infobox "Modules selected: $MODULES" ${r} ${c}
-  else
-  whiptail --backtitle "ghostbusker's dotfiles installer" \
-  --title "Setup dotfiles" --infobox "Cancelled" ${r} ${c}
-  exit
-  fi
+log2Ram() {
+  echo "installing log2ram" #must be done last and requires reboot
+  printf -- 'deb http://packages.azlux.fr/debian/ buster main'| sudo tee /etc/apt/sources.list.d/azlux.list
+  wget -qO - https://azlux.fr/repo.gpg.key | sudo apt-key add -
+  apt update
+  apt install log2ram
 }
 
-################# ACTUAL run scrip, like do allthe stuff in the modules above ########################
+copyDotfiles (){
+  echo "copying dotfiles into place"
+  sudo cp -r .config/ /home/$USER/
+  sudo cp -r .bashrc /home/$USER/
+
+  #this next part made all the difference, chome and a bunch of other apps were broken otherwise
+  #take ownership and set permissions of user folder:
+  sudo -u $USER chmod 750 -R /home/$USER/
+  sudo chown -R $USER:$USER /home/$USER/
+  sudo umask 0027
+}
+
+deleteUserPi(){
+  echo "deleting pi user and removing all files"
+  sudo pkill -u pi
+  sudo userdel --remove-all-files pi
+}
+
+pepareInstall(){
+  echo "preparing to run modules"
+  sudo git config --global color.ui auto
+  echo "updating package list"
+  sudo apt update || sudo apt-get -o Acquire::ForceIPv4=true update
+  echo "starting script timer"
+  STOPWATCH=0
+  echo "creating install log"
+  tmpLog="/tmp/dotfiles-install.log"
+
+  #backup then temporarily change terminal colors
+  #TEMP1=$PS1
+  #export PS1="\e[0;32m\]"
+}
+
+runModules(){
+  echo "running each module in sequence"
+  for module in $MODULES ; do \
+    $module | tee -a -i $tmpLog ; \
+  done
+}
+
+exportLog(){
+  echo "exporting log to currrent working directory"
+  sudo mv $tmpLog $(pwd)
+}
+
+showInfo(){
+  echo "showing some helpful info"
+  echo "Current /boot/config.txt settings: "
+  vcgencmd get_config int
+  echo "showing directory tree"
+  sudo tree
+  echo "showing codec info"
+  for codec in H264 MPG2 WVC1 MPG4 MJPG WMV9 ; do \
+    echo "$codec:\t$(vcgencmd codec_enabled $codec)" ; \
+  done
+  echo "script runtime"
+  ELAPSED="Elapsed: $(($STOPWATCH / 3600))hrs $((($STOPWATCH / 60) % 60))min $(($STOPWATCH % 60))sec"
+  echo "$ELAPSED" #| lolcat
+
+  #return terminal colors to normal
+  #PS1=$TEMP1
+
+  #alternatley/additionally, reload bash?
+  bash
+}
+
+################# ACTUAL run scrip, do all the stuff in the modules above ########################
 
 checkRoot
 checkHelp
 chooseModules
-
-#backup then temporarily change terminal colors
-#TEMP1=$PS1
-#export PS1="\e[0;32m\]"
-
-#enable colored output for git
-sudo git config --global color.ui auto
-
-#update package list, force use of IPv4 if failure to connect
-sudo printf -- 'Updating package list...\n'
-sudo apt update || sudo apt-get -o Acquire::ForceIPv4=true update
-
-#starting script timer
-sudo printf -- 'Starting script timer...\n'
-STOPWATCH=0
-
-#create installer log file
-tmpLog="/tmp/dotfiles-install.log"
-
-#run each script selected in MODULES list
-for module in $MODULES ; do \
-  $module | tee -a -i $tmpLog ; \
-done
-
-#Move the install log to the current working directory
-sudo mv $tmpLog $(pwd)
-
-#######Script finished, show some helpful info ##############
-
-#show overclock and overlay info from /boot/config.txt
-printf -- 'Current /boot/config.txt settings:\n'
-vcgencmd get_config int
-
-#show directory tree
-sudo tree
-
-#show codec info
-for codec in H264 MPG2 WVC1 MPG4 MJPG WMV9 ; do \
-	printf -- '$codec:\t$(vcgencmd codec_enabled $codec)' ; \
-done
-
-#ta ta fa na
-printf -- 'script complete\n' #| lolcat
-printf -- 'reboot if needed\n' #| lolcat
-printf -- 'login as new user\n' #| lolcat
-
-#print script elapsed runtime
-ELAPSED="Elapsed: $(($STOPWATCH / 3600))hrs $((($STOPWATCH / 60) % 60))min $(($STOPWATCH % 60))sec"
-printf -- '$ELAPSED\n' #| lolcat
-
-#return terminal colors to normal
-#PS1=$TEMP1
-
-#alternatley/additionally, reload bash?
-bash
-
+prepareInstall
+runModules
+exportLog
+echo "installer script finished"
+echo "reboot may be needed"
+showInfo
 exit 0
 
 #just a little section to layout my thougts on this config.
 #try putting 'pi' as the new user name and see if anything breaks, or if the home folder gets encrypted
 #try putting in a username with a space as well, i bet it breaks things
 #ask for keyword for system theme and auto generate background, motd, colors?
-#fix localization (keyboard, timezone, wifi), current solution is insufficient 
-#create new user (not "pi") with encrypted file system (https://technicalustad.com/how-to-encrypt-raspberry-pi-home-folder/)
-#fetch backgrounds based on keyword
 
 #I want this pi to have as many use-cases as possible. 
 #-provide wifi hotspot if plugged into internet via ethernet
@@ -393,10 +390,6 @@ exit 0
 
 #new user first login script?
 #Update list of default apps (terminal, browser, etc.): update-alternatives --all
-#delete pi user?
-#sudo pkill -u pi
-#sudo userdel --remove-all-files pi
 
 #maybe try the following line to intsall apps 1 by 1 for testing
 #for i in package1 package2 package3; do sudo apt-get install -y $i; done
-

@@ -9,16 +9,16 @@ case $- in
 esac
 
 #the ghstbskr section of the file, *ahem*
-figlet ghstbskr | lolcat
-neofetch
+#figlet ghstbskr | lolcat
+#neofetch
 #add local scripts folder to PATH for 'weather', 'tardis', 'toggle-compton', etc.
-export PATH="~/.config/scripts/"
+#export PATH="~/.config/scripts/"
 
 #im going to add these to ~/.bash_aliases
-alias ls='ls -F'
-alias ll='ls -lh'
-alias gh='history|grep'
-alias tp='trash-put'
+#alias ls='ls -F'
+#alias ll='ls -lh'
+#alias gh='history|grep'
+#alias tp='trash-put'
 
 # some more ls aliases
 #alias ll='ls -l'
