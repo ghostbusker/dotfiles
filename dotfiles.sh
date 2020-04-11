@@ -13,8 +13,11 @@ c=$(( c < 70 ? 70 : c ))
 
 #set whiptail colors
 export NEWT_COLORS="
-root=,black
-roottext=green,black"
+root=,green
+roottext=green,black
+textbox=,
+listbox=,
+"
 
 #inform user and prompt for consent
 whiptail --backtitle "ghostbusker's dotfiles installer" \
@@ -113,6 +116,8 @@ newEncryptedUser(){
   sudo ecryptfs-migrate-home -u $USER
 
   #show encryption password with command: ecryptfs-unwrap-passphrase
+  #pass the USER variable so it can be used in other modules
+  echo "USER=$USER"
 }
 
 favoriteApps(){
@@ -128,9 +133,11 @@ favoriteApps(){
   echo "installing apps for stress testing and benchmarks"
   sudo apt install -y stress sysbench
   echo "installing network info tools"
-  sudo apt install -y nmap macchanger tshark zenmap wireshark
+  sudo apt install -y nmap tshark zenmap 
+  yes N | sudo apt install -y macchanger  # yes send N to prevent prompt
+  yes N | sudo apt install -y wireshark
   echo "installing more common apps"
-  sudo apt install -y screenkey ttyrec realvnc-vnc-server realvnc-vnc-viewer chromium-browser
+  sudo apt install -y screenkey ttyrec realvnc-vnc-server realvncv-nc-viewer chromium-browser
   echo "installing productivity apps"
   sudo apt install -y geany neovim
 }
@@ -318,11 +325,11 @@ deleteUserPi(){
 
 pepareInstall(){
   echo "\e[101mINSTALLER:\e[92m preparing to run modules"
-  sudo git config --global color.ui auto
   echo "updating package list"
   sudo apt update || sudo apt-get -o Acquire::ForceIPv4=true update
   echo "updating git"
   sudo apt install -y git
+  sudo git config --global color.ui auto
   echo "starting script timer"
   STOPWATCH=0
   echo "creating install log"
@@ -356,7 +363,7 @@ showInfo(){
     echo "$codec:\t$(vcgencmd codec_enabled $codec)" ; \
   done
   echo "script runtime"
-  ELAPSED="Elapsed: $(($STOPWATCH / 3600))hrs $((($STOPWATCH / 60) % 60))min $(($STOPWATCH % 60))sec"
+  ELAPSED="Elapsed: $(($STOPWATCH/3600))hrs $((($STOPWATCH/60)%60))min $(($STOPWATCH%60))sec"
   echo "$ELAPSED" #| lolcat
 
   #return terminal colors to normal
@@ -384,6 +391,9 @@ exit 0
 #try putting in a username with a space as well, i bet it breaks things
 #ask for keyword for system theme and auto generate background, motd, colors?
 
+#count number of lines in output log file and create a "loading" animation that uses the live line-count
+#to "calculate" percent finished.
+ 
 #I want this pi to have as many use-cases as possible. 
 #-provide wifi hotspot if plugged into internet via ethernet
 #-provide internet via ethernet port if connected to wifi
