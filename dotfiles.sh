@@ -27,7 +27,7 @@ whiptail --backtitle "ghostbusker's dotfiles installer" \
 ####FUCNTIONS#####
 
 chooseModules(){
-  echo "\e[101mINSTALLER:\e[92m let user choose which modules to run"
+  echo "installer: let user choose which modules to run"
   MODULES=$(whiptail --backtitle "ghostbusker's dotfiles installer" \
     --title "Choose your own adventure" \
     --checklist --separate-output "Modules:" ${r} ${c} 20 \
@@ -49,23 +49,26 @@ chooseModules(){
     "asciiAquarium" "Install ASCII Aquarium" ON \
     "swapfileChange" "Change Swapfile" OFF \
     "log2Ram" "Install Log2RAM" OFF\
-    "copyDotfiles" "Copy dotfiles to $USER home Directory" ON \
+    "copyDotfiles" "Copy dotfiles to $TARGETUSER home Directory" ON \
     "deletUserPi" "Delete User Pi? *DANGEROUS*" OFF 3>&1 1>&2 2>&3)
   exitstatus=$?
   if [ $exitstatus = 0 ]; then
     whiptail --backtitle "ghostbusker's dotfiles installer" \
     --title "Setup dotfiles" \
-    --infobox "Modules selected: $MODULES" ${r} ${c}
+    --infobox "Modules selected: \n$MODULES" ${r} ${c}
   else
     whiptail --backtitle "ghostbusker's dotfiles installer" \
     --title "Setup dotfiles" \
     --infobox "Cancelled" ${r} ${c}
     exit
   fi
+
+  #pass MODULES list to other modules
+  echo "MODULES=$MODULES"
 }
 
 checkRoot(){
-  echo "\e[101mINSTALLER:\e[92m checkinging for root..."
+  echo "installer: checkinging for root..."
   if [[ $EUID -eq 0 ]]; then
       echo "you are root."
   else
@@ -75,7 +78,7 @@ checkRoot(){
 }
 
 checkHelp(){
-  echo "\e[101mINSTALLER:\e[92m checking for --help or -h flags"
+  echo "installer: checking for --help or -h flags"
   if [ ${#@} -ne 0 ] && [ "${@#"--help"}" = "" ]; then
     echo "there is no help."
     sleep 3
@@ -85,12 +88,12 @@ checkHelp(){
 }
 
 newEncryptedUser(){
-  echo "\e[101mINSTALLER:\e[92m creating new encrypted user"
-  USER=username
-  USER=$(whiptail --backtitle "ghostbusker's dotfiles installer" \
+  echo "installer: creating new encrypted user"
+  TARGETUSER=username
+  TARGETUSER=$(whiptail --backtitle "ghostbusker's dotfiles installer" \
   --title "New Encrypted User"  \
   --inputbox "Enter new user name. User 'pi' should be deleted for security reasons. No spaces please." \
-  ${r} ${c} $USER 3>&1 1>&2 2>&3)
+  ${r} ${c} $TARGETUSER 3>&1 1>&2 2>&3)
   exitstatus=$?
   if [ $exitstatus = 0 ]; then
     whiptail --backtitle "ghostbusker's dotfiles installer" \
@@ -106,26 +109,28 @@ newEncryptedUser(){
   --passwordbox "Enter password for new user: " ${r} ${c} 3>&1 1>&2 2>&3)
 
   #create new user and add them to the sudo group
-  echo -e "$PASS\n$PASS\n" | sudo adduser --gecos "" $USER
-  sudo usermod -a -G sudo $USER
+  echo -e "$PASS\n$PASS\n" | sudo adduser --gecos "" $TARGETUSER
+  sudo usermod -a -G sudo $TARGETUSER
 
   #install apps needed to encrypt the user folder
   sudo apt install -y ecryptfs-utils lsof cryptsetup
 
   #encrypt new user home directory
-  sudo ecryptfs-migrate-home -u $USER
+  sudo ecryptfs-migrate-home -u $TARGETUSER
 
   #show encryption password with command: ecryptfs-unwrap-passphrase
-  #pass the USER variable so it can be used in other modules
-  echo "USER=$USER"
+  #pass the TARGETUSER variable so it can be used in other modules
+  echo "TARGETUSER=$TARGETUSER"
 }
 
 favoriteApps(){
   #This is going to get an implementation and organization overhaul
-  echo "\e[101mINSTALLER:\e[92m installing favorite apps and tools"
+  echo "installer: installing favorite apps and tools"
   echo "installing termnial upgrade + terminal candy"
   sudo apt install -y terminator locate tilda neovim ranger trash-cli neofetch figlet \
   lolcat cmatrix hollywood funny-manpages caca-utils libaa-bin thefuck howdoi cowsay fortune
+  echo "installing vanity fonts"
+  sudo apt install -y fonts-ocr-a && sudo fc-cache -f -v
   echo "installing system utilities and monitors"
   sudo apt install -y	glances nmon htop
   echo "installing media apps"
@@ -134,8 +139,8 @@ favoriteApps(){
   sudo apt install -y stress sysbench
   echo "installing network info tools"
   sudo apt install -y nmap tshark zenmap 
-  yes N | sudo apt install -y macchanger  # yes send N to prevent prompt
-  yes N | sudo apt install -y wireshark
+  yes N | sudo apt install -y macchanger  # yes send N to prevent prompt but...
+  yes N | sudo apt install -y wireshark   # not working, still getting promt
   echo "installing more common apps"
   sudo apt install -y screenkey ttyrec realvnc-vnc-server realvncv-nc-viewer chromium-browser
   echo "installing productivity apps"
@@ -143,7 +148,7 @@ favoriteApps(){
 }
 
 desktopFromScratch (){
-  echo "\e[101mINSTALLER:\e[92m installing graphical desktop environment"
+  echo "installer: installing graphical desktop environment"
   sudo apt install -y xorg xserver-xorg xinit git cmake lxappearance
   echo "installing i3-gaps window manager from source"
   cd /opt/ 
@@ -166,18 +171,18 @@ desktopFromScratch (){
 }
 
 makeFolders() {
-  echo "\e[101mINSTALLER:\e[92m make folders in home directory"
-  sudo mkdir /home/$USER/Documents
-  sudo mkdir /home/$USER/Downloads
-  sudo mkdir /home/$USER/Music
-  sudo mkdir /home/$USER/Videos
-  sudo mkdir /home/$USER/Pictures
+  echo "installer: make folders in home directory"
+  sudo mkdir /home/$TARGETUSER/Documents
+  sudo mkdir /home/$TARGETUSER/Downloads
+  sudo mkdir /home/$TARGETUSER/Music
+  sudo mkdir /home/$TARGETUSER/Videos
+  sudo mkdir /home/$TARGETUSER/Pictures
 }
 
 scrapeWallpapers() {
-  echo "\e[101mINSTALLER:\e[92m scraping wallpapers from the web" #shamelessly
-  sudo mkdir /home/$USER/Pictures/Wallpapers
-  cd /home/$USER/Pictures/Wallpapers
+  echo "installer: scraping wallpapers from the web" #shamelessly
+  sudo mkdir /home/$TARGETUSER/Pictures/Wallpapers
+  cd /home/$TARGETUSER/Pictures/Wallpapers
   sudo wget http://getwallpapers.com/wallpaper/full/2/2/3/702223-free-rainforest-backgrounds-2560x1440.jpg
   sudo wget http://getwallpapers.com/wallpaper/full/9/d/6/702176-rainforest-backgrounds-1920x1080-for-mac.jpg
   sudo wget http://getwallpapers.com/wallpaper/full/8/0/e/702147-rainforest-backgrounds-2560x1600-images.jpg
@@ -187,42 +192,42 @@ scrapeWallpapers() {
 }
 
 openVPN() {
-  echo "\e[101mINSTALLER:\e[92m installing openvpn for tunneling back to home network"
+  echo "installer: installing openvpn for tunneling back to home network"
   sudo apt install -y openvpn
   #runs with: sudo openvpn ~./location/of/ovpn-file.ovpn
   #launched by i3, see ~/.config/i3/config
 }
 
 fixPiGroups() {
-  echo "\e[101mINSTALLER:\e[92m adding user to all the groups that user pi was a part of"
-  sudo usermod -a -G adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,input,netdev,spi,i2c,gpio $USER
+  echo "installer: adding user to all the groups that user pi was a part of"
+  sudo usermod -a -G adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,input,netdev,spi,i2c,gpio $TARGETUSER
 }
 
 powerButtonLED() {
-  echo "\e[101mINSTALLER:\e[92m adding GPIO pin3 shutdown to /boot/config.txt AND enabling UART so that pin 8 acts as power LED" 
+  echo "installer: adding GPIO pin3 shutdown to /boot/config.txt AND enabling UART so that pin 8 acts as power LED" 
   sudo sed -i '$a dtoverlay=gpio-shutdown,gpio_pin=3,active_low=1,gpio_pull=up\' /boot/config.txt
   sudo sed -i '$a enable_uart=1\' /boot/config.txt
 }
 
 localizeEasternUS() {
-  echo "\e[101mINSTALLER:\e[92m setting localization for keyboard, clock, and wifi"
+  echo "installer: setting localization for keyboard, clock, and wifi"
   sudo sed -i 's/gb/us/g' /etc/default/keyboard
   sudo timedatectl set-timezone US/Eastern
   sudo raspi-config nonint do_wifi_country US
 }
 
 enableSSH() {
-  echo "\e[101mINSTALLER:\e[92m enabling ssh as a service"
+  echo "installer: enabling ssh as a service"
   sudo raspi-config nonint do_ssh 0
 }
 
 enableVNC() {
-  echo "\e[101mINSTALLER:\e[92m enabling vnc"
+  echo "installer: enabling vnc"
   sudo raspi-config nonint do_vnc 0
 }
 
 retroPie() {
-  echo "\e[101mINSTALLER:\e[92m installing retropie"
+  echo "installer: installing retropie"
   cd /opt/
   sudo git clone --depth=1 https://github.com/RetroPie/RetroPie-Setup.git
   cd RetroPie-Setup
@@ -230,12 +235,12 @@ retroPie() {
 }
 
 creativeSuite() {
-  echo "\e[101mINSTALLER:\e[92m installing ghostbusker's creative suite"
+  echo "installer: installing ghostbusker's creative suite"
   sudo apt install -y mixxx kdenlive blender audacity gimp
 }
 
 coolRetroTerm() {
-  echo "\e[101mINSTALLER:\e[92m installing cool retro terminal"
+  echo "installer: installing cool retro terminal"
   cd /opt/ 
   sudo apt install -y build-essential qmlscene qt5-qmake qt5-default qtdeclarative5-dev qml-module-qtquick-controls \
   qml-module-qtgraphicaleffects qml-module-qtquick-dialogs qml-module-qtquick-localstorage qml-module-qtquick-window2 \
@@ -248,7 +253,7 @@ coolRetroTerm() {
 }
 
 terminalPipes() {
-  echo "\e[101mINSTALLER:\e[92m installing pipeseroni's pipes.sh from source"
+  echo "installer: installing pipeseroni's pipes.sh from source"
   cd /opt/
   sudo git clone https://github.com/pipeseroni/pipes.sh
   cd pipes.sh
@@ -266,7 +271,7 @@ terminalPipes() {
 #probs done installing NMmatrix  
 
 asciiAquarium(){
-  echo "\e[101mINSTALLER:\e[92m installing ascii aquarium"
+  echo "installer: installing ascii aquarium"
   sudo apt-get install libcurses-perl
   cd /opt/ 
   sudo wget http://search.cpan.org/CPAN/authors/id/K/KB/KBAUCOM/Term-Animation-2.4.tar.gz
@@ -283,7 +288,7 @@ asciiAquarium(){
 }
 
 swapfileChange(){
-  echo "\e[101mINSTALLER:\e[92m adjusting sawp file size"
+  echo "installer: adjusting sawp file size"
   sudo sed -i 's/^CONF_SWAPSIZE=[0-9]*$/CONF_SWAPSIZE=512/' /etc/dphys-swapfile
   sudo dphys-swapfile setup
   #Andreas Speiss recomends these swap file changes
@@ -298,62 +303,79 @@ swapfileChange(){
 }
 
 log2Ram() {
-  echo "\e[101mINSTALLER:\e[92m installing log2ram" #must be done last and requires reboot
+  echo "installer: installing log2ram" #must be done last and requires reboot
   printf -- 'deb http://packages.azlux.fr/debian/ buster main'| sudo tee /etc/apt/sources.list.d/azlux.list
   wget -qO - https://azlux.fr/repo.gpg.key | sudo apt-key add -
   apt update
-  apt install log2ram
+  apt install -y log2ram
 }
 
 copyDotfiles (){
-  echo "\e[101mINSTALLER:\e[92m copying dotfiles into place"
-  sudo cp -r .config/ /home/$USER/
-  sudo cp -r .bashrc /home/$USER/
+  echo "installer: copying dotfiles into place"
+  sudo cp -r .config/ /home/$TARGETUSER/
+  sudo cp -r .bashrc /home/$TARGETUSER/
 
   #this next part made all the difference, chome and a bunch of other apps were broken otherwise
   #take ownership and set permissions of user folder:
-  sudo -u $USER chmod 750 -R /home/$USER/
-  sudo chown -R $USER:$USER /home/$USER/
+  sudo -u $TARGETUSER chmod 750 -R /home/$TARGETUSER/
+  sudo chown -R $TARGETUSER:$TARGETUSER /home/$TARGETUSER/
   sudo umask 0027
 }
 
 deleteUserPi(){
-  echo "\e[101mINSTALLER:\e[92m deleting pi user and removing all files"
+  echo "installer: deleting pi user and removing all files"
   sudo pkill -u pi
-  sudo userdel --remove-all-files pi
+  #sudo userdel --remove-all-files pi
 }
 
 pepareInstall(){
-  echo "\e[101mINSTALLER:\e[92m preparing to run modules"
+  echo "installer: preparing to run modules"
   echo "updating package list"
   sudo apt update || sudo apt-get -o Acquire::ForceIPv4=true update
   echo "updating git"
   sudo apt install -y git
   sudo git config --global color.ui auto
-  echo "starting script timer"
-  STOPWATCH=0
+  echo "check for TARGETUSER"
+  if [[ ! $TARGETUSER =~ "newEncryptedUser" ]] ; then TARGETUSER=$USER ; fi
+  echo "TARGETUSER is $TARGETUSER"
+  echo "selected Modules:"
+  echo $MODULES
+  echo "run installer with these settings?"
+  select yn in "Yes" "No"
+  case $yn in
+    Yes ) done;;
+    No ) exit;;
+  esac
+  read
+  
   echo "creating install log"
   tmpLog="/tmp/dotfiles-install.log"
+  echo "tmpLog=/tmp/dotfiles-install.log"
+
+  echo "starting script timer"
+  stopWatch=$(date +%s)
+  echo "stopWatch=$stopWatch"
 
   #backup then temporarily change terminal colors
   #TEMP1=$PS1
   #export PS1="\e[0;32m\]"
+
 }
 
 runModules(){
-  echo "\e[101mINSTALLER:\e[92m running each module in sequence"
+  echo "installer: running each module in sequence"
   for module in $MODULES ; do \
     $module | tee -a -i $tmpLog ; \
   done
 }
 
 exportLog(){
-  echo "\e[101mINSTALLER:\e[92m exporting log to currrent working directory"
+  echo "installer: exporting log to currrent working directory"
   sudo mv $tmpLog $(pwd)
 }
 
 showInfo(){
-  echo "\e[101mINSTALLER:\e[92m showing some helpful info"
+  echo "installer: showing some helpful info"
   echo "Current /boot/config.txt settings: "
   vcgencmd get_config int
   echo "showing directory tree"
@@ -362,15 +384,10 @@ showInfo(){
   for codec in H264 MPG2 WVC1 MPG4 MJPG WMV9 ; do \
     echo "$codec:\t$(vcgencmd codec_enabled $codec)" ; \
   done
-  echo "script runtime"
-  ELAPSED="Elapsed: $(($STOPWATCH/3600))hrs $((($STOPWATCH/60)%60))min $(($STOPWATCH%60))sec"
-  echo "$ELAPSED" #| lolcat
+  echo "script runtime $(($(date +%s) - ${stopWatch})) seconds" #| lolcat
 
   #return terminal colors to normal
   #PS1=$TEMP1
-
-  #alternatley/additionally, reload bash?
-  bash
 }
 
 ################# ACTUAL run scrip, do all the stuff in the modules above ########################

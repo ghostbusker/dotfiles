@@ -15,10 +15,11 @@ neofetch
 #export PATH="~/.config/scripts/"
 
 #im going to add these to ~/.bash_aliases
-#alias ls='ls -F'
-#alias ll='ls -lh'
-#alias gh='history|grep'
-#alias tp='trash-put'
+#alias ls='ls -F '
+#alias ll='ls -lh '
+#alias gh='history|grep '
+#alias hg='history|grep '
+#alias tp='trash-put '
 
 # some more ls aliases
 #alias ll='ls -l'
