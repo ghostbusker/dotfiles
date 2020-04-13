@@ -340,13 +340,13 @@ pepareInstall(){
   echo "TARGETUSER is $TARGETUSER"
   echo "selected Modules:"
   echo $MODULES
-  echo "run installer with these settings?"
-  select yn in "Yes" "No"
-  case $yn in
-    Yes ) done;;
-    No ) exit;;
-  esac
-  read
+  echo "run installer with these settings? (y/n)"
+  read answer
+  if [ "$answer" != "${answer#[Yy]}" ] ;then
+    done
+  else
+    exit
+  fi
   
   echo "creating install log"
   tmpLog="/tmp/dotfiles-install.log"
