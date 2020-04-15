@@ -24,6 +24,12 @@ whiptail --backtitle "ghostbusker's dotfiles installer" \
 --title "This is the script you are about to install:" \
 --textbox --scrolltext $0 ${r} ${c}
 
+#create a reference to where this script is located
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+#set apt to be less noisy
+export DEBIAN_FRONTEND=noninteractive
+
 ####FUCNTIONS#####
 
 chooseModules(){
@@ -113,7 +119,7 @@ newEncryptedUser(){
   sudo usermod -a -G sudo $TARGETUSER
 
   #install apps needed to encrypt the user folder
-  sudo apt install -y ecryptfs-utils lsof cryptsetup
+  sudo apt -yq install ecryptfs-utils lsof cryptsetup
 
   #encrypt new user home directory
   sudo ecryptfs-migrate-home -u $TARGETUSER
@@ -127,32 +133,31 @@ favoriteApps(){
   #This is going to get an implementation and organization overhaul
   echo "installer: installing favorite apps and tools"
   echo "installing termnial upgrade + terminal candy"
-  sudo apt install -y terminator locate tilda neovim ranger trash-cli neofetch figlet \
+  sudo apt -yq install terminator locate tilda neovim ranger trash-cli neofetch figlet \
   lolcat cmatrix hollywood funny-manpages caca-utils libaa-bin thefuck howdoi cowsay fortune
   echo "installing vanity fonts"
-  sudo apt install -y fonts-ocr-a && sudo fc-cache -f -v
+  sudo apt -yq install fonts-ocr-a
+  sudo fc-cache -f -v 
   echo "installing system utilities and monitors"
-  sudo apt install -y	glances nmon htop
+  sudo apt -yq install	glances nmon htop
   echo "installing media apps"
-  sudo apt install -y cmus vis playerctl vlc
+  sudo apt -yq install cmus vis playerctl vlc
   echo "installing apps for stress testing and benchmarks"
-  sudo apt install -y stress sysbench
+  sudo apt -yq install stress sysbench
   echo "installing network info tools"
-  sudo apt install -y nmap tshark zenmap 
-  yes N | sudo apt install -y macchanger  # yes send N to prevent prompt but...
-  yes N | sudo apt install -y wireshark   # not working, still getting promt
+  sudo apt -yq install nmap tshark zenmap macchanger wireshark # not working, still getting promt
   echo "installing more common apps"
-  sudo apt install -y screenkey ttyrec realvnc-vnc-server realvncv-nc-viewer chromium-browser
+  sudo apt -yq install screenkey ttyrec realvnc-vnc-server realvncv-nc-viewer chromium-browser
   echo "installing productivity apps"
-  sudo apt install -y geany neovim
+  sudo apt -yq install geany neovim
 }
 
 desktopFromScratch (){
   echo "installer: installing graphical desktop environment"
-  sudo apt install -y xorg xserver-xorg xinit git cmake lxappearance
+  sudo apt -yq install xorg xserver-xorg xinit git cmake lxappearance
   echo "installing i3-gaps window manager from source"
   cd /opt/ 
-  sudo apt install -y i3 gcc make autoconf dh-autoreconf libxcb-keysyms1-dev libpango1.0-dev libxcb-util0-dev xcb libxcb1-dev \
+  sudo apt -yq install i3 gcc make autoconf dh-autoreconf libxcb-keysyms1-dev libpango1.0-dev libxcb-util0-dev xcb libxcb1-dev \
   libxcb-icccm4-dev libyajl-dev libev-dev libxcb-xkb-dev libxcb-cursor-dev libxkbcommon-dev libxcb-xinerama0-dev \
   libxkbcommon-x11-dev libstartup-notification0-dev libxcb-randr0-dev libxcb-xrm0 libxcb-xrm-dev libxcb-shape0 libxcb-shape0-dev
   sudo git clone https://www.github.com/Airblader/i3 i3-gaps
@@ -165,9 +170,9 @@ desktopFromScratch (){
   sudo make -j8
   sudo make install
   echo "installing apps that will be part of desktop composition and daily use"
-  sudo apt install -y i3blocks feh compton clipit arandr mpv florence dunst nemo conky dhcpcd-gtk wpagui
+  sudo apt -yq install i3blocks feh compton clipit arandr mpv florence dunst nemo conky dhcpcd-gtk wpagui
   echo "installing wifi and bluetooth tools"
-  sudo apt install -y pi-bluetooth blueman bluealsa network-manager
+  sudo apt -yq install pi-bluetooth blueman bluealsa network-manager
 }
 
 makeFolders() {
@@ -193,7 +198,7 @@ scrapeWallpapers() {
 
 openVPN() {
   echo "installer: installing openvpn for tunneling back to home network"
-  sudo apt install -y openvpn
+  sudo apt -yq install openvpn
   #runs with: sudo openvpn ~./location/of/ovpn-file.ovpn
   #launched by i3, see ~/.config/i3/config
 }
@@ -236,13 +241,13 @@ retroPie() {
 
 creativeSuite() {
   echo "installer: installing ghostbusker's creative suite"
-  sudo apt install -y mixxx kdenlive blender audacity gimp
+  sudo apt -yq install mixxx kdenlive blender audacity gimp
 }
 
 coolRetroTerm() {
   echo "installer: installing cool retro terminal"
   cd /opt/ 
-  sudo apt install -y build-essential qmlscene qt5-qmake qt5-default qtdeclarative5-dev qml-module-qtquick-controls \
+  sudo apt -yq install build-essential qmlscene qt5-qmake qt5-default qtdeclarative5-dev qml-module-qtquick-controls \
   qml-module-qtgraphicaleffects qml-module-qtquick-dialogs qml-module-qtquick-localstorage qml-module-qtquick-window2 \
   qml-module-qt-labs-settings qml-module-qt-labs-folderlistmodel
   git clone --recursive https://github.com/Swordfish90/cool-retro-term.git
@@ -272,7 +277,7 @@ terminalPipes() {
 
 asciiAquarium(){
   echo "installer: installing ascii aquarium"
-  sudo apt-get install libcurses-perl
+  sudo apt-get install -y libcurses-perl
   cd /opt/ 
   sudo wget http://search.cpan.org/CPAN/authors/id/K/KB/KBAUCOM/Term-Animation-2.4.tar.gz
   sudo tar -zxvf Term-Animation-2.4.tar.gz
@@ -307,7 +312,7 @@ log2Ram() {
   printf -- 'deb http://packages.azlux.fr/debian/ buster main'| sudo tee /etc/apt/sources.list.d/azlux.list
   wget -qO - https://azlux.fr/repo.gpg.key | sudo apt-key add -
   apt update
-  apt install -y log2ram
+  apt -yq install log2ram
 }
 
 copyDotfiles (){
@@ -333,7 +338,7 @@ pepareInstall(){
   echo "updating package list"
   sudo apt update || sudo apt-get -o Acquire::ForceIPv4=true update
   echo "updating git"
-  sudo apt install -y git
+  sudo apt -yq install git
   sudo git config --global color.ui auto
   echo "check for TARGETUSER"
   if [[ ! $TARGETUSER =~ "newEncryptedUser" ]] ; then TARGETUSER=$USER ; fi
@@ -342,19 +347,23 @@ pepareInstall(){
   echo $MODULES
   echo "run installer with these settings? (y/n)"
   read answer
-  if [ "$answer" != "${answer#[Yy]}" ] ;then
-    done
-  else
-    exit
-  fi
+  read 
+  read
+  read
+  #if [ "$answer" != "${answer#[Yy]}" ] ;then
+  #  echo "running..."
+  #else
+  #  exit
+  #fi
   
   echo "creating install log"
   tmpLog="/tmp/dotfiles-install.log"
   echo "tmpLog=/tmp/dotfiles-install.log"
 
   echo "starting script timer"
-  stopWatch=$(date +%s)
-  echo "stopWatch=$stopWatch"
+  start=$SECONDS
+  #stopWatch=$(date +%s)
+  #echo "stopWatch=$stopWatch"
 
   #backup then temporarily change terminal colors
   #TEMP1=$PS1
@@ -371,11 +380,12 @@ runModules(){
 
 exportLog(){
   echo "installer: exporting log to currrent working directory"
-  sudo mv $tmpLog $(pwd)
+  sudo mv $tmpLog $DIR/
 }
 
 showInfo(){
   echo "installer: showing some helpful info"
+  duration=$(( SECONDS - start ))   # stop script timer
   echo "Current /boot/config.txt settings: "
   vcgencmd get_config int
   echo "showing directory tree"
@@ -384,7 +394,7 @@ showInfo(){
   for codec in H264 MPG2 WVC1 MPG4 MJPG WMV9 ; do \
     echo "$codec:\t$(vcgencmd codec_enabled $codec)" ; \
   done
-  echo "script runtime $(($(date +%s) - ${stopWatch})) seconds" #| lolcat
+  echo "script runtime $duration seconds" #| lolcat
 
   #return terminal colors to normal
   #PS1=$TEMP1
