@@ -9,7 +9,7 @@ set $mod Mod4
 exec compton -f -b
 
 #set wallpaper, then change every -n seconds, maybe add some imagemagick to script to make unique
-exec feh --randomize --bg-fill ~/Pictures/Wallpapers/*
+#exec feh --randomize --bg-fill ~/Pictures/Wallpapers/*
 exec watch -n 15 feh --randomize --bg-fill ~/Pictures/Wallpapers/*
 
 #fetch a new weather image every 15 minutes and rename it weather.png
@@ -21,7 +21,8 @@ for_window [class="florence"] floating enable
 
 ############Invisible background apps###############
 #get the clipboard manager and OSK running (and floating!)
-exec --no-startup-id tilda --config ~/.config/tilda
+#exec --no-startup-id tilda --config ~/.config/tilda
+exec --no-startup-id tilda ~/.config/tilda
 exec --no-startup-id clipit
 exec --no-startup-id dunst
 exec --no-startup-id dhcpcd-gtk
@@ -37,11 +38,11 @@ for_window [urgent=latest] focus
 
 ############# Workspace Setup ##############
 #exec --no-startup-id i3-msg workspace $ws1
-exec --no-startup-id conky
+#exec --no-startup-id conky
 exec xterm -e htop
-exec xterm -e ~/.config/scripts/weather.sh
-#exec xterm -e "pipes.sh -p 10 -f 30 -r 20000"
-#exec xterm -e "cmatrix -ab -C magenta"
+exec xterm -e bash ~/.config/scripts/weather.sh
+exec xterm -e "pipes.sh -p 10 -f 30 -r 20000"
+exec xterm -e "cmatrix -ab -C magenta"
 exec mpv --loop --no-osc --background=0/0/0/0 --framedrop=vo /tmp/weather.png 
 
 #exec --no-startup-id i3-msg workspace $ws2
@@ -105,8 +106,8 @@ client.background       #CCFFCC
 # start a terminal
 bindsym $mod+Return exec terminator
 
-# start dmenu (a program launcher)
-bindsym $mod+d exec dmenu_run
+# start dmenu (a program launcher) with prefered colors
+bindsym $mod+d exec "dmenu_run -nf '#C0CCC0' -nb '#336633' -sb '#CC3300' -sf '#f0fff0' -fn 'monospace-10' -p 'dmenu prompt &gt;'"
 
 # run script to toggle compton transpancy on all windows.
 bindsym $mod+F12 exec ~/.config/scripts/compton_toggle.sh

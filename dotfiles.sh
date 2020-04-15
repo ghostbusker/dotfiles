@@ -32,7 +32,7 @@ export DEBIAN_FRONTEND=noninteractive
 
 ####FUCNTIONS#####
 
-chooseModules(){
+chooseModules() {
   echo "installer: let user choose which modules to run"
   MODULES=$(whiptail --backtitle "ghostbusker's dotfiles installer" \
     --title "Choose your own adventure" \
@@ -51,12 +51,12 @@ chooseModules(){
     "retroPie" "Install RetroPie" OFF \
     "creativeSuite" "Install Creative Suite" OFF \
     "coolRetroTerm" "Install CoolRetroTerm" ON \
-    "termnialPipes" "Install Pipes for terminal" ON \
+    "terminalPipes" "Install Pipes for terminal" ON \
     "asciiAquarium" "Install ASCII Aquarium" ON \
     "swapfileChange" "Change Swapfile" OFF \
     "log2Ram" "Install Log2RAM" OFF\
-    "copyDotfiles" "Copy dotfiles to $TARGETUSER home Directory" ON \
-    "deletUserPi" "Delete User Pi? *DANGEROUS*" OFF 3>&1 1>&2 2>&3)
+    "copyDotfiles" "Copy dotfiles to $targetUser home Directory" ON \
+    "deleteUserPi" "Delete User Pi? *DANGEROUS*" OFF 3>&1 1>&2 2>&3)
   exitstatus=$?
   if [ $exitstatus = 0 ]; then
     whiptail --backtitle "ghostbusker's dotfiles installer" \
@@ -73,7 +73,7 @@ chooseModules(){
   echo "MODULES=$MODULES"
 }
 
-checkRoot(){
+checkRoot() {
   echo "installer: checkinging for root..."
   if [[ $EUID -eq 0 ]]; then
       echo "you are root."
@@ -83,7 +83,7 @@ checkRoot(){
   fi
 }
 
-checkHelp(){
+checkHelp() {
   echo "installer: checking for --help or -h flags"
   if [ ${#@} -ne 0 ] && [ "${@#"--help"}" = "" ]; then
     echo "there is no help."
@@ -93,13 +93,13 @@ checkHelp(){
   fi
 }
 
-newEncryptedUser(){
+newEncryptedUser() {
   echo "installer: creating new encrypted user"
-  TARGETUSER=username
-  TARGETUSER=$(whiptail --backtitle "ghostbusker's dotfiles installer" \
+  targetUser=username
+  targetUser=$(whiptail --backtitle "ghostbusker's dotfiles installer" \
   --title "New Encrypted User"  \
   --inputbox "Enter new user name. User 'pi' should be deleted for security reasons. No spaces please." \
-  ${r} ${c} $TARGETUSER 3>&1 1>&2 2>&3)
+  ${r} ${c} $targetUser 3>&1 1>&2 2>&3)
   exitstatus=$?
   if [ $exitstatus = 0 ]; then
     whiptail --backtitle "ghostbusker's dotfiles installer" \
@@ -115,21 +115,21 @@ newEncryptedUser(){
   --passwordbox "Enter password for new user: " ${r} ${c} 3>&1 1>&2 2>&3)
 
   #create new user and add them to the sudo group
-  echo -e "$PASS\n$PASS\n" | sudo adduser --gecos "" $TARGETUSER
-  sudo usermod -a -G sudo $TARGETUSER
+  echo -e "$PASS\n$PASS\n" | sudo adduser --gecos "" $targetUser
+  sudo usermod -a -G sudo $targetUser
 
   #install apps needed to encrypt the user folder
   sudo apt -yq install ecryptfs-utils lsof cryptsetup
 
   #encrypt new user home directory
-  sudo ecryptfs-migrate-home -u $TARGETUSER
+  sudo ecryptfs-migrate-home -u $targetUser
 
   #show encryption password with command: ecryptfs-unwrap-passphrase
-  #pass the TARGETUSER variable so it can be used in other modules
-  echo "TARGETUSER=$TARGETUSER"
+  #pass the targetUser variable so it can be used in other modules
+  echo "targetUser=$targetUser"
 }
 
-favoriteApps(){
+favoriteApps() {
   #This is going to get an implementation and organization overhaul
   echo "installer: installing favorite apps and tools"
   echo "installing termnial upgrade + terminal candy"
@@ -139,7 +139,7 @@ favoriteApps(){
   sudo apt -yq install fonts-ocr-a
   sudo fc-cache -f -v 
   echo "installing system utilities and monitors"
-  sudo apt -yq install	glances nmon htop
+  sudo apt -yq install glances nmon htop # this line not working
   echo "installing media apps"
   sudo apt -yq install cmus vis playerctl vlc
   echo "installing apps for stress testing and benchmarks"
@@ -147,12 +147,12 @@ favoriteApps(){
   echo "installing network info tools"
   sudo apt -yq install nmap tshark zenmap macchanger wireshark # not working, still getting promt
   echo "installing more common apps"
-  sudo apt -yq install screenkey ttyrec realvnc-vnc-server realvncv-nc-viewer chromium-browser
+  sudo apt -yq install screenkey ttyrec realvnc-vnc-server realvncv-nc-viewer chromium-browser # this line not working
   echo "installing productivity apps"
   sudo apt -yq install geany neovim
 }
 
-desktopFromScratch (){
+desktopFromScratch () {
   echo "installer: installing graphical desktop environment"
   sudo apt -yq install xorg xserver-xorg xinit git cmake lxappearance
   echo "installing i3-gaps window manager from source"
@@ -175,19 +175,19 @@ desktopFromScratch (){
   sudo apt -yq install pi-bluetooth blueman bluealsa network-manager
 }
 
-makeFolders() {
-  echo "installer: make folders in home directory"
-  sudo mkdir /home/$TARGETUSER/Documents
-  sudo mkdir /home/$TARGETUSER/Downloads
-  sudo mkdir /home/$TARGETUSER/Music
-  sudo mkdir /home/$TARGETUSER/Videos
-  sudo mkdir /home/$TARGETUSER/Pictures
+makeFolders() { # this whole module not working
+  echo "installer: make folders in home directory" 
+  sudo mkdir /home/$targetUser/Documents
+  sudo mkdir /home/$targetUser/Downloads
+  sudo mkdir /home/$targetUser/Music
+  sudo mkdir /home/$targetUser/Videos
+  sudo mkdir /home/$targetUser/Pictures
 }
 
-scrapeWallpapers() {
+scrapeWallpapers() { # this whole module not working
   echo "installer: scraping wallpapers from the web" #shamelessly
-  sudo mkdir /home/$TARGETUSER/Pictures/Wallpapers
-  cd /home/$TARGETUSER/Pictures/Wallpapers
+  sudo mkdir /home/$targetUser/Pictures/Wallpapers
+  cd /home/$targetUser/Pictures/Wallpapers
   sudo wget http://getwallpapers.com/wallpaper/full/2/2/3/702223-free-rainforest-backgrounds-2560x1440.jpg
   sudo wget http://getwallpapers.com/wallpaper/full/9/d/6/702176-rainforest-backgrounds-1920x1080-for-mac.jpg
   sudo wget http://getwallpapers.com/wallpaper/full/8/0/e/702147-rainforest-backgrounds-2560x1600-images.jpg
@@ -205,7 +205,7 @@ openVPN() {
 
 fixPiGroups() {
   echo "installer: adding user to all the groups that user pi was a part of"
-  sudo usermod -a -G adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,input,netdev,spi,i2c,gpio $TARGETUSER
+  sudo usermod -a -G adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,input,netdev,spi,i2c,gpio $targetUser
 }
 
 powerButtonLED() {
@@ -228,6 +228,7 @@ enableSSH() {
 
 enableVNC() {
   echo "installer: enabling vnc"
+  sudo apt -yq install realvnc-vnc-server realvncv-nc-viewer
   sudo raspi-config nonint do_vnc 0
 }
 
@@ -275,7 +276,7 @@ terminalPipes() {
 #sudo make install   
 #probs done installing NMmatrix  
 
-asciiAquarium(){
+asciiAquarium() {
   echo "installer: installing ascii aquarium"
   sudo apt-get install -y libcurses-perl
   cd /opt/ 
@@ -292,7 +293,7 @@ asciiAquarium(){
   sudo chmod 0755 /usr/local/bin/asciiquarium
 }
 
-swapfileChange(){
+swapfileChange() {
   echo "installer: adjusting sawp file size"
   sudo sed -i 's/^CONF_SWAPSIZE=[0-9]*$/CONF_SWAPSIZE=512/' /etc/dphys-swapfile
   sudo dphys-swapfile setup
@@ -315,46 +316,46 @@ log2Ram() {
   apt -yq install log2ram
 }
 
-copyDotfiles (){
+copyDotfiles() {
   echo "installer: copying dotfiles into place"
-  sudo cp -r .config/ /home/$TARGETUSER/
-  sudo cp -r .bashrc /home/$TARGETUSER/
+  cd $DIR
+  sudo cp -r .config/ /home/$targetUser/
+  sudo cp -r .bashrc /home/$targetUser/
+  sudo cp -r .conkyrc /home/$targetUser/
+  sudo cp -r .profile /home/$targetUser/
 
   #this next part made all the difference, chome and a bunch of other apps were broken otherwise
   #take ownership and set permissions of user folder:
-  sudo -u $TARGETUSER chmod 750 -R /home/$TARGETUSER/
-  sudo chown -R $TARGETUSER:$TARGETUSER /home/$TARGETUSER/
+  sudo -u $targetUser chmod 750 -R /home/$targetUser/
+  sudo chown -R $targetUser:$targetUser /home/$targetUser/
   sudo umask 0027
 }
 
-deleteUserPi(){
+deleteUserPi() {
   echo "installer: deleting pi user and removing all files"
   sudo pkill -u pi
   #sudo userdel --remove-all-files pi
 }
 
-pepareInstall(){
+prepareInstall() {
   echo "installer: preparing to run modules"
   echo "updating package list"
   sudo apt update || sudo apt-get -o Acquire::ForceIPv4=true update
   echo "updating git"
   sudo apt -yq install git
   sudo git config --global color.ui auto
-  echo "check for TARGETUSER"
-  if [[ ! $TARGETUSER =~ "newEncryptedUser" ]] ; then TARGETUSER=$USER ; fi
-  echo "TARGETUSER is $TARGETUSER"
+  echo "check for targetUser"
+  if [[ ! $targetUser =~ "newEncryptedUser" ]] ; then targetUser=$USER ; fi
+  echo "targetUser is $targetUser"
   echo "selected Modules:"
   echo $MODULES
   echo "run installer with these settings? (y/n)"
   read answer
-  read 
-  read
-  read
-  #if [ "$answer" != "${answer#[Yy]}" ] ;then
-  #  echo "running..."
-  #else
-  #  exit
-  #fi
+  if [ "$answer" != "${answer#[Yy]}" ] ;then
+    echo "running..."
+  else
+    exit
+  fi
   
   echo "creating install log"
   tmpLog="/tmp/dotfiles-install.log"
@@ -371,19 +372,19 @@ pepareInstall(){
 
 }
 
-runModules(){
+runModules() {
   echo "installer: running each module in sequence"
   for module in $MODULES ; do \
     $module | tee -a -i $tmpLog ; \
   done
 }
 
-exportLog(){
+exportLog() {
   echo "installer: exporting log to currrent working directory"
   sudo mv $tmpLog $DIR/
 }
 
-showInfo(){
+showInfo() {
   echo "installer: showing some helpful info"
   duration=$(( SECONDS - start ))   # stop script timer
   echo "Current /boot/config.txt settings: "
