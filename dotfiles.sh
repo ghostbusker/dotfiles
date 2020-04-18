@@ -36,7 +36,7 @@ chooseModules() {
   echo "installer: let user choose which modules to run"
   MODULES=$(whiptail --backtitle "ghostbusker's dotfiles installer" \
     --title "Choose your own adventure" \
-    --checklist --separate-output "Modules:" ${r} ${c} 20 \
+    --checklist --separate-output "Modules:" ${r} ${c} 21 \
     "newEncryptedUser" "New Encrypted User" ON \
     "favoriteApps" "Install Favorite GUI + Terminal Apps" ON \
     "desktopFromScratch" "Install Destop Environment" ON \

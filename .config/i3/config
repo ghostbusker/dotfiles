@@ -107,7 +107,7 @@ client.background       #CCFFCC
 bindsym $mod+Return exec terminator
 
 # start dmenu (a program launcher) with prefered colors
-bindsym $mod+d exec "dmenu_run -nf '#C0CCC0' -nb '#336633' -sb '#CC3300' -sf '#f0fff0' -fn 'monospace-10' -p 'dmenu prompt &gt;'"
+bindsym $mod+d exec "dmenu_run -nf '#C0CCC0' -nb '#336633' -sb '#CC3300' -sf '#f0fff0' -fn 'monospace-10' -p 'run > '"
 
 # run script to toggle compton transpancy on all windows.
 bindsym $mod+F12 exec ~/.config/scripts/compton_toggle.sh
