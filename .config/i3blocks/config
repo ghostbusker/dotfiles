@@ -56,6 +56,11 @@ command=sed "s/\(...\)$/.\1°C/" < /sys/class/thermal/thermal_zone0/temp
 interval=5
 color=#FF00FF
 
+#cpu frequency
+[cpu_freq]
+interval=1
+color=#FF00FF
+
 [PublicIP]
 command=curl -s 'https://api.ipify.org' | awk '{ print "Public:" $1 }'
 interval=300

@@ -28,7 +28,7 @@ whiptail --backtitle "ghostbusker's dotfiles installer" \
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 #set apt to be less noisy
-export DEBIAN_FRONTEND=noninteractive
+#export DEBIAN_FRONTEND=noninteractive
 
 ####FUCNTIONS#####
 
@@ -61,11 +61,11 @@ chooseModules() {
   if [ $exitstatus = 0 ]; then
     whiptail --backtitle "ghostbusker's dotfiles installer" \
     --title "Setup dotfiles" \
-    --infobox "Modules selected: \n$MODULES" ${r} ${c}
+    --msgbox "Modules selected: \n$MODULES" ${r} ${c}
   else
     whiptail --backtitle "ghostbusker's dotfiles installer" \
     --title "Setup dotfiles" \
-    --infobox "Cancelled" ${r} ${c}
+    --msgbox "Cancelled" ${r} ${c}
     exit
   fi
 
@@ -104,18 +104,28 @@ newEncryptedUser() {
   if [ $exitstatus = 0 ]; then
     whiptail --backtitle "ghostbusker's dotfiles installer" \
     --title "New Encrypted User" \
-    --infobox "New User: $username" ${r} ${c}
+    --msgbox "New User: $targetUser" ${r} ${c}
   else
     whiptail --backtitle "ghostbusker's dotfiles installer" \
-    --title "New Encrypted User" --infobox "Cancelled" ${r} ${c}
+    --title "New Encrypted User" \
+    --msgbox "Cancelled" ${r} ${c}
     exit
   fi
-  PASS=$(whiptail --backtitle "ghostbusker's dotfiles installer" \
-  --title "New Encrypted User"  \
-  --passwordbox "Enter password for new user: " ${r} ${c} 3>&1 1>&2 2>&3)
+  echo "requesting password"
+  while [[ "$userPass" != "$passRepeat" ]]; do
+    userPass=$(whiptail --backtitle "ghostbusker's dotfiles installer" \
+    --title "New Encrypted User" \
+    --passwordbox "${passWrong}Enter password for new user: " \
+    ${r} ${c} 3>&1 1>&2 2>&3)
+    passRepeat=$(whiptail --backtitle "ghostbusker's dotfiles installer" \
+    --title "New Encrypted User" \
+    --passwordbox "Re-Enter password: " \
+    ${r} ${c} 3>&1 1>&2 2>&3)
+    passWrong="Passwords don't match! Re-"
+  done
 
   #create new user and add them to the sudo group
-  echo -e "$PASS\n$PASS\n" | sudo adduser --gecos "" $targetUser
+  echo -e "$userPass\n$userPass\n" | sudo adduser --gecos "" $targetUser
   sudo usermod -a -G sudo $targetUser
 
   #install apps needed to encrypt the user folder
@@ -133,7 +143,7 @@ favoriteApps() {
   #This is going to get an implementation and organization overhaul
   echo "installer: installing favorite apps and tools"
   echo "installing termnial upgrade + terminal candy"
-  sudo apt -yq install terminator locate tilda neovim ranger trash-cli neofetch figlet \
+  sudo apt -yq install terminator xterm locate tilda neovim ranger trash-cli neofetch figlet \
   lolcat cmatrix hollywood funny-manpages caca-utils libaa-bin thefuck howdoi cowsay fortune
   echo "installing vanity fonts"
   sudo apt -yq install fonts-ocr-a
@@ -141,13 +151,14 @@ favoriteApps() {
   echo "installing system utilities and monitors"
   sudo apt -yq install glances nmon htop # this line not working
   echo "installing media apps"
-  sudo apt -yq install cmus vis playerctl vlc
+  sudo apt -yq install cmus vis playerctl vlc fswebcam
   echo "installing apps for stress testing and benchmarks"
   sudo apt -yq install stress sysbench
   echo "installing network info tools"
-  sudo apt -yq install nmap tshark zenmap macchanger wireshark # not working, still getting promt
+  sudo apt -yq install nmap tshark zenmap 
+  sudo export DEBIAN_FRONTEND=noninteractive apt -yq install macchanger wireshark #still prompting for user input
   echo "installing more common apps"
-  sudo apt -yq install screenkey ttyrec realvnc-vnc-server realvncv-nc-viewer chromium-browser # this line not working
+  sudo apt -yq install screenkey ttyrec realvnc-vnc-server realvnc-vnc-viewer chromium-browser # this line not working
   echo "installing productivity apps"
   sudo apt -yq install geany neovim
 }
@@ -188,12 +199,36 @@ scrapeWallpapers() { # this whole module not working
   echo "installer: scraping wallpapers from the web" #shamelessly
   sudo mkdir /home/$targetUser/Pictures/Wallpapers
   cd /home/$targetUser/Pictures/Wallpapers
+  sudo wget https://cdn.clipart.email/ea453281dbdec70a2bf5b70464f41e4f_desert-sand-background-gallery-yopriceville-high-quality-_5500-3667.jpeg
   sudo wget http://getwallpapers.com/wallpaper/full/2/2/3/702223-free-rainforest-backgrounds-2560x1440.jpg
   sudo wget http://getwallpapers.com/wallpaper/full/9/d/6/702176-rainforest-backgrounds-1920x1080-for-mac.jpg
   sudo wget http://getwallpapers.com/wallpaper/full/8/0/e/702147-rainforest-backgrounds-2560x1600-images.jpg
   sudo wget http://getwallpapers.com/wallpaper/full/e/8/7/702136-rainforest-backgrounds-1920x1080-for-mobile.jpg
   sudo wget http://getwallpapers.com/wallpaper/full/a/6/e/702131-beautiful-rainforest-backgrounds-1920x1080-for-iphone-6.jpg
   sudo wget http://getwallpapers.com/wallpaper/full/a/a/9/702126-rainforest-backgrounds-2560x1600-for-computer.jpg
+  sudo wget https://images.unsplash.com/photo-1518965539400-77d851d65c43
+  sudo wget https://images.unsplash.com/photo-1565138146061-e29b079736c0
+  sudo wget https://images.unsplash.com/photo-1516528387618-afa90b13e000
+  sudo wget https://images.unsplash.com/photo-1428572184420-7d1092d8c6c6
+  sudo wget https://images.unsplash.com/photo-1497250681960-ef046c08a56e
+  sudo wget https://images.unsplash.com/photo-1580630873708-e0475b1856c4
+  sudo wget https://images.unsplash.com/photo-1518058488548-9da59a9b1fef
+  sudo wget https://images.unsplash.com/photo-1570828066702-7706220a65f6
+  sudo wget https://images.unsplash.com/photo-1495527400402-c7d3dc332654
+  sudo wget https://images.unsplash.com/photo-1515615575935-36f6e462f56d
+  sudo wget https://images.unsplash.com/photo-1524207874394-5ec7c8c8e1a6
+  sudo wget https://images.unsplash.com/photo-1548759806-821febf1275c
+  sudo wget https://images.unsplash.com/photo-1547499417-0b7889e0f147
+  sudo wget https://images.unsplash.com/photo-1569429593410-b498b3fb3387
+  sudo wget https://images.unsplash.com/photo-1504548840739-580b10ae7715
+  sudo wget https://images.unsplash.com/photo-1563836728031-53a374d2d2e1
+  sudo wget https://images.unsplash.com/photo-1556331968-208c53a23c2a
+  sudo wget https://images.unsplash.com/photo-1564565562150-80a3466b13fe
+  sudo wget https://images.unsplash.com/photo-1561622481-5ae24d986629
+  sudo wget https://images.unsplash.com/photo-1544481921-fb52f37ba73c
+  sudo wget https://images.unsplash.com/photo-1527409335569-f0e5c91fa707
+  sudo wget https://images.unsplash.com/photo-1472145246862-b24cf25c4a36
+
 }
 
 openVPN() {
@@ -242,7 +277,7 @@ retroPie() {
 
 creativeSuite() {
   echo "installer: installing ghostbusker's creative suite"
-  sudo apt -yq install mixxx kdenlive blender audacity gimp
+  sudo apt -yq install mixxx kdenlive blender audacity gimp fswebcam
 }
 
 coolRetroTerm() {
@@ -345,7 +380,24 @@ prepareInstall() {
   sudo apt -yq install git
   sudo git config --global color.ui auto
   echo "check for targetUser"
-  if [[ ! $targetUser =~ "newEncryptedUser" ]] ; then targetUser=$USER ; fi
+  if [[ ! $MODULES =~ "newEncryptedUser" ]] ; then
+    targetUser=username
+    targetUser=$(whiptail --backtitle "ghostbusker's dotfiles installer" \
+    --title "Prepare Install"  \
+    --inputbox "Enter the target user name where files and permissions should be applied. " \
+    ${r} ${c} $targetUser 3>&1 1>&2 2>&3)
+    exitstatus=$?
+    if [ $exitstatus = 0 ]; then
+      whiptail --backtitle "ghostbusker's dotfiles installer" \
+      --title "Prepare Install" \
+      --msgbox "Target User: $targetUser" ${r} ${c}
+    else
+      whiptail --backtitle "ghostbusker's dotfiles installer" \
+      --title "Prepare Install" \
+      --msgbox "Cancelled" ${r} ${c}
+      exit
+    fi
+  fi
   echo "targetUser is $targetUser"
   echo "selected Modules:"
   echo $MODULES
@@ -356,13 +408,7 @@ prepareInstall() {
   else
     exit
   fi
-  
-  echo "creating install log"
-  tmpLog="/tmp/dotfiles-install.log"
-  echo "tmpLog=/tmp/dotfiles-install.log"
 
-  echo "starting script timer"
-  start=$SECONDS
   #stopWatch=$(date +%s)
   #echo "stopWatch=$stopWatch"
 
@@ -373,20 +419,15 @@ prepareInstall() {
 }
 
 runModules() {
+
   echo "installer: running each module in sequence"
+  start=$seconds   # start script timer
+  # magic loop that calls each fucntion and executes it
   for module in $MODULES ; do \
-    $module | tee -a -i $tmpLog ; \
+    $module ; \
   done
-}
-
-exportLog() {
-  echo "installer: exporting log to currrent working directory"
-  sudo mv $tmpLog $DIR/
-}
-
-showInfo() {
-  echo "installer: showing some helpful info"
   duration=$(( SECONDS - start ))   # stop script timer
+  echo "installer: showing some helpful info"
   echo "Current /boot/config.txt settings: "
   vcgencmd get_config int
   echo "showing directory tree"
@@ -396,6 +437,7 @@ showInfo() {
     echo "$codec:\t$(vcgencmd codec_enabled $codec)" ; \
   done
   echo "script runtime $duration seconds" #| lolcat
+  duration=$(( SECONDS - start ))   # stop script timer
 
   #return terminal colors to normal
   #PS1=$TEMP1
@@ -403,15 +445,17 @@ showInfo() {
 
 ################# ACTUAL run scrip, do all the stuff in the modules above ########################
 
-checkRoot
-checkHelp
-chooseModules
-prepareInstall
-runModules
-exportLog
+echo "creating install log"
+tmpLog="/tmp/dotfiles-install.log"
+checkRoot | tee -a -i $tmpLog
+checkHelp | tee -a -i $tmpLog
+chooseModules | tee -a -i $tmpLog
+prepareInstall | tee -a -i $tmpLog
+runModules | tee -a -i $tmpLog
+echo "installer: exporting log to currrent working directory"
+sudo mv $tmpLog $DIR/
 echo "installer script finished"
 echo "reboot may be needed"
-showInfo
 exit 0
 
 #just a little section to layout my thougts on this config.
@@ -421,11 +465,13 @@ exit 0
 
 #count number of lines in output log file and create a "loading" animation that uses the live line-count
 #to "calculate" percent finished.
- 
+
+#demonstrate better control over the terminal colors
+
 #I want this pi to have as many use-cases as possible. 
 #-provide wifi hotspot if plugged into internet via ethernet
 #-provide internet via ethernet port if connected to wifi
-#-provide filesharing in both use-cases
+#-provide filesharing / streaming in both use-cases (Samba share + miniDLNA)
 #-provide vnc desktop for access via phone/tablet/laptop/fredidgerator
 
 #new user first login script?
@@ -433,3 +479,5 @@ exit 0
 
 #maybe try the following line to intsall apps 1 by 1 for testing
 #for i in package1 package2 package3; do sudo apt-get install -y $i; done
+
+#fix .bashrc and add scrits folder to .bash_aliases or whatever

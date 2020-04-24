@@ -1,0 +1,5 @@
+#!/bin/bash
+
+speedInHertz=$(echo $(vcgencmd measure_clock arm) | cut -c15- | rev | tr -d '[:space:]' | cut -c7- | rev )
+speedInGHz=$(echo "$speedInHertz/1000" | bc -l | xargs printf "%.1f" )
+echo "GHz: $speedInGHz"
