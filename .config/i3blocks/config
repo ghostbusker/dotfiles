@@ -35,8 +35,9 @@ command=echo "Got clicked with button $button"
 color=#F79494
 
 #[compton_toggle]
-#full_text=Opacity
-#color=#F79494
+command=~/home
+full_text=Opacity
+color=#00AA00
 
 [keymap]
 command=xkb-switch;xkb-switch -W

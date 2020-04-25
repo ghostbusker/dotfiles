@@ -112,10 +112,10 @@ newEncryptedUser() {
     exit
   fi
   echo "requesting password"
-  while [[ "$userPass" != "$passRepeat" ]]; do
+  while [ "$userPass" != "$passRepeat" ]; do
     userPass=$(whiptail --backtitle "ghostbusker's dotfiles installer" \
     --title "New Encrypted User" \
-    --passwordbox "${passWrong}Enter password for new user: " \
+    --passwordbox "$passWrong Enter password for new user: " \
     ${r} ${c} 3>&1 1>&2 2>&3)
     passRepeat=$(whiptail --backtitle "ghostbusker's dotfiles installer" \
     --title "New Encrypted User" \
