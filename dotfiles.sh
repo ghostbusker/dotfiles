@@ -15,9 +15,9 @@ c=$(( c < 70 ? 70 : c ))
 export NEWT_COLORS="
 root=,green
 roottext=green,black
-textbox=,
-listbox=,
 "
+#textbox=,
+#listbox=,
 
 #inform user and prompt for consent
 whiptail --backtitle "ghostbusker's dotfiles installer" \
@@ -70,7 +70,7 @@ chooseModules() {
   fi
 
   #pass MODULES list to other modules
-  echo "MODULES=$MODULES"
+  #echo "MODULES=$MODULES"
 }
 
 checkRoot() {
@@ -136,7 +136,7 @@ newEncryptedUser() {
 
   #show encryption password with command: ecryptfs-unwrap-passphrase
   #pass the targetUser variable so it can be used in other modules
-  echo "targetUser=$targetUser"
+  #echo "targetUser=$targetUser"
 }
 
 favoriteApps() {
@@ -380,7 +380,9 @@ prepareInstall() {
   sudo apt -yq install git
   sudo git config --global color.ui auto
   echo "check for targetUser"
-  if [[ ! $MODULES =~ "newEncryptedUser" ]] ; then
+  if [[ $MODULES == *"newEncryptedUser"* ]]; then
+    echo "targetUser will be selected durring newEncryptedUser setup"
+  else
     targetUser=username
     targetUser=$(whiptail --backtitle "ghostbusker's dotfiles installer" \
     --title "Prepare Install"  \
@@ -396,9 +398,26 @@ prepareInstall() {
       --title "Prepare Install" \
       --msgbox "Cancelled" ${r} ${c}
       exit
-    fi
   fi
-  echo "targetUser is $targetUser"
+
+ #if [[ !  =~ "newEncryptedUser" ]] ; then
+ #   targetUser=username
+ #   targetUser=$(whiptail --backtitle "ghostbusker's dotfiles installer" \
+ #   --title "Prepare Install"  \
+ #   --inputbox "Enter the target user name where files and permissions should be applied. " \
+ #   ${r} ${c} $targetUser 3>&1 1>&2 2>&3)
+ #   exitstatus=$?
+ #   if [ $exitstatus = 0 ]; then
+ #     whiptail --backtitle "ghostbusker's dotfiles installer" \
+ #     --title "Prepare Install" \
+ #     --msgbox "Target User: $targetUser" ${r} ${c}
+ #   else
+ #     whiptail --backtitle "ghostbusker's dotfiles installer" \
+ #     --title "Prepare Install" \
+ #     --msgbox "Cancelled" ${r} ${c}
+ #     exit
+ #   fi
+ # fi
   echo "selected Modules:"
   echo $MODULES
   echo "run installer with these settings? (y/n)"
