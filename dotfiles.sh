@@ -48,6 +48,7 @@ chooseModules() {
     "localizeEasternUS" "Localize to Eastern US" OFF \
     "enableSSH" "Enable SSH on boot" OFF \
     "enableVNC" "Enable VNC on boot" OFF \
+    "moonlightStream" "Install moonlight for game streaming" ON \
     "retroPie" "Install RetroPie" OFF \
     "creativeSuite" "Install Creative Suite" OFF \
     "coolRetroTerm" "Install CoolRetroTerm" ON \
@@ -70,7 +71,9 @@ chooseModules() {
   fi
 
   #pass MODULES list to other modules
-  #echo "MODULES=$MODULES"
+  echo "MODULES="
+  echo $MODULES
+  export MODULES=$MODULES
 }
 
 checkRoot() {
@@ -136,7 +139,8 @@ newEncryptedUser() {
 
   #show encryption password with command: ecryptfs-unwrap-passphrase
   #pass the targetUser variable so it can be used in other modules
-  #echo "targetUser=$targetUser"
+  echo "targetUser=$targetUser"
+  export targetUser=$targetUser
 }
 
 favoriteApps() {
@@ -206,29 +210,28 @@ scrapeWallpapers() { # this whole module not working
   sudo wget http://getwallpapers.com/wallpaper/full/e/8/7/702136-rainforest-backgrounds-1920x1080-for-mobile.jpg
   sudo wget http://getwallpapers.com/wallpaper/full/a/6/e/702131-beautiful-rainforest-backgrounds-1920x1080-for-iphone-6.jpg
   sudo wget http://getwallpapers.com/wallpaper/full/a/a/9/702126-rainforest-backgrounds-2560x1600-for-computer.jpg
-  sudo wget https://images.unsplash.com/photo-1518965539400-77d851d65c43
-  sudo wget https://images.unsplash.com/photo-1565138146061-e29b079736c0
-  sudo wget https://images.unsplash.com/photo-1516528387618-afa90b13e000
-  sudo wget https://images.unsplash.com/photo-1428572184420-7d1092d8c6c6
-  sudo wget https://images.unsplash.com/photo-1497250681960-ef046c08a56e
-  sudo wget https://images.unsplash.com/photo-1580630873708-e0475b1856c4
-  sudo wget https://images.unsplash.com/photo-1518058488548-9da59a9b1fef
-  sudo wget https://images.unsplash.com/photo-1570828066702-7706220a65f6
-  sudo wget https://images.unsplash.com/photo-1495527400402-c7d3dc332654
-  sudo wget https://images.unsplash.com/photo-1515615575935-36f6e462f56d
-  sudo wget https://images.unsplash.com/photo-1524207874394-5ec7c8c8e1a6
-  sudo wget https://images.unsplash.com/photo-1548759806-821febf1275c
-  sudo wget https://images.unsplash.com/photo-1547499417-0b7889e0f147
-  sudo wget https://images.unsplash.com/photo-1569429593410-b498b3fb3387
-  sudo wget https://images.unsplash.com/photo-1504548840739-580b10ae7715
-  sudo wget https://images.unsplash.com/photo-1563836728031-53a374d2d2e1
-  sudo wget https://images.unsplash.com/photo-1556331968-208c53a23c2a
-  sudo wget https://images.unsplash.com/photo-1564565562150-80a3466b13fe
-  sudo wget https://images.unsplash.com/photo-1561622481-5ae24d986629
-  sudo wget https://images.unsplash.com/photo-1544481921-fb52f37ba73c
-  sudo wget https://images.unsplash.com/photo-1527409335569-f0e5c91fa707
-  sudo wget https://images.unsplash.com/photo-1472145246862-b24cf25c4a36
-
+  sudo wget --output-document=77d851d65c43.jpg https://images.unsplash.com/photo-1518965539400-77d851d65c43
+  sudo wget --output-document=e29b079736c0.jpg https://images.unsplash.com/photo-1565138146061-e29b079736c0
+  sudo wget --output-document=afa90b13e000.jpg https://images.unsplash.com/photo-1516528387618-afa90b13e000
+  sudo wget --output-document=7d1092d8c6c6.jpg https://images.unsplash.com/photo-1428572184420-7d1092d8c6c6
+  sudo wget --output-document=ef046c08a56e.jpg https://images.unsplash.com/photo-1497250681960-ef046c08a56e
+  sudo wget --output-document=e0475b1856c4.jpg https://images.unsplash.com/photo-1580630873708-e0475b1856c4
+  sudo wget --output-document=9da59a9b1fef.jpg https://images.unsplash.com/photo-1518058488548-9da59a9b1fef
+  sudo wget --output-document=7706220a65f6.jpg https://images.unsplash.com/photo-1570828066702-7706220a65f6
+  sudo wget --output-document=c7d3dc332654.jpg https://images.unsplash.com/photo-1495527400402-c7d3dc332654
+  sudo wget --output-document=36f6e462f56d.jpg https://images.unsplash.com/photo-1515615575935-36f6e462f56d
+  sudo wget --output-document=5ec7c8c8e1a6.jpg https://images.unsplash.com/photo-1524207874394-5ec7c8c8e1a6
+  sudo wget --output-document=821febf1275c.jpg https://images.unsplash.com/photo-1548759806-821febf1275c
+  sudo wget --output-document=0b7889e0f147.jpg https://images.unsplash.com/photo-1547499417-0b7889e0f147
+  sudo wget --output-document=b498b3fb3387.jpg https://images.unsplash.com/photo-1569429593410-b498b3fb3387
+  sudo wget --output-document=580b10ae7715.jpg https://images.unsplash.com/photo-1504548840739-580b10ae7715
+  sudo wget --output-document=53a374d2d2e1.jpg https://images.unsplash.com/photo-1563836728031-53a374d2d2e1
+  sudo wget --output-document=208c53a23c2a.jpg https://images.unsplash.com/photo-1556331968-208c53a23c2a
+  sudo wget --output-document=80a3466b13fe.jpg https://images.unsplash.com/photo-1564565562150-80a3466b13fe
+  sudo wget --output-document=5ae24d986629.jpg https://images.unsplash.com/photo-1561622481-5ae24d986629
+  sudo wget --output-document=fb52f37ba73c.jpg https://images.unsplash.com/photo-1544481921-fb52f37ba73c
+  sudo wget --output-document=f0e5c91fa707.jpg https://images.unsplash.com/photo-1527409335569-f0e5c91fa707
+  sudo wget --output-document=b24cf25c4a36.jpg https://images.unsplash.com/photo-1472145246862-b24cf25c4a36
 }
 
 openVPN() {
@@ -265,6 +268,16 @@ enableVNC() {
   echo "installer: enabling vnc"
   sudo apt -yq install realvnc-vnc-server realvncv-nc-viewer
   sudo raspi-config nonint do_vnc 0
+}
+
+moonlightStream() {
+  echo "installing: setting up Moonlight nvidia Shield game streaming"
+  sudo bash -c 'printf "deb http://archive.itimmer.nl/raspbian/moonlight buster main\n" >> /etc/apt/sources.list'
+  wget http://archive.itimmer.nl/itimmer.gpg
+  sudo apt-key add itimmer.gpg
+  sudo apt-get update
+  sudo apt-get install moonlight-embedded
+  # don't forget to pair with target IP then stream using $:moonlight stream -1080 -30fps -app Steam
 }
 
 retroPie() {
@@ -383,6 +396,7 @@ prepareInstall() {
   if [[ $MODULES == *"newEncryptedUser"* ]]; then
     echo "targetUser will be selected durring newEncryptedUser setup"
   else
+    #setup target
     targetUser=username
     targetUser=$(whiptail --backtitle "ghostbusker's dotfiles installer" \
     --title "Prepare Install"  \
@@ -397,7 +411,8 @@ prepareInstall() {
       whiptail --backtitle "ghostbusker's dotfiles installer" \
       --title "Prepare Install" \
       --msgbox "Cancelled" ${r} ${c}
-      exit
+      exit                               #DOESNT EXIT
+    fi
   fi
 
  #if [[ !  =~ "newEncryptedUser" ]] ; then
@@ -418,11 +433,13 @@ prepareInstall() {
  #     exit
  #   fi
  # fi
+
+
   echo "selected Modules:"
   echo $MODULES
   echo "run installer with these settings? (y/n)"
   read answer
-  if [ "$answer" != "${answer#[Yy]}" ] ;then
+  if [ "$answer" != "${answer#[Yy]}" ]; then           #TOTOTES BROKOKES
     echo "running..."
   else
     exit
@@ -434,7 +451,6 @@ prepareInstall() {
   #backup then temporarily change terminal colors
   #TEMP1=$PS1
   #export PS1="\e[0;32m\]"
-
 }
 
 runModules() {
@@ -475,7 +491,7 @@ echo "installer: exporting log to currrent working directory"
 sudo mv $tmpLog $DIR/
 echo "installer script finished"
 echo "reboot may be needed"
-exit 0
+exit
 
 #just a little section to layout my thougts on this config.
 #try putting 'pi' as the new user name and see if anything breaks, or if the home folder gets encrypted
