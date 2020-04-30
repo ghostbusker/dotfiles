@@ -58,43 +58,44 @@ chooseModules() {
     "log2Ram" "Install Log2RAM" OFF\
     "copyDotfiles" "Copy dotfiles to $targetUser home Directory" ON \
     "deleteUserPi" "Delete User Pi? *DANGEROUS*" OFF 3>&1 1>&2 2>&3)
-  exitstatus=$?
-  if [ $exitstatus = 0 ]; then
-    whiptail --backtitle "ghostbusker's dotfiles installer" \
-    --title "Setup dotfiles" \
-    --msgbox "Modules selected: \n$MODULES" ${r} ${c}
-  else
-    whiptail --backtitle "ghostbusker's dotfiles installer" \
-    --title "Setup dotfiles" \
-    --msgbox "Cancelled" ${r} ${c}
-    exit
-  fi
+  #exitstatus=$?
+  #if [ $exitstatus = 0 ]; then
+  #  whiptail --backtitle "ghostbusker's dotfiles installer" \
+  #  --title "Setup dotfiles" \
+  #  --msgbox "Modules selected: \n$MODULES" ${r} ${c}
+  #else
+  #  whiptail --backtitle "ghostbusker's dotfiles installer" \
+  #  --title "Setup dotfiles" \
+  #  --msgbox "Cancelled" ${r} ${c}
+  #  exit
+  #fi
 
   #pass MODULES list to other modules
+  #NOT WORKING
   echo "MODULES="
   echo $MODULES
-  export MODULES=$MODULES
+  export MODULES="$MODULES"
 }
 
-checkRoot() {
-  echo "installer: checkinging for root..."
-  if [[ $EUID -eq 0 ]]; then
-      echo "you are root."
-  else
-      echo "please install sudo or run this as root."
-      exit 1
-  fi
-}
+#checkRoot() {
+#  echo "installer: checkinging for root..."
+#  if [[ $EUID -eq 0 ]]; then
+#      echo "you are root."
+#  else
+#      echo "please install sudo or run this as root."
+#      exit 1
+#  fi
+#}
 
-checkHelp() {
-  echo "installer: checking for --help or -h flags"
-  if [ ${#@} -ne 0 ] && [ "${@#"--help"}" = "" ]; then
-    echo "there is no help."
-    sleep 3
-    echo "only zuul."
-    exit 0
-  fi
-}
+#checkHelp() {
+#  echo "installer: checking for --help or -h flags"
+#  if [ ${#@} -ne 0 ] && [ "${@#"--help"}" = "" ]; then
+#    echo "there is no help."
+#    sleep 3
+#    echo "only zuul."
+#    exit 0
+#  fi
+#}
 
 newEncryptedUser() {
   echo "installer: creating new encrypted user"
@@ -114,18 +115,18 @@ newEncryptedUser() {
     --msgbox "Cancelled" ${r} ${c}
     exit
   fi
-  echo "requesting password"
-  while [ "$userPass" != "$passRepeat" ]; do
-    userPass=$(whiptail --backtitle "ghostbusker's dotfiles installer" \
-    --title "New Encrypted User" \
-    --passwordbox "$passWrong Enter password for new user: " \
-    ${r} ${c} 3>&1 1>&2 2>&3)
-    passRepeat=$(whiptail --backtitle "ghostbusker's dotfiles installer" \
-    --title "New Encrypted User" \
-    --passwordbox "Re-Enter password: " \
-    ${r} ${c} 3>&1 1>&2 2>&3)
-    passWrong="Passwords don't match! Re-"
-  done
+#  echo "requesting password"
+#  while [ "$userPass" != "$passRepeat" ]; do
+#    userPass=$(whiptail --backtitle "ghostbusker's dotfiles installer" \
+#    --title "New Encrypted User" \
+#    --passwordbox "$passWrong Enter password for new user: " \
+#    ${r} ${c} 3>&1 1>&2 2>&3)
+#    passRepeat=$(whiptail --backtitle "ghostbusker's dotfiles installer" \
+#    --title "New Encrypted User" \
+#    --passwordbox "Re-Enter password: " \
+#    ${r} ${c} 3>&1 1>&2 2>&3)
+#    passWrong="Passwords don't match! Re-"
+#  done
 
   #create new user and add them to the sudo group
   echo -e "$userPass\n$userPass\n" | sudo adduser --gecos "" $targetUser
@@ -139,8 +140,9 @@ newEncryptedUser() {
 
   #show encryption password with command: ecryptfs-unwrap-passphrase
   #pass the targetUser variable so it can be used in other modules
+  #NOT WORKING
   echo "targetUser=$targetUser"
-  export targetUser=$targetUser
+  export targetUser="$targetUser"
 }
 
 favoriteApps() {
@@ -392,28 +394,28 @@ prepareInstall() {
   echo "updating git"
   sudo apt -yq install git
   sudo git config --global color.ui auto
-  echo "check for targetUser"
-  if [[ $MODULES == *"newEncryptedUser"* ]]; then
-    echo "targetUser will be selected durring newEncryptedUser setup"
-  else
-    #setup target
-    targetUser=username
-    targetUser=$(whiptail --backtitle "ghostbusker's dotfiles installer" \
-    --title "Prepare Install"  \
-    --inputbox "Enter the target user name where files and permissions should be applied. " \
-    ${r} ${c} $targetUser 3>&1 1>&2 2>&3)
-    exitstatus=$?
-    if [ $exitstatus = 0 ]; then
-      whiptail --backtitle "ghostbusker's dotfiles installer" \
-      --title "Prepare Install" \
-      --msgbox "Target User: $targetUser" ${r} ${c}
-    else
-      whiptail --backtitle "ghostbusker's dotfiles installer" \
-      --title "Prepare Install" \
-      --msgbox "Cancelled" ${r} ${c}
-      exit                               #DOESNT EXIT
-    fi
-  fi
+ # echo "check for targetUser"
+ # if [[ $MODULES == *"newEncryptedUser"* ]]; then
+ #   echo "targetUser will be selected durring newEncryptedUser setup"
+ # else
+ #   #setup target
+ #   targetUser=username
+ #   targetUser=$(whiptail --backtitle "ghostbusker's dotfiles installer" \
+ #   --title "Prepare Install"  \
+ #   --inputbox "Enter the target user name where files and permissions should be applied. " \
+ #   ${r} ${c} $targetUser 3>&1 1>&2 2>&3)
+ #   exitstatus=$?
+ #   if [ $exitstatus = 0 ]; then
+ #     whiptail --backtitle "ghostbusker's dotfiles installer" \
+ #     --title "Prepare Install" \
+ #     --msgbox "Target User: $targetUser" ${r} ${c}
+ #   else
+ #     whiptail --backtitle "ghostbusker's dotfiles installer" \
+ #     --title "Prepare Install" \
+ #     --msgbox "Cancelled" ${r} ${c}
+ #     exit                               #DOESNT EXIT
+ #   fi
+ # fi
 
  #if [[ !  =~ "newEncryptedUser" ]] ; then
  #   targetUser=username
@@ -438,12 +440,13 @@ prepareInstall() {
   echo "selected Modules:"
   echo $MODULES
   echo "run installer with these settings? (y/n)"
+  echo "this is broken so your choice matters libstartup-notification0-dev"
   read answer
-  if [ "$answer" != "${answer#[Yy]}" ]; then           #TOTOTES BROKOKES
-    echo "running..."
-  else
-    exit
-  fi
+  #if [ "$answer" != "${answer#[Yy]}" ]; then           #TOTOTES BROKOKES
+  #  echo "running..."
+  #else
+  #  exit
+  #fi
 
   #stopWatch=$(date +%s)
   #echo "stopWatch=$stopWatch"
@@ -482,8 +485,8 @@ runModules() {
 
 echo "creating install log"
 tmpLog="/tmp/dotfiles-install.log"
-checkRoot | tee -a -i $tmpLog
-checkHelp | tee -a -i $tmpLog
+#checkRoot | tee -a -i $tmpLog
+#checkHelp | tee -a -i $tmpLog
 chooseModules | tee -a -i $tmpLog
 prepareInstall | tee -a -i $tmpLog
 runModules | tee -a -i $tmpLog
