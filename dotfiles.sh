@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Detect screen size, default to 80x24
 screen_size=$(stty size 2>/dev/null || echo 24 80)
@@ -27,6 +27,17 @@ whiptail --backtitle "ghostbusker's dotfiles installer" \
 #create a reference to where this script is located
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
+
+#localization options
+LOCALE=en_US.UTF-8
+LAYOUT=us
+TIMEZONE=US/Eastern
+WIFICOUNTRY=US
+
+  sudo timedatectl set-timezone $TIMEZONE
+  sudo raspi-config nonint do_change_locale $LOCALE
+  sudo raspi-config nonint do_configure_keyboard $LAYOUT
+  sudo raspi-config nonint do_wifi_country US
 #set apt to be less noisy
 #export DEBIAN_FRONTEND=noninteractive
 
@@ -36,7 +47,7 @@ chooseModules() {
   echo "installer: let user choose which modules to run"
   MODULES=$(whiptail --backtitle "ghostbusker's dotfiles installer" \
     --title "Choose your own adventure" \
-    --checklist --separate-output "Modules:" ${r} ${c} 21 \
+    --checklist --separate-output "Modules:" ${r} ${c} 22 \
     "newEncryptedUser" "New Encrypted User" ON \
     "favoriteApps" "Install Favorite GUI + Terminal Apps" ON \
     "desktopFromScratch" "Install Destop Environment" ON \
@@ -55,6 +66,7 @@ chooseModules() {
     "terminalPipes" "Install Pipes for terminal" ON \
     "asciiAquarium" "Install ASCII Aquarium" ON \
     "swapfileChange" "Change Swapfile" OFF \
+    "autoHotspot" "Turn Pi into hotspot atuomatically" OFF \
     "log2Ram" "Install Log2RAM" OFF\
     "copyDotfiles" "Copy dotfiles to $targetUser home Directory" ON \
     "deleteUserPi" "Delete User Pi? *DANGEROUS*" OFF 3>&1 1>&2 2>&3)
@@ -257,7 +269,9 @@ powerButtonLED() {
 localizeEasternUS() {
   echo "installer: setting localization for keyboard, clock, and wifi"
   sudo sed -i 's/gb/us/g' /etc/default/keyboard
-  sudo timedatectl set-timezone US/Eastern
+  sudo timedatectl set-timezone $TIMEZONE
+  sudo raspi-config nonint do_change_locale $LOCALE
+  sudo raspi-config nonint do_configure_keyboard $LAYOUT
   sudo raspi-config nonint do_wifi_country US
 }
 
@@ -357,6 +371,15 @@ swapfileChange() {
   #Alternatively... Disable Swap 
   #sudo swapoff -a -v
 }
+
+autoHotspot () {
+  echo "installer: setting up automatic hotspot script"
+  curl "https://www.raspberryconnect.com/images/hsinstaller/AutoHotspot-Setup.tar.gz" -o AutoHotspot-Setup.tar.gz
+  tar -xzvf AutoHotspot-Setup.tar.gz
+  cd Autohotspot
+  sudo ./autohotspot-setup.sh
+}
+
 
 log2Ram() {
   echo "installer: installing log2ram" #must be done last and requires reboot
