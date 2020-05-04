@@ -5,6 +5,7 @@
 whiptail --title "This is the script you are about to install:" --textbox --scrolltext $0 20 70
 
 # these are the variables you might consider changing before continuing script
+SWAPSIZE=128    #swap file in MB
 TIMEZONE=US/Eastern
 LOCALE=en_US.UTF-8
 LAYOUT=us   #keyboard
@@ -21,17 +22,17 @@ roottext=green,black
 #
 
 new_encrypted_user() {
-  targetUser=username
   targetUser=$(whiptail \
     --title "New Encrypted User"  \
     --backtitle "ghostbusker's dotfiles installer" \
     --inputbox "Enter new user name. User 'pi' should be deleted for security reasons. No spaces please." \
-    $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT $targetUser 3>&1 1>&2 2>&3)
+    $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT targetUser 3>&1 1>&2 2>&3)
+  
   userPass=$(whiptail \
     --title "New Encrypted User"  \
     --backtitle "ghostbusker's dotfiles installer" \
     --passwordbox "Enter password for new user: " \
-    $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    $WT_HEIGHT $WT_WIDTH 3>&1 1>&2 2>&3)
 
   #create new user and add them to the sudo group
   echo -e "$userPass\n$userPass\n" | sudo adduser --gecos "" $targetUser
@@ -49,15 +50,18 @@ set_localization() {
   sudo raspi-config nonint do_change_locale $LOCALE
   sudo raspi-config nonint do_configure_keyboard $LAYOUT
   sudo raspi-config nonint do_wifi_country $WIFICOUNTRY
+  export LANGUAGE=$LOCALE
+  export LANG=$LOCALE
+  export LC_ALL=$LOCALE
+  sudo locale-gen $LOCALE
+  sudo dpkg-reconfigure localeslocale-gen $LOCALE
 }
 
 enable_SSH() {
-  echo "installer: enabling ssh as a service"
   sudo raspi-config nonint do_ssh 0
 }
 
 enable_VNC() {
-  echo "installer: enabling vnc"
   sudo apt -yq install realvnc-vnc-server realvncv-nc-viewer
   sudo raspi-config nonint do_vnc 0
 }
@@ -108,8 +112,7 @@ favorite_apps() {
   sudo apt -yq install geany neovim
 }
 
-make_folders() {
-  #make folders in home directory 
+make_common_folders() {
   sudo mkdir /home/$targetUser/Documents
   sudo mkdir /home/$targetUser/Downloads
   sudo mkdir /home/$targetUser/Music
@@ -155,8 +158,8 @@ scrape_wallpapers() {
 openVPN() {
   # install openvpn for tunneling back to home network
   sudo apt -yq install openvpn
-  #runs with: sudo openvpn ~./location/of/ovpn-file.ovpn
-  #launched by i3, see ~/.config/i3/config
+  # runs with: sudo openvpn ~./location/of/ovpn-file.ovpn
+  # launched by i3, see ~/.config/i3/config
 }
 
 fix_pi_groups() {
@@ -175,8 +178,8 @@ moonlight_stream() {
   sudo bash -c 'printf "deb http://archive.itimmer.nl/raspbian/moonlight buster main\n" >> /etc/apt/sources.list'
   wget http://archive.itimmer.nl/itimmer.gpg
   sudo apt-key add itimmer.gpg
-  sudo apt-get update
-  sudo apt-get install moonlight-embedded
+  sudo apt update
+  sudo apt -yq install moonlight-embedded
   # don't forget to pair with target IP then stream using $:moonlight stream -1080 -30fps -app Steam
 }
 retropie() {
@@ -188,6 +191,13 @@ retropie() {
 
 creative_suite() {
   sudo apt -yq install mixxx kdenlive blender audacity gimp fswebcam fluidsynth
+  #sudo apt -yq install non-daw non-mixer non-sequencer non-session-manager
+  # trying out reaper daw
+  cd /opt/
+  wget http://reaper.fm/files/6.x/reaper609_linux_armv7l.tar.xz
+  sudo tar xvf reaper609_linux_armv7l.tar.xz 
+  cd reaper_linux_armv7l
+  sudo install-reaper.sh
 }
 
 cool_retro_term() {
@@ -236,13 +246,13 @@ ascii_aquarium() {
 }
 
 set_swapfile() {
-  #Andreas Speiss recomends these swap file changes
+  # Andreas Speiss recomends these swap file changes
   sudo sed -i '/CONF_SWAPFILE/c\CONF_SWAPFILE=/var/swap' /etc/dphys-swapfile 
   sudo sed -i '/CONF_SWAPFACTOR/c\CONF_SWAPFACTOR=2' /etc/dphys-swapfile 
-  sudo sed -i '/CONF_SWAPSIZE/c\#CONF_SWAPSIZE=100' /etc/dphys-swapfile 
+  sudo sed -i '/CONF_SWAPSIZE/c\#CONF_SWAPSIZE=$SWAPSIZE' /etc/dphys-swapfile 
   sudo dphys-swapfile setup
   sudo dphys-swapfile swapon
-  #Alternatively... Disable Swap 
+  # Alternatively... Disable Swap 
   #sudo swapoff -a -v
 }
 
@@ -269,8 +279,8 @@ copy_dotfiles() {
   sudo cp -r .conkyrc /home/$targetUser/
   sudo cp -r .profile /home/$targetUser/
 
-  #this next part made all the difference, chome and a bunch of other apps were broken otherwise
-  #take ownership and set permissions of user folder:
+  # this next part made all the difference, chome and a bunch of other apps were broken otherwise
+  # take ownership and set permissions of user folder:
   sudo -u $targetUser chmod 750 -R /home/$targetUser/
   sudo chown -R $targetUser:$targetUser /home/$targetUser/
   sudo umask 0027
@@ -282,7 +292,7 @@ delete_user_pi() {
 }
 
 show_helpfull_info() {
-  printf "\nCurrent /boot/config.txt settings:\n"
+  printf "\nCurrent /boot/config.txt settings: '\n"
   vcgencmd get_config int
   echo "showing directory tree"
   sudo tree
@@ -291,7 +301,6 @@ show_helpfull_info() {
     echo "$codec:\t$(vcgencmd codec_enabled $codec)" ; \
   done
   echo "script runtime $duration seconds" #| lolcat
-
 }
  
 #
@@ -320,11 +329,12 @@ sudo apt update || sudo apt-get -o Acquire::ForceIPv4=true update
 sudo apt -yq install git
 sudo git config --global color.ui auto
 
-# ask user which modules to run
+# ask user which modules to run 
+############################################# NOT DISPLAYING CORRECTLY################################################################
 MODULES=$(whiptail \
   --backtitle "ghostbusker's dotfiles installer" \
   --title "Choose your own adventure" \
-  --checklist "Modules:" $WT_HEIGHT $WT_WIDTH 22\
+  --checklist "Modules:" $WT_HEIGHT $WT_WIDTH \
   --separate-output \
   "new_encrypted_user" "New User with Encrypted home folder" ON \
   "set_localization" "Localize Keyboard, Wifi, timezone" OFF \
@@ -332,7 +342,7 @@ MODULES=$(whiptail \
   "enable_VNC" "Enable VNC on boot" OFF \
   "favorite_apps" "Install Favorite GUI + Terminal Apps" ON \
   "desktop_from_scratch" "Install Desktop Environment" ON \
-  "make_folders" "Make Default folders" ON \
+  "make_common_folders" "Make Default folders" ON \
   "scrape_wallpapers" "Scrape Wallpapers from Web" ON \
   "openVPN" "Install OpenVPN client" OFF \
   "fix_pi_groups" "Fix Pi Groups associations" ON \
@@ -349,8 +359,8 @@ MODULES=$(whiptail \
   "copy_dotfiles" "Copy dotfiles to $targetUser home Directory" ON \
   "delete_user_pi" "Delete User Pi? *DANGEROUS*" OFF 3>&1 1>&2 2>&3)
 
-# set a target user if not creating new user
-if [ ! $MODULES  =~ "new_encrypted_user" ]; then
+# set a target user if not creating new user ###########################NNNNNNNNNNNOOOOOOOOOOOOTTTTTTTTTWORKING
+if [[ ! $MODULES  =~ *new_encrypted_user* ]]; then
   targetUser=$(whiptail --inputbox "could not determine the taget user.\\n\\nWhat user should these settings apply to?" 20 60 username 3>&1 1>&2 2>&3)
 fi
 
@@ -360,9 +370,9 @@ tmpLog="/tmp/dotfiles-install.log"
 # start script timer
 start=$seconds
 
-# magic loop that calls each fucntion and executes it
+# magic loop that calls each fucntion, anounces its name, executes it, and logs the output
 for module in $MODULES ; do \
-  printf "\nINSTALLER: RUNNING MODULE $module\n" | tee -a -i $tmpLog
+  printf "\nINSTALLER: RUNNING MODULE $module '\n" | tee -a -i $tmpLog
   $module | tee -a -i $tmpLog ; \
 done
 

@@ -10,7 +10,7 @@ exec compton -f -b
 
 #set wallpaper, then change every -n seconds, maybe add some imagemagick to script to make unique
 #exec feh --randomize --bg-fill ~/Pictures/Wallpapers/*
-exec watch -n 15 feh --randomize --bg-fill ~/Pictures/Wallpapers/*
+exec watch -n 90 feh --randomize --bg-fill ~/Pictures/Wallpapers/*
 
 #fetch a new weather image every 15 minutes and rename it weather.png
 exec watch -n 900 wget -O /tmp/weather.png https://s.w-x.co/staticmaps/wu/wxtype/county_loc/csg/animate.png

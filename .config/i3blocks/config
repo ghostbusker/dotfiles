@@ -31,11 +31,11 @@ markup=none
 
 [click]
 full_text=Click me!
-command=echo "Got clicked with button $button"
+command=echo "Got clicked with button $button" ||
 color=#F79494
 
 #[compton_toggle]
-command=~/home
+command=[[ -z ${BLOCK_BUTTON} ]] || i3-msg exec <cmd>
 full_text=Opacity
 color=#00AA00
 
