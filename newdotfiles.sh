@@ -1,7 +1,9 @@
 #!/bin/sh
 # https://github.com/ghostbusker/dotfiles
 
-eval 'resize' #creates LINES and COLUMNS variables for sizing menus
+# get terminal dimensions for sizing menus
+LINES=$(tput lines)
+COLUMNS=$(tput cols)
 
 # inform user and prompt for consent
 whiptail --title "This is the script you are about to install:" --textbox --scrolltext $0 $LINES $COLUMNS
@@ -14,11 +16,6 @@ LAYOUT=us   #keyboard
 WIFICOUNTRY=US
 
 # set whiptail menu colors
-export NEWT_COLORS="
-root=,green
-roottext=green,black
-"
-
 export NEWT_COLORS='
 root=green,brightgreen
 shadow=brightblue,brightblue
