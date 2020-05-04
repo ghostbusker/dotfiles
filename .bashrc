@@ -9,7 +9,9 @@ case $- in
 esac
 
 #the ghstbskr section of the file, *ahem*
+
 figlet ghstbskr | lolcat
+cowsay -f ghostbusters "github.com/ghostbusker/dotfiles"
 neofetch
 #add local scripts folder to PATH for 'weather', 'tardis', 'toggle-compton', etc.
 #export PATH="~/.config/scripts/"

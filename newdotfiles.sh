@@ -1,8 +1,10 @@
 #!/bin/sh
-#https://github.com/ghostbusker/dotfiles
+# https://github.com/ghostbusker/dotfiles
+
+eval 'resize' #creates LINES and COLUMNS variables for sizing menus
 
 # inform user and prompt for consent
-whiptail --title "This is the script you are about to install:" --textbox --scrolltext $0 20 70
+whiptail --title "This is the script you are about to install:" --textbox --scrolltext $0 $LINES $COLUMNS
 
 # these are the variables you might consider changing before continuing script
 SWAPSIZE=128    #swap file in MB
@@ -17,6 +19,20 @@ root=,green
 roottext=green,black
 "
 
+export NEWT_COLORS='
+root=green,brightgreen
+shadow=brightblue,brightblue
+title=brightcyan,white
+window=white,brightmagenta
+border=white,brightgreen
+textbox=black,black
+listbox=brightgreen,white
+actlistbox=white,brightgreen
+actsellistbox=white,brightgreen
+button=black,white
+compactbutton=magenta,brightmagenta
+'
+
 #
 # Just Declare the Modules ###################################################################################################################################################################
 #
@@ -26,13 +42,13 @@ new_encrypted_user() {
     --title "New Encrypted User"  \
     --backtitle "ghostbusker's dotfiles installer" \
     --inputbox "Enter new user name. User 'pi' should be deleted for security reasons. No spaces please." \
-    $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT targetUser 3>&1 1>&2 2>&3)
+    $LINES $COLUMNS $(( LINES - 8 )) targetUser 3>&1 1>&2 2>&3)
   
   userPass=$(whiptail \
     --title "New Encrypted User"  \
     --backtitle "ghostbusker's dotfiles installer" \
     --passwordbox "Enter password for new user: " \
-    $WT_HEIGHT $WT_WIDTH 3>&1 1>&2 2>&3)
+    $LINES $COLUMNS 3>&1 1>&2 2>&3)
 
   #create new user and add them to the sudo group
   echo -e "$userPass\n$userPass\n" | sudo adduser --gecos "" $targetUser
@@ -313,17 +329,6 @@ if [ $(id -u) -ne 0 ]; then
   exit 1
 fi
 
-# determine what size menus will be
-WT_HEIGHT=18
-WT_WIDTH=$(tput cols)
-if [ -z "$WT_WIDTH" ] || [ "$WT_WIDTH" -lt 60 ]; then
-  WT_WIDTH=80
-fi
-if [ "$WT_WIDTH" -gt 178 ]; then
-  WT_WIDTH=120
-fi
-WT_MENU_HEIGHT=$(($WT_HEIGHT-7))
-
 # prepare apt and git for installing a bunch of apps
 sudo apt update || sudo apt-get -o Acquire::ForceIPv4=true update
 sudo apt -yq install git
@@ -334,7 +339,7 @@ sudo git config --global color.ui auto
 MODULES=$(whiptail \
   --backtitle "ghostbusker's dotfiles installer" \
   --title "Choose your own adventure" \
-  --checklist "Modules:" $WT_HEIGHT $WT_WIDTH \
+  --checklist "Modules:" 30 $COLUMNS 22\
   --separate-output \
   "new_encrypted_user" "New User with Encrypted home folder" ON \
   "set_localization" "Localize Keyboard, Wifi, timezone" OFF \
