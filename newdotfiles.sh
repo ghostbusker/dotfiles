@@ -19,10 +19,7 @@ WIFICOUNTRY=US
 export NEWT_COLORS='
 root=,red
 roottext=white,red
-title=red,white
-#shadow=brightblue,brightblue
-#tit
-#window=white,brightmagenta
+title=red,
 border=white,
 '
 
