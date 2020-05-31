@@ -24,12 +24,12 @@ root=,red
 #shadow=brightblue,brightblue
 #title=brightcyan,white
 #window=white,brightmagenta
-border=black,brightgreen
+border=brightred,black
 #textbox=black,black
 #listbox=brightgreen,white
 #actlistbox=white,brightgreen
 #actsellistbox=white,brightgreen
-button=black,white
+#button=black,white
 #compactbutton=magenta,brightmagenta
 '
 
@@ -343,7 +343,7 @@ sudo git config --global color.ui auto
 MODULES=$(whiptail \
   --backtitle "ghostbusker's dotfiles installer" \
   --title "Choose your own adventure" \
-  --checklist "Modules:" $MENU_HEIGHT $MENU_WIDTH $MENU_HEIGHT\
+  --checklist "Modules:" 28 $MENU_WIDTH 22\
   --separate-output \
   "new_encrypted_user" "New User with Encrypted home folder" ON \
   "set_localization" "Localize Keyboard, Wifi, timezone" OFF \
