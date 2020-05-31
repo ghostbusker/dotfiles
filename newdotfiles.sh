@@ -18,16 +18,17 @@ WIFICOUNTRY=US
 # set whiptail menu colors
 export NEWT_COLORS='
 root=,red
-roottext=
+roottext=white,red
+title=red,white
 #shadow=brightblue,brightblue
 #title=brightcyan,white
 #window=white,brightmagenta
 border=white,
 #textbox=black,white
-listbox=black,white
-actlistbox=white,brightgreen
-actsellistbox=white,brightgreen
-button=red,white
+listbox=,brown
+#actlistbox=white,brightgreen
+#actsellistbox=white,brightgreen
+#button=red,white
 #compactbutton=magenta,brightmagenta
 '
 
@@ -342,7 +343,7 @@ sudo git config --global color.ui auto
 MODULES=$(whiptail \
   --backtitle "ghostbusker's dotfiles installer" \
   --title "Choose your own adventure" \
-  --checklist "Modules:" 0 $MENU_WIDTH 22\
+  --checklist "Modules:" 0 0 22\
   --notags \
   --fullbuttons \
   --separate-output \
