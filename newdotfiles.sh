@@ -6,10 +6,7 @@ MENU_HEIGHT=$(($(tput lines)-8))
 MENU_WIDTH=$(($(tput cols)-8))
 
 # inform user and prompt for consent
-whiptail --title "This is the script you are about to install:" --textbox --scrolltext $0 $MENU_HEIGHT $MENU_WIDTH
-
-#determine script location
-SCRIPT_LOCATION=$(pwd)
+whiptail --title "This is the script you are about to install:" --textbox --scrolltext --fullbuttons $0 $MENU_HEIGHT $MENU_WIDTH
 
 # these are the variables you might consider changing before continuing script
 SWAPSIZE=128    #swap file in MB
@@ -21,15 +18,16 @@ WIFICOUNTRY=US
 # set whiptail menu colors
 export NEWT_COLORS='
 root=,red
+roottext=
 #shadow=brightblue,brightblue
 #title=brightcyan,white
 #window=white,brightmagenta
-border=brightred,black
-#textbox=black,black
-#listbox=brightgreen,white
-#actlistbox=white,brightgreen
-#actsellistbox=white,brightgreen
-#button=black,white
+border=white,
+#textbox=black,white
+listbox=black,white
+actlistbox=white,brightgreen
+actsellistbox=white,brightgreen
+button=red,white
 #compactbutton=magenta,brightmagenta
 '
 
@@ -42,14 +40,14 @@ new_encrypted_user() {
     --title "New Encrypted User"  \
     --backtitle "ghostbusker's dotfiles installer" \
     --inputbox "Enter new user name. User 'pi' should be deleted for security reasons. No spaces please." \
-    $MENU_HEIGHT $MENU_WIDTH $0 3>&1 1>&2 2>&3)
+    --fullbuttons 0 $MENU_WIDTH username 3>&1 1>&2 2>&3)
   export TARGETUSER=$TARGETUSER
   
    userPass=$(whiptail \
     --title "New Encrypted User"  \
     --backtitle "ghostbusker's dotfiles installer" \
     --passwordbox "Enter password for new user: " \
-    $MENU_HEIGHT $MENU_WIDTH $0 3>&1 1>&2 2>&3)
+    --fullbuttons 0 $MENU_WIDTH 3>&1 1>&2 2>&3)
 
   #create new user, set password, and add them to the sudo group
   sudo adduser --gecos "" $TARGETUSER 
@@ -64,6 +62,7 @@ new_encrypted_user() {
 } 
 
 set_localization() {
+  # something here is broken but the keyboard part works so IM happy
   sudo timedatectl set-timezone $TIMEZONE
   sudo raspi-config nonint do_change_locale $LOCALE
   sudo raspi-config nonint do_configure_keyboard $LAYOUT
@@ -343,7 +342,9 @@ sudo git config --global color.ui auto
 MODULES=$(whiptail \
   --backtitle "ghostbusker's dotfiles installer" \
   --title "Choose your own adventure" \
-  --checklist "Modules:" 28 $MENU_WIDTH 22\
+  --checklist "Modules:" 0 $MENU_WIDTH 22\
+  --notags \
+  --fullbuttons \
   --separate-output \
   "new_encrypted_user" "New User with Encrypted home folder" ON \
   "set_localization" "Localize Keyboard, Wifi, timezone" OFF \
@@ -370,7 +371,8 @@ MODULES=$(whiptail \
 
 # set a target user if not creating new user ###########################NNNNNNNNNNNOOOOOOOOOOOOTTTTTTTTTWORKING
 if [[ ! $MODULES  =~ *new_encrypted_user* ]]; then
-  TARGETUSER=$(whiptail --inputbox "could not determine the taget user.\\n\\nWhat user should these settings apply to?" $MENU_HEIGHT $MENU_WIDTH username 3>&1 1>&2 2>&3)
+  TARGETUSER=$(whiptail --inputbox "could not determine the taget user.\\n\\nWhat user should these settings apply to?" \
+  --fullbuttons 0 0 username 3>&1 1>&2 2>&3)
   export TARGETUSER=$TARGETUSER
 fi
 
