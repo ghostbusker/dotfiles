@@ -6,7 +6,7 @@ MENU_HEIGHT=$(($(tput lines)-8))
 MENU_WIDTH=$(($(tput cols)-8))
 
 # inform user and prompt for consent
-whiptail --title "This is the script you are about to install:" --textbox --scrolltext --fullbuttons $0 $MENU_HEIGHT $MENU_WIDTH
+whiptail --title "This is the script you are about to install:" --textbox --scrolltext $0 $MENU_HEIGHT $MENU_WIDTH
 
 # these are the variables you might consider changing before continuing script
 SWAPSIZE=128    #swap file in MB
@@ -21,15 +21,9 @@ root=,red
 roottext=white,red
 title=red,white
 #shadow=brightblue,brightblue
-#title=brightcyan,white
+#tit
 #window=white,brightmagenta
 border=white,
-#textbox=black,white
-listbox=,brown
-#actlistbox=white,brightgreen
-#actsellistbox=white,brightgreen
-#button=red,white
-#compactbutton=magenta,brightmagenta
 '
 
 #
@@ -41,14 +35,14 @@ new_encrypted_user() {
     --title "New Encrypted User"  \
     --backtitle "ghostbusker's dotfiles installer" \
     --inputbox "Enter new user name. User 'pi' should be deleted for security reasons. No spaces please." \
-    --fullbuttons 0 $MENU_WIDTH username 3>&1 1>&2 2>&3)
+    --fullbuttons --nocancel 0 $MENU_WIDTH username 3>&1 1>&2 2>&3)
   export TARGETUSER=$TARGETUSER
   
    userPass=$(whiptail \
     --title "New Encrypted User"  \
     --backtitle "ghostbusker's dotfiles installer" \
     --passwordbox "Enter password for new user: " \
-    --fullbuttons 0 $MENU_WIDTH 3>&1 1>&2 2>&3)
+    --fullbuttons --nocancel 0 $MENU_WIDTH 3>&1 1>&2 2>&3)
 
   #create new user, set password, and add them to the sudo group
   sudo adduser --gecos "" $TARGETUSER 
@@ -346,6 +340,7 @@ MODULES=$(whiptail \
   --checklist "Modules:" 0 0 22\
   --notags \
   --fullbuttons \
+  --nocancel \
   --separate-output \
   "new_encrypted_user" "New User with Encrypted home folder" ON \
   "set_localization" "Localize Keyboard, Wifi, timezone" OFF \
@@ -372,8 +367,11 @@ MODULES=$(whiptail \
 
 # set a target user if not creating new user ###########################NNNNNNNNNNNOOOOOOOOOOOOTTTTTTTTTWORKING
 if [[ ! $MODULES  =~ *new_encrypted_user* ]]; then
-  TARGETUSER=$(whiptail --inputbox "could not determine the taget user.\\n\\nWhat user should these settings apply to?" \
-  --fullbuttons 0 0 username 3>&1 1>&2 2>&3)
+  TARGETUSER=$(whiptail \
+  --backtitle "ghostbusker's dotfiles installer" \
+  --title "No New User, Select Target" \
+  --inputbox "What user should these settings apply to?" \
+  --fullbuttons --nocancel 0 0 $TARGETUSER 3>&1 1>&2 2>&3)
   export TARGETUSER=$TARGETUSER
 fi
 
