@@ -1,12 +1,15 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # https://github.com/ghostbusker/dotfiles
 
 # get terminal dimensions for sizing menus
-LINES=$(tput lines)
-COLUMNS=$(tput cols)
+MENU_HEIGHT=$(($(tput lines)-8))
+MENU_WIDTH=$(($(tput cols)-8))
 
 # inform user and prompt for consent
-whiptail --title "This is the script you are about to install:" --textbox --scrolltext $0 $LINES $COLUMNS
+whiptail --title "This is the script you are about to install:" --textbox --scrolltext $0 $MENU_HEIGHT $MENU_WIDTH
+
+#determine script location
+SCRIPT_LOCATION=$(pwd)
 
 # these are the variables you might consider changing before continuing script
 SWAPSIZE=128    #swap file in MB
@@ -17,17 +20,17 @@ WIFICOUNTRY=US
 
 # set whiptail menu colors
 export NEWT_COLORS='
-root=green,brightgreen
-shadow=brightblue,brightblue
-title=brightcyan,white
-window=white,brightmagenta
-border=white,brightgreen
-textbox=black,black
-listbox=brightgreen,white
-actlistbox=white,brightgreen
-actsellistbox=white,brightgreen
+root=,red
+#shadow=brightblue,brightblue
+#title=brightcyan,white
+#window=white,brightmagenta
+border=black,brightgreen
+#textbox=black,black
+#listbox=brightgreen,white
+#actlistbox=white,brightgreen
+#actsellistbox=white,brightgreen
 button=black,white
-compactbutton=magenta,brightmagenta
+#compactbutton=magenta,brightmagenta
 '
 
 #
@@ -35,27 +38,29 @@ compactbutton=magenta,brightmagenta
 #
 
 new_encrypted_user() {
-  targetUser=$(whiptail \
+  TARGETUSER=$(whiptail \
     --title "New Encrypted User"  \
     --backtitle "ghostbusker's dotfiles installer" \
     --inputbox "Enter new user name. User 'pi' should be deleted for security reasons. No spaces please." \
-    $LINES $COLUMNS $(( LINES - 8 )) targetUser 3>&1 1>&2 2>&3)
+    $MENU_HEIGHT $MENU_WIDTH $0 3>&1 1>&2 2>&3)
+  export TARGETUSER=$TARGETUSER
   
-  userPass=$(whiptail \
+   userPass=$(whiptail \
     --title "New Encrypted User"  \
     --backtitle "ghostbusker's dotfiles installer" \
     --passwordbox "Enter password for new user: " \
-    $LINES $COLUMNS 3>&1 1>&2 2>&3)
+    $MENU_HEIGHT $MENU_WIDTH $0 3>&1 1>&2 2>&3)
 
-  #create new user and add them to the sudo group
-  echo -e "$userPass\n$userPass\n" | sudo adduser --gecos "" $targetUser
-  sudo usermod -a -G sudo $targetUser
+  #create new user, set password, and add them to the sudo group
+  sudo adduser --gecos "" $TARGETUSER 
+  printf "$userPass\n$userPass\n" | sudo passwd $TARGETUSER   ##################### BROKEN . User gets made but passord "doesnt match" and fails to set. Must be set manually using passwd command.
+  sudo usermod -a -G sudo $TARGETUSER
 
   #install apps needed to encrypt the user folder
   sudo apt -yq install ecryptfs-utils lsof cryptsetup
 
   #encrypt new user home directory
-  sudo ecryptfs-migrate-home -u $targetUser
+  sudo ecryptfs-migrate-home -u $TARGETUSER
 } 
 
 set_localization() {
@@ -105,8 +110,8 @@ favorite_apps() {
   #This is going to get an implementation and organization overhaul
   echo "installer: installing favorite apps and tools"
   echo "installing termnial upgrade + terminal candy"
-  sudo apt -yq install terminator xterm locate tilda neovim ranger trash-cli neofetch figlet \
-  lolcat cmatrix hollywood funny-manpages caca-utils libaa-bin thefuck howdoi cowsay fortune
+  sudo apt -yq install terminator xterm locate tilda neovim ranger trash-cli neofetch figlet lolcat cmatrix hollywood \
+  funny-manpages caca-utils libaa-bin thefuck howdoi cowsay fortune
   echo "installing vanity fonts"
   sudo apt -yq install fonts-ocr-a
   sudo fc-cache -f -v 
@@ -126,17 +131,17 @@ favorite_apps() {
 }
 
 make_common_folders() {
-  sudo mkdir /home/$targetUser/Documents
-  sudo mkdir /home/$targetUser/Downloads
-  sudo mkdir /home/$targetUser/Music
-  sudo mkdir /home/$targetUser/Videos
-  sudo mkdir /home/$targetUser/Pictures
+  sudo mkdir /home/$TARGETUSER/Documents
+  sudo mkdir /home/$TARGETUSER/Downloads
+  sudo mkdir /home/$TARGETUSER/Music
+  sudo mkdir /home/$TARGETUSER/Videos
+  sudo mkdir /home/$TARGETUSER/Pictures
 }
 
-scrape_wallpapers() {
+scrape_wallpapers() {  ##################### BROKEN  ##################### BROKEN  ##################### BROKEN  ##################### BROKEN  ##################### BROKEN Picyutrds wound up in /home/Pictures/Wallpapers
   echo "installer: scraping wallpapers from the web" #shamelessly
-  sudo mkdir /home/$targetUser/Pictures/Wallpapers
-  cd /home/$targetUser/Pictures/Wallpapers
+  sudo mkdir /home/$TARGETUSER/Pictures/Wallpapers
+  cd /home/$TARGETUSER/Pictures/Wallpapers
   sudo wget https://cdn.clipart.email/ea453281dbdec70a2bf5b70464f41e4f_desert-sand-background-gallery-yopriceville-high-quality-_5500-3667.jpeg
   sudo wget http://getwallpapers.com/wallpaper/full/2/2/3/702223-free-rainforest-backgrounds-2560x1440.jpg
   sudo wget http://getwallpapers.com/wallpaper/full/9/d/6/702176-rainforest-backgrounds-1920x1080-for-mac.jpg
@@ -177,7 +182,7 @@ openVPN() {
 
 fix_pi_groups() {
   # adding user to all the groups that user pi was a part of
-  sudo usermod -a -G adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,input,netdev,spi,i2c,gpio $targetUser
+  sudo usermod -a -G adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,input,netdev,spi,i2c,gpio $TARGETUSER
 }
 
 power_button_LED() {
@@ -285,17 +290,19 @@ log2Ram() {
   apt -yq install log2ram
 }
 
-copy_dotfiles() {
+copy_dotfiles() { ##################### BROKEN 
   cd $(dirname "$0")
-  sudo cp -r .config/ /home/$targetUser/
-  sudo cp -r .bashrc /home/$targetUser/
-  sudo cp -r .conkyrc /home/$targetUser/
-  sudo cp -r .profile /home/$targetUser/
+  sudo git clone http://github.com/ghostbusker/dotfiles
+  cd dotfiles
+  sudo cp -f -r .config /home/$TARGETUSER/
+  sudo cp -f -r .bashrc /home/$TARGETUSER/
+  sudo cp -f -r .conkyrc /home/$TARGETUSER/
+  sudo cp -f -r .profile /home/$TARGETUSER/
 
   # this next part made all the difference, chome and a bunch of other apps were broken otherwise
   # take ownership and set permissions of user folder:
-  sudo -u $targetUser chmod 750 -R /home/$targetUser/
-  sudo chown -R $targetUser:$targetUser /home/$targetUser/
+  sudo -u $TARGETUSER chmod 750 -R /home/$TARGETUSER/
+  sudo chown -R $TARGETUSER:$TARGETUSER /home/$TARGETUSER/
   sudo umask 0027
 }
 
@@ -305,15 +312,15 @@ delete_user_pi() {
 }
 
 show_helpfull_info() {
-  printf "\nCurrent /boot/config.txt settings: '\n"
+  printf "\nCurrent /boot/config.txt settings: \n"
   vcgencmd get_config int
   echo "showing directory tree"
+  cd
   sudo tree
   echo "showing codec info"
   for codec in H264 MPG2 WVC1 MPG4 MJPG WMV9 ; do \
     echo "$codec:\t$(vcgencmd codec_enabled $codec)" ; \
   done
-  echo "script runtime $duration seconds" #| lolcat
 }
  
 #
@@ -322,7 +329,7 @@ show_helpfull_info() {
 
 # check for root
 if [ $(id -u) -ne 0 ]; then
-  printf "Script must be run as root. '\n"
+  printf "\nScript must be run as root. \n"
   exit 1
 fi
 
@@ -336,7 +343,7 @@ sudo git config --global color.ui auto
 MODULES=$(whiptail \
   --backtitle "ghostbusker's dotfiles installer" \
   --title "Choose your own adventure" \
-  --checklist "Modules:" 30 $COLUMNS 22\
+  --checklist "Modules:" $MENU_HEIGHT $MENU_WIDTH $MENU_HEIGHT\
   --separate-output \
   "new_encrypted_user" "New User with Encrypted home folder" ON \
   "set_localization" "Localize Keyboard, Wifi, timezone" OFF \
@@ -358,29 +365,32 @@ MODULES=$(whiptail \
   "set_swapfile" "Change Swapfile" OFF \
   "auto_hotspot" "Turn Pi into hotspot atuomatically" OFF \
   "log2Ram" "Install Log2RAM" OFF\
-  "copy_dotfiles" "Copy dotfiles to $targetUser home Directory" ON \
+  "copy_dotfiles" "Copy dotfiles to target user home Directory" ON \
   "delete_user_pi" "Delete User Pi? *DANGEROUS*" OFF 3>&1 1>&2 2>&3)
 
 # set a target user if not creating new user ###########################NNNNNNNNNNNOOOOOOOOOOOOTTTTTTTTTWORKING
 if [[ ! $MODULES  =~ *new_encrypted_user* ]]; then
-  targetUser=$(whiptail --inputbox "could not determine the taget user.\\n\\nWhat user should these settings apply to?" 20 60 username 3>&1 1>&2 2>&3)
+  TARGETUSER=$(whiptail --inputbox "could not determine the taget user.\\n\\nWhat user should these settings apply to?" $MENU_HEIGHT $MENU_WIDTH username 3>&1 1>&2 2>&3)
+  export TARGETUSER=$TARGETUSER
 fi
 
 #start a log
 tmpLog="/tmp/dotfiles-install.log"
 
 # start script timer
-start=$seconds
+START=$SECONDS
 
 # magic loop that calls each fucntion, anounces its name, executes it, and logs the output
 for module in $MODULES ; do \
-  printf "\nINSTALLER: RUNNING MODULE $module '\n" | tee -a -i $tmpLog
+  printf "\nINSTALLER: RUNNING MODULE $module \n" | tee -a -i $tmpLog
   $module | tee -a -i $tmpLog ; \
 done
 
 # stop script timer
-duration=$(( SECONDS - start ))
+STOP=$(($SECONDS-$START))
 
+# display script and system info, add to log
+printf 'script runtime %dh:%dm:%ds\n' $(($STOP/3600)) $(($STOP%3600/60)) $(($STOP%60)) | tee -a -i $tmpLog
 show_helpfull_info | tee -a -i $tmpLog
 
 # save log to same location as script
