@@ -23,7 +23,7 @@ for_window [class="florence"] floating enable
 #get the clipboard manager and OSK running (and floating!)
 #exec --no-startup-id tilda --config ~/.config/tilda
 exec --no-startup-id tilda ~/.config/tilda
-exec --no-startup-id clipit
+exec --no-startup-id clipit --daemon
 exec --no-startup-id dunst
 exec --no-startup-id dhcpcd-gtk
 exec --no-startup-id nm-tray

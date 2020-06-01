@@ -1,12 +1,21 @@
 #!/usr/bin/env bash
 # https://github.com/ghostbusker/dotfiles
+# install using "curl -sSL dotfiles.ghostbusker.com | sudo bash"
 
 # get terminal dimensions for sizing menus
 MENU_HEIGHT=$(($(tput lines)-8))
 MENU_WIDTH=$(($(tput cols)-8))
 
-# inform user and prompt for consent
-whiptail --title "This is the script you are about to install:" \
+# set whiptail menu colors
+export NEWT_COLORS='
+root=,red
+roottext=white,red
+title=red,
+border=white,
+'
+
+whiptail \
+--title "This is the script you are about to install:" \
 --msgbox "$(curl -sSL http://dotfiles.ghostbusker.com)" \
 --scrolltext --fullbuttons $MENU_HEIGHT $MENU_WIDTH
 
@@ -17,39 +26,35 @@ LOCALE=en_US.UTF-8
 LAYOUT=us   #keyboard
 WIFICOUNTRY=US
 
-# set whiptail menu colors
-export NEWT_COLORS='
-root=,red
-roottext=white,red
-title=red,
-border=white,
-'
+# start a log
+TEMPLOG="/tmp/dotfiles-install.log"
 
-#
-# Just Declare the Modules ###################################################################################################################################################################
-#
+### Modules ### Modules ### Modules ### Modules ### Modules ### Modules ### Modules ### Modules ### Modules ### Modules ### Modules ### Modules ### Modules ### Modules ### Modules ### Modules ###
 
 new_encrypted_user() {
   TARGETUSER=$(whiptail \
     --title "New Encrypted User"  \
     --backtitle "ghostbusker's dotfiles installer" \
     --inputbox "Enter new user name. User 'pi' should be deleted for security reasons. No spaces please." \
-    --fullbuttons --nocancel $MENU_HEIGHT $MENU_WIDTH username 3>&1 1>&2 2>&3)
+    --fullbuttons --nocancel 0 0 username 3>&1 1>&2 2>&3)
   export TARGETUSER=$TARGETUSER
   
    userPass=$(whiptail \
     --title "New Encrypted User"  \
     --backtitle "ghostbusker's dotfiles installer" \
     --passwordbox "Enter password for new user: " \
-    --fullbuttons --nocancel $MENU_HEIGHT $MENU_WIDTH 3>&1 1>&2 2>&3)
+    --fullbuttons --nocancel 0 0 3>&1 1>&2 2>&3)
 
   #create new user, set password, and add them to the sudo group
   sudo adduser --gecos "" $TARGETUSER 
-  printf "$userPass\n$userPass\n" | sudo passwd $TARGETUSER   ##################### BROKEN . User gets made but passord "doesnt match" and fails to set. Must be set manually using passwd command.
-  sudo usermod -a -G sudo $TARGETUSER
+  printf "$userPass\n$userPass\n" | sudo passwd $TARGETUSER 
+  sudo usermod -a -G sudo $TARGETUSER 
+
+  #clear password variable after use
+  userPass=""
 
   #install apps needed to encrypt the user folder
-  sudo apt -yq install ecryptfs-utils lsof cryptsetup
+  sudo apt -y install ecryptfs-utils lsof cryptsetup
 
   #encrypt new user home directory
   sudo ecryptfs-migrate-home -u $TARGETUSER
@@ -73,15 +78,15 @@ enable_SSH() {
 }
 
 enable_VNC() {
-  sudo apt -yq install realvnc-vnc-server realvncv-nc-viewer
+  sudo apt -y install realvnc-vnc-server realvnc-vnc-viewer
   sudo raspi-config nonint do_vnc 0
 }
 
 desktop_from_scratch () {
-  sudo apt -yq install xorg xserver-xorg xinit git cmake lxappearance
+  sudo apt -y install xorg xserver-xorg xinit git cmake lxappearance
   #installing i3-gaps window manager from source
   cd /opt/ 
-  sudo apt -yq install i3 gcc make autoconf dh-autoreconf libxcb-keysyms1-dev libpango1.0-dev libxcb-util0-dev xcb libxcb1-dev \
+  sudo apt -y install i3 gcc make autoconf dh-autoreconf libxcb-keysyms1-dev libpango1.0-dev libxcb-util0-dev xcb libxcb1-dev \
   libxcb-icccm4-dev libyajl-dev libev-dev libxcb-xkb-dev libxcb-cursor-dev libxkbcommon-dev libxcb-xinerama0-dev \
   libxkbcommon-x11-dev libstartup-notification0-dev libxcb-randr0-dev libxcb-xrm0 libxcb-xrm-dev libxcb-shape0 libxcb-shape0-dev
   sudo git clone https://www.github.com/Airblader/i3 i3-gaps
@@ -94,33 +99,33 @@ desktop_from_scratch () {
   sudo make -j8
   sudo make install
   #installing apps that will be part of desktop composition and daily use
-  sudo apt -yq install i3blocks feh compton clipit arandr mpv florence dunst nemo conky dhcpcd-gtk wpagui
+  sudo apt -y install i3blocks feh compton clipit arandr mpv florence dunst nemo conky dhcpcd-gtk wpagui
   #installing wifi and bluetooth tools"
-  sudo apt -yq install pi-bluetooth blueman bluealsa network-manager
+  sudo apt -y install pi-bluetooth blueman bluealsa network-manager
 }
 
 favorite_apps() {
   #This is going to get an implementation and organization overhaul
   echo "installer: installing favorite apps and tools"
   echo "installing termnial upgrade + terminal candy"
-  sudo apt -yq install terminator xterm locate tilda neovim ranger trash-cli neofetch figlet lolcat cmatrix hollywood \
+  sudo apt -y install terminator xterm locate tilda neovim ranger trash-cli neofetch figlet lolcat cmatrix hollywood \
   funny-manpages caca-utils libaa-bin thefuck howdoi cowsay fortune
   echo "installing vanity fonts"
-  sudo apt -yq install fonts-ocr-a
+  sudo apt -y install fonts-ocr-a
   sudo fc-cache -f -v 
   echo "installing system utilities and monitors"
-  sudo apt -yq install glances nmon htop # this line not working
+  sudo apt -y install glances nmon htop # this line not working
   echo "installing media apps"
-  sudo apt -yq install cmus vis playerctl vlc fswebcam
+  sudo apt -y install cmus vis playerctl vlc fswebcam
   echo "installing apps for stress testing and benchmarks"
-  sudo apt -yq install stress sysbench
+  sudo apt -y install stress sysbench
   echo "installing network info tools"
-  sudo apt -yq install nmap tshark zenmap 
-  sudo export DEBIAN_FRONTEND=noninteractive apt -yq install macchanger wireshark #still prompting for user input
+  sudo apt -y install nmap tshark zenmap 
+  sudo export DEBIAN_FRONTEND=noninteractive apt -y install macchanger wireshark #still prompting for user input
   echo "installing more common apps"
-  sudo apt -yq install screenkey ttyrec realvnc-vnc-server realvnc-vnc-viewer chromium-browser # this line not working
+  sudo apt -y install screenkey ttyrec realvnc-vnc-server realvnc-vnc-viewer chromium-browser # this line not working
   echo "installing productivity apps"
-  sudo apt -yq install geany neovim
+  sudo apt -y install geany neovim
 }
 
 make_common_folders() {
@@ -131,7 +136,7 @@ make_common_folders() {
   sudo mkdir /home/$TARGETUSER/Pictures
 }
 
-scrape_wallpapers() {  ##################### BROKEN  ##################### BROKEN  ##################### BROKEN  ##################### BROKEN  ##################### BROKEN Picyutrds wound up in /home/Pictures/Wallpapers
+scrape_wallpapers() {
   echo "installer: scraping wallpapers from the web" #shamelessly
   sudo mkdir /home/$TARGETUSER/Pictures/Wallpapers
   cd /home/$TARGETUSER/Pictures/Wallpapers
@@ -168,7 +173,7 @@ scrape_wallpapers() {  ##################### BROKEN  ##################### BROKE
 
 openVPN() {
   # install openvpn for tunneling back to home network
-  sudo apt -yq install openvpn
+  sudo apt -y install openvpn
   # runs with: sudo openvpn ~./location/of/ovpn-file.ovpn
   # launched by i3, see ~/.config/i3/config
 }
@@ -190,7 +195,7 @@ moonlight_stream() {
   wget http://archive.itimmer.nl/itimmer.gpg
   sudo apt-key add itimmer.gpg
   sudo apt update
-  sudo apt -yq install moonlight-embedded
+  sudo apt -y install moonlight-embedded
   # don't forget to pair with target IP then stream using $:moonlight stream -1080 -30fps -app Steam
 }
 retropie() {
@@ -201,8 +206,8 @@ retropie() {
 }
 
 creative_suite() {
-  sudo apt -yq install mixxx kdenlive blender audacity gimp fswebcam fluidsynth
-  #sudo apt -yq install non-daw non-mixer non-sequencer non-session-manager
+  sudo apt -y install mixxx kdenlive blender audacity gimp fswebcam fluidsynth
+  #sudo apt -y install non-daw non-mixer non-sequencer non-session-manager
   # trying out reaper daw
   cd /opt/
   wget http://reaper.fm/files/6.x/reaper609_linux_armv7l.tar.xz
@@ -213,7 +218,7 @@ creative_suite() {
 
 cool_retro_term() {
   cd /opt/ 
-  sudo apt -yq install build-essential qmlscene qt5-qmake qt5-default qtdeclarative5-dev qml-module-qtquick-controls \
+  sudo apt -y install build-essential qmlscene qt5-qmake qt5-default qtdeclarative5-dev qml-module-qtquick-controls \
   qml-module-qtgraphicaleffects qml-module-qtquick-dialogs qml-module-qtquick-localstorage qml-module-qtquick-window2 \
   qml-module-qt-labs-settings qml-module-qt-labs-folderlistmodel
   git clone --recursive https://github.com/Swordfish90/cool-retro-term.git
@@ -277,13 +282,13 @@ auto_hotspot () {
 
 
 log2Ram() {
-  printf -- 'deb http://packages.azlux.fr/debian/ buster main'| sudo tee /etc/apt/sources.list.d/azlux.list
+  printf -- 'deb http://packages.azlux.fr/debian/ buster main' | sudo tee /etc/apt/sources.list.d/azlux.list
   wget -qO - https://azlux.fr/repo.gpg.key | sudo apt-key add -
   apt update
-  apt -yq install log2ram
+  apt -y install log2ram
 }
 
-copy_dotfiles() { ##################### BROKEN 
+copy_dotfiles() {
   cd $(dirname "$0")
   sudo git clone http://github.com/ghostbusker/dotfiles
   cd dotfiles
@@ -316,23 +321,16 @@ show_helpfull_info() {
   done
 }
  
-#
-# Actual Script Time ###################################################################################################################################################################
-#
+
+### Actual Script Time ### Actual Script Time ### Actual Script Time ### Actual Script Time ### Actual Script Time ### Actual Script Time ### 
 
 # check for root
-if [ $(id -u) -ne 0 ]; then
-  printf "\nScript must be run as root. \n"
-  exit 1
-fi
-
-# prepare apt and git for installing a bunch of apps
-sudo apt update || sudo apt-get -o Acquire::ForceIPv4=true update
-sudo apt -yq install git
-sudo git config --global color.ui auto
+#if [ $(id -u) -ne 0 ]; then
+#  printf "\nScript must be run as root. \n"
+#  exit 1
+#fi
 
 # ask user which modules to run 
-############################################# NOT DISPLAYING CORRECTLY################################################################
 MODULES=$(whiptail \
   --backtitle "ghostbusker's dotfiles installer" \
   --title "Choose your own adventure" \
@@ -345,26 +343,26 @@ MODULES=$(whiptail \
   "set_localization" "Localize Keyboard, Wifi, timezone" OFF \
   "enable_SSH" "Enable SSH on boot" OFF \
   "enable_VNC" "Enable VNC on boot" OFF \
-  "favorite_apps" "Install Favorite GUI + Terminal Apps" ON \
-  "desktop_from_scratch" "Install Desktop Environment" ON \
-  "make_common_folders" "Make Default folders" ON \
+  "favorite_apps" "Favorite GUI + Terminal Apps" ON \
+  "desktop_from_scratch" "Desktop Environment" ON \
+  "make_common_folders" "Create Common Folders" ON \
   "scrape_wallpapers" "Scrape Wallpapers from Web" ON \
   "openVPN" "Install OpenVPN client" OFF \
   "fix_pi_groups" "Fix Pi Groups associations" ON \
   "power_button_LED" "Enalbe GPIO Power Button and LED" ON \
   "moonlight_stream" "Install moonlight for game streaming" ON \
   "retroPie" "Install RetroPie" OFF \
-  "creative_suite" "Install Creative Suite" OFF \
-  "cool_retro_term" "Install CoolRetroTerm" ON \
-  "terminal_pipes" "Install Pipes for terminal" ON \
-  "ascii_aquarium" "Install ASCII Aquarium" ON \
-  "set_swapfile" "Change Swapfile" OFF \
-  "auto_hotspot" "Turn Pi into hotspot atuomatically" OFF \
+  "creative_suite" "Creative Suite Apps" OFF \
+  "cool_retro_term" "CoolRetroTerm" ON \
+  "terminal_pipes" "Pipes for terminal" ON \
+  "ascii_aquarium" "ASCII Aquarium" ON \
+  "set_swapfile" "Adjust Swapfile" OFF \
+  "auto_hotspot" "Autohotspot" OFF \
   "log2Ram" "Install Log2RAM" OFF\
   "copy_dotfiles" "Copy dotfiles to target user home Directory" ON \
   "delete_user_pi" "Delete User Pi? *DANGEROUS*" OFF 3>&1 1>&2 2>&3)
 
-# set a target user if not creating new user ###########################NNNNNNNNNNNOOOOOOOOOOOOTTTTTTTTTWORKING
+# set a target user if not creating new user 
 if [[ ! $MODULES  =~ *new_encrypted_user* ]]; then
   TARGETUSER=$(whiptail \
   --backtitle "ghostbusker's dotfiles installer" \
@@ -374,26 +372,28 @@ if [[ ! $MODULES  =~ *new_encrypted_user* ]]; then
   export TARGETUSER=$TARGETUSER
 fi
 
-#start a log
-tmpLog="/tmp/dotfiles-install.log"
-
 # start script timer
 START=$SECONDS
 
+# prepare apt and git for installing a bunch of apps
+sudo apt update 
+sudo apt -y install git
+sudo git config --global color.ui auto
+
 # magic loop that calls each fucntion, anounces its name, executes it, and logs the output
 for module in $MODULES ; do \
-  printf "\nINSTALLER: RUNNING MODULE $module \n" | tee -a -i $tmpLog
-  $module | tee -a -i $tmpLog ; \
+  printf "\nINSTALLER: RUNNING MODULE $module \n" | tee -a -i $TEMPLOG
+  $module | tee -a -i $TEMPLOG ; \
 done
 
 # stop script timer
 STOP=$(($SECONDS-$START))
 
 # display script and system info, add to log
-printf 'script runtime %dh:%dm:%ds\n' $(($STOP/3600)) $(($STOP%3600/60)) $(($STOP%60)) | tee -a -i $tmpLog
-show_helpfull_info | tee -a -i $tmpLog
+printf 'script runtime %dh:%dm:%ds\n' $(($STOP/3600)) $(($STOP%3600/60)) $(($STOP%60)) | tee -a -i $TEMPLOG
+show_helpfull_info | tee -a -i $TEMPLOG
 
 # save log to same location as script
-sudo mv $tmpLog $(dirname "$0")
+sudo mv $TEMPLOG $(dirname "$0")
 
 exit
