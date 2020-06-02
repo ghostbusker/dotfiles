@@ -34,9 +34,15 @@ full_text=Click me!
 command=echo "Got clicked with button $button"
 color=#F79494
 
-#[compton_toggle]
+#compton_toggle
+[compton_toggle]
 command=bash ~/.config/i3blocks/compton_toggle
 full_text=Opacity
+color=#00AA00
+
+[empy_container]
+command=i3-msg open
+full_text=window
 color=#00AA00
 
 [keymap]

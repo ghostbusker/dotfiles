@@ -16,6 +16,7 @@ border=white,
 
 whiptail \
 --title "This is the script you are about to install:" \
+--backtitle "ghostbusker's dotfiles installer" \
 --msgbox "$(curl -sSL http://dotfiles.ghostbusker.com)" \
 --scrolltext --fullbuttons $MENU_HEIGHT $MENU_WIDTH
 
@@ -35,15 +36,15 @@ new_encrypted_user() {
   TARGETUSER=$(whiptail \
     --title "New Encrypted User"  \
     --backtitle "ghostbusker's dotfiles installer" \
-    --inputbox "Enter new user name. User 'pi' should be deleted for security reasons. No spaces please." \
-    --fullbuttons --nocancel 0 0 username 3>&1 1>&2 2>&3)
+    --inputbox "Enter new user name. \\n\\User 'pi' should be deleted for security reasons. \\n\\No spaces please." \
+    --fullbuttons --nocancel 10 40 username 3>&1 1>&2 2>&3)
   export TARGETUSER=$TARGETUSER
   
    userPass=$(whiptail \
     --title "New Encrypted User"  \
     --backtitle "ghostbusker's dotfiles installer" \
     --passwordbox "Enter password for new user: " \
-    --fullbuttons --nocancel 0 0 3>&1 1>&2 2>&3)
+    --fullbuttons --nocancel 10 40 3>&1 1>&2 2>&3)
 
   #create new user, set password, and add them to the sudo group
   sudo adduser --gecos "" $TARGETUSER 
@@ -108,7 +109,7 @@ favorite_apps() {
   #This is going to get an implementation and organization overhaul
   echo "installer: installing favorite apps and tools"
   echo "installing termnial upgrade + terminal candy"
-  sudo apt -y install terminator xterm locate tilda neovim ranger trash-cli neofetch figlet lolcat cmatrix hollywood \
+  sudo apt -y install xterm locate tilda neovim ranger trash-cli neofetch figlet lolcat cmatrix hollywood \
   funny-manpages caca-utils libaa-bin thefuck howdoi cowsay fortune
   echo "installing vanity fonts"
   sudo apt -y install fonts-ocr-a
@@ -224,8 +225,10 @@ cool_retro_term() {
   git clone --recursive https://github.com/Swordfish90/cool-retro-term.git
   cd cool-retro-term
   qmake && make
+  sudo make install
   sudo cp cool-retro-term.desktop /usr/share/applications
-  sudo ln -s /opt/cool-retro-term/cool-retro-term /usr/local/bin/cool-retro-term
+  #sudo ln -s /opt/cool-retro-term/cool-retro-term /usr/local/bin/cool-retro-term
+
 }
 
 terminal_pipes() {
@@ -278,6 +281,8 @@ auto_hotspot () {
   tar -xzvf AutoHotspot-Setup.tar.gz
   cd Autohotspot
   sudo ./autohotspot-setup.sh
+  ### SOMETHING IS BROKEN AND THIS INSTALLER MENU FLASHES, THIS NEXT LINE MIGHT FIX
+  read
 }
 
 
@@ -300,7 +305,9 @@ copy_dotfiles() {
   # this next part made all the difference, chome and a bunch of other apps were broken otherwise
   # take ownership and set permissions of user folder:
   sudo -u $TARGETUSER chmod 750 -R /home/$TARGETUSER/
+  # AAAAAANNDDD ITS BROKEN
   sudo chown -R $TARGETUSER:$TARGETUSER /home/$TARGETUSER/
+  #umask command not found according to lastest raspbian release
   sudo umask 0027
 }
 
@@ -362,6 +369,7 @@ MODULES=$(whiptail \
   "copy_dotfiles" "Copy dotfiles to target user home Directory" ON \
   "delete_user_pi" "Delete User Pi? *DANGEROUS*" OFF 3>&1 1>&2 2>&3)
 
+### NOT WOKRING ### RUNS UNDER ALL CONDITIONS
 # set a target user if not creating new user 
 if [[ ! $MODULES  =~ *new_encrypted_user* ]]; then
   TARGETUSER=$(whiptail \

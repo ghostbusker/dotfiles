@@ -104,7 +104,7 @@ client.background       #CCFFCC
 #################App Launch Hotkeys###################
 
 # start a terminal
-bindsym $mod+Return exec terminator
+bindsym $mod+Return exec xterm
 
 # start dmenu (a program launcher) with prefered colors
 bindsym $mod+d exec "dmenu_run -nf '#C0CCC0' -nb '#336633' -sb '#CC3300' -sf '#f0fff0' -fn 'monospace-10' -p 'run > '"
