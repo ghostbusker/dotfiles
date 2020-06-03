@@ -40,9 +40,11 @@ for_window [urgent=latest] focus
 #exec --no-startup-id i3-msg workspace $ws1
 #exec --no-startup-id conky
 exec xterm -e htop
-exec xterm -e bash ~/.config/scripts/weather.sh
-exec xterm -e "pipes.sh -p 10 -f 30 -r 20000"
+exec xterm -e "pipes.sh -p 5 -f 12 -r 20000"
 exec xterm -e "cmatrix -ab -C magenta"
+
+### weather stuff ###
+exec xterm -e bash ~/.config/scripts/weather.sh
 exec mpv --loop --no-osc --background=0/0/0/0 --framedrop=vo /tmp/weather.png 
 
 #exec --no-startup-id i3-msg workspace $ws2
