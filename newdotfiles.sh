@@ -36,7 +36,7 @@ new_encrypted_user() {
   TARGETUSER=$(whiptail \
     --title "New Encrypted User"  \
     --backtitle "ghostbusker's dotfiles installer" \
-    --inputbox "Enter new user name. \\n\\User 'pi' should be deleted for security reasons. \\n\\No spaces please." \
+    --inputbox "Enter new user name. \nUser 'pi' should be deleted for security reasons. \nNo spaces please." \
     --fullbuttons --nocancel 10 40 username 3>&1 1>&2 2>&3)
   export TARGETUSER=$TARGETUSER
   

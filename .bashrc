@@ -38,10 +38,12 @@ if [ -f ~/.bash_aliases ]; then
     source ~/.bash_aliases
 fi
 
-# scrape user's ~/.config/scripts folder and add each script to aliases
+# scrape user's ~/.config/scripts folder, make each script executable, and add to aliases
 SCRIPTS=$(ls ~/.config/scripts)
+REALHOME=$(realpath ~/)
 for script in $SCRIPTS ; do \
-  alias $(sed 's/.*//' $script)="bash ~/.config/scripts/$script" ; \
+  sudo chmod +x $REALHOME/.config/scripts/$script
+  alias $(echo "$script" | cut -f 1 -d '.')=sudo bash $REALHOME"/.config/scripts/$script" ; \
 done
 
 # don't put duplicate lines or lines starting with space in the history.
