@@ -1,6 +1,6 @@
 #!/bin/bash
 
-clear
+#clear
 
 function colour () {
    echo "\e[$1m$2\e[0m"

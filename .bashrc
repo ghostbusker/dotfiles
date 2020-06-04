@@ -11,10 +11,11 @@ esac
 #the ghstbskr section of the file, *ahem*
 
 figlet ghstbskr | lolcat
-cowsay -f ghostbusters "github.com/ghostbusker/dotfiles"
-neofetch
+neofetch --ascii "$(cowsay -f ghostbusters "github.com/ghostbusker/dotfiles")"
 #add local scripts folder to PATH for 'weather', 'tardis', 'toggle-compton', etc.
 #export PATH="~/.config/scripts/"
+
+
 
 #im going to add these to ~/.bash_aliases
 #alias ls='ls -F '
@@ -34,23 +35,34 @@ neofetch
 # See /usr/share/doc/bash-doc/examples in the bash-doc package.
 
 if [ -f ~/.bash_aliases ]; then
-    . ~/.bash_aliases
+    source ~/.bash_aliases
 fi
+
+# scrape user's ~/.config/scripts folder and add each script to aliases
+SCRIPTS=$(ls ~/.config/scripts)
+for script in $SCRIPTS ; do \
+  alias $(sed 's/.*//' $script)="bash ~/.config/scripts/$script" ; \
+done
 
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
 #HISTCONTROL=ignoreboth
 
-# append to the history file, don't overwrite it
-shopt -s histappend
-
-# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-#HISTSIZE=1000
-#HISTFILESIZE=2000
-
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
 shopt -s checkwinsize
+
+# Store multi-line commands in one history entry:
+shopt -s cmdhist
+
+# append to the history file, don't overwrite it
+shopt -s histappend
+
+# save each command right after it has been executed
+PROMPT_COMMAND='history -a'
+
+# don’t save ls, ps and history commands
+export HISTIGNORE="ls:ps:history"
 
 # If set, the pattern "**" used in a pathname expansion context will
 # match all files and zero or more directories and subdirectories.
@@ -135,3 +147,17 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
+
+# Eternal bash history.
+# ---------------------
+# Undocumented feature which sets the size to "unlimited".
+# https://stackoverflow.com/questions/9457233/unlimited-bash-history
+export HISTFILESIZE=
+export HISTSIZE=
+export HISTTIMEFORMAT="%h %d %H:%M:%S "
+# Change the file location because certain bash sessions truncate .bash_history file upon close.
+# http://superuser.com/questions/575479/bash-history-truncated-to-500-lines-on-each-login
+export HISTFILE=~/.bash_eternal_history
+# Force prompt to write history after every command.
+# http://superuser.com/questions/20900/bash-history-loss
+PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
