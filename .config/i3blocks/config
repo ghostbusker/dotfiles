@@ -36,12 +36,12 @@ color=#F79494
 
 #compton_toggle
 [compton_toggle]
-command=bash ~/.config/i3blocks/compton_toggle
+command=bash ~/.config/scripts/compton_toggle.sh
 full_text=Opacity
 color=#00AA00
 
 [empy_container]
-command=i3-msg open
+command=i3-msg open &>/dev/null
 full_text=window
 color=#00AA00
 
@@ -59,12 +59,13 @@ align=center
 
 #pi cpu temp
 [temp]
-command=sed "s/\(...\)$/.\1°C/" < /sys/class/thermal/thermal_zone0/temp
+command=bash ~/.config/script/cpu_temp.sh
 interval=5
 color=#FF00FF
 
 #cpu frequency
 [cpu_freq]
+command=bash ~/.config/script/cpu_freq.sh
 interval=1
 color=#FF00FF
 

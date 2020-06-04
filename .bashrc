@@ -12,10 +12,6 @@ esac
 
 figlet ghstbskr | lolcat
 neofetch --ascii "$(cowsay -f ghostbusters "github.com/ghostbusker/dotfiles")"
-#add local scripts folder to PATH for 'weather', 'tardis', 'toggle-compton', etc.
-#export PATH="~/.config/scripts/"
-
-
 
 #im going to add these to ~/.bash_aliases
 #alias ls='ls -F '
@@ -43,7 +39,7 @@ SCRIPTS=$(ls ~/.config/scripts)
 REALHOME=$(realpath ~/)
 for script in $SCRIPTS ; do \
   sudo chmod +x $REALHOME/.config/scripts/$script
-  alias $(echo "$script" | cut -f 1 -d '.')=sudo bash $REALHOME"/.config/scripts/$script" ; \
+  alias $(echo "$script" | cut -f 1 -d '.')="bash $REALHOME/.config/scripts/$script" ; \
 done
 
 # don't put duplicate lines or lines starting with space in the history.
