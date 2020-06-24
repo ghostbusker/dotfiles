@@ -10,7 +10,13 @@ exec compton -f -b
 
 #set wallpaper, then change every -n seconds, maybe add some imagemagick to script to make unique
 #exec feh --randomize --bg-fill ~/Pictures/Wallpapers/*
-exec watch -n 90 feh --randomize --bg-fill ~/Pictures/Wallpapers/*
+exec watch -n 900 feh --randomize --bg-fill ~/Pictures/Wallpapers/*
+
+# sets the Energy Star feature to On and sets it to wait 10 minutes of inactivity to turn off the screens. 
+exec --no-startup-id xset dpms 600
+
+# launches a program that will also wait 10 minutes of inactivity before launching the screenlocker i3lock
+exec --no-startup-id xautolock -time 10 -locker i3lock
 
 #fetch a new weather image every 15 minutes and rename it weather.png
 exec watch -n 900 wget -O /tmp/weather.png https://s.w-x.co/staticmaps/wu/wxtype/county_loc/csg/animate.png
@@ -43,6 +49,10 @@ exec xterm -e htop
 exec xterm -e "pipes.sh -p 5 -f 12 -r 20000"
 exec xterm -e "cmatrix -ab -C magenta"
 
+## ws6 is for ranger ###
+exec --no-startup-id i3-msg workspace $ws6
+exec xterm -e "ranger" -title ranger
+assign [title="ranger"] $ws6
 ### weather stuff ###
 exec xterm -e bash ~/.config/scripts/weather.sh
 exec mpv --loop --no-osc --background=0/0/0/0 --framedrop=vo /tmp/weather.png 

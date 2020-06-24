@@ -10,8 +10,8 @@ esac
 
 #the ghstbskr section of the file, *ahem*
 
-figlet ghstbskr | lolcat
-neofetch --ascii "$(cowsay -f ghostbusters "github.com/ghostbusker/dotfiles")"
+#figlet ghstbskr | lolcat
+neofetch --ascii "~/.watermark"
 
 #im going to add these to ~/.bash_aliases
 #alias ls='ls -F '
@@ -38,7 +38,7 @@ fi
 SCRIPTS=$(ls ~/.config/scripts)
 REALHOME=$(realpath ~/)
 for script in $SCRIPTS ; do \
-  sudo chmod +x $REALHOME/.config/scripts/$script
+  chmod +x $REALHOME/.config/scripts/$script
   alias $(echo "$script" | cut -f 1 -d '.')="bash $REALHOME/.config/scripts/$script" ; \
 done
 
@@ -60,7 +60,7 @@ shopt -s histappend
 PROMPT_COMMAND='history -a'
 
 # don’t save ls, ps and history commands
-export HISTIGNORE="ls:ps:history"
+#export HISTIGNORE="ls:ps:history"
 
 # If set, the pattern "**" used in a pathname expansion context will
 # match all files and zero or more directories and subdirectories.
