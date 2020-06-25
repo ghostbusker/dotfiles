@@ -126,7 +126,7 @@ favorite_apps() {
   echo "installing more common apps"
   sudo apt -y install screenkey ttyrec realvnc-vnc-server realvnc-vnc-viewer chromium-browser # this line not working
   echo "installing productivity apps"
-  sudo apt -y install geany neovim
+  sudo apt -y install geany neovim remind
 }
 
 make_common_folders() {
