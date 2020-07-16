@@ -55,7 +55,7 @@ new_encrypted_user() {
   userPass=""
 
   #install apps needed to encrypt the user folder
-  sudo apt -y install ecryptfs-utils lsof cryptsetup
+  sudo apt -y --fix-missing install ecryptfs-utils lsof cryptsetup
 
   #encrypt new user home directory
   sudo ecryptfs-migrate-home -u $TARGETUSER
@@ -79,15 +79,15 @@ enable_SSH() {
 }
 
 enable_VNC() {
-  sudo apt -y install realvnc-vnc-server realvnc-vnc-viewer
+  sudo apt -y --fix-missing install realvnc-vnc-server realvnc-vnc-viewer
   sudo raspi-config nonint do_vnc 0
 }
 
 desktop_from_scratch () {
-  sudo apt -y install xorg xserver-xorg xinit git cmake lxappearance
+  sudo apt -y --fix-missing install xorg xserver-xorg xinit git cmake lxappearance
   #installing i3-gaps window manager from source
   cd /opt/ 
-  sudo apt -y install i3 gcc make autoconf dh-autoreconf libxcb-keysyms1-dev libpango1.0-dev libxcb-util0-dev xcb libxcb1-dev \
+  sudo apt -y --fix-missing install i3 gcc make autoconf dh-autoreconf libxcb-keysyms1-dev libpango1.0-dev libxcb-util0-dev xcb libxcb1-dev \
   libxcb-icccm4-dev libyajl-dev libev-dev libxcb-xkb-dev libxcb-cursor-dev libxkbcommon-dev libxcb-xinerama0-dev \
   libxkbcommon-x11-dev libstartup-notification0-dev libxcb-randr0-dev libxcb-xrm0 libxcb-xrm-dev libxcb-shape0 libxcb-shape0-dev
   sudo git clone https://www.github.com/Airblader/i3 i3-gaps
@@ -100,33 +100,34 @@ desktop_from_scratch () {
   sudo make -j8
   sudo make install
   #installing apps that will be part of desktop composition and daily use
-  sudo apt -y install i3blocks feh compton clipit arandr mpv florence dunst nemo conky dhcpcd-gtk wpagui
+  sudo apt -y --fix-missing install i3blocks feh compton clipit arandr mpv florence dunst nemo conky dhcpcd-gtk wpagui
   #installing wifi and bluetooth tools"
-  sudo apt -y install pi-bluetooth blueman bluealsa network-manager
+  sudo apt -y --fix-missing install pi-bluetooth blueman bluealsa network-manager
 }
 
 favorite_apps() {
   #This is going to get an implementation and organization overhaul
   echo "installer: installing favorite apps and tools"
   echo "installing termnial upgrade + terminal candy"
-  sudo apt -y install xterm locate tilda neovim ranger trash-cli neofetch figlet lolcat cmatrix hollywood \
+  sudo apt -y --fix-missing install xterm locate tilda neovim ranger trash-cli neofetch figlet lolcat cmatrix hollywood \
   funny-manpages caca-utils libaa-bin thefuck howdoi cowsay fortune
   echo "installing vanity fonts"
-  sudo apt -y install fonts-ocr-a
+  sudo apt -y --fix-missing install fonts-ocr-a
   sudo fc-cache -f -v 
   echo "installing system utilities and monitors"
-  sudo apt -y install glances nmon htop # this line not working
+  sudo apt -y --fix-missing install glances nmon htop # this line not working
   echo "installing media apps"
-  sudo apt -y install cmus vis playerctl vlc fswebcam
+  sudo apt -y --fix-missing install cmus vis playerctl vlc fswebcam
   echo "installing apps for stress testing and benchmarks"
-  sudo apt -y install stress sysbench
+  sudo apt -y --fix-missing install stress sysbench
   echo "installing network info tools"
-  sudo apt -y install nmap tshark zenmap 
-  sudo export DEBIAN_FRONTEND=noninteractive apt -y install macchanger wireshark #still prompting for user input
+  sudo apt -y --fix-missing install nmap tshark zenmap 
+  export DEBIAN_FRONTEND=noninteractive
+  yes | sudo apt -y --fix-missing install macchanger wireshark #still prompting for user input
   echo "installing more common apps"
-  sudo apt -y install screenkey ttyrec realvnc-vnc-server realvnc-vnc-viewer chromium-browser # this line not working
+  sudo apt -y --fix-missing install screenkey ttyrec realvnc-vnc-server realvnc-vnc-viewer chromium-browser # this line not working
   echo "installing productivity apps"
-  sudo apt -y install geany neovim remind
+  sudo apt -y --fix-missing install geany neovim remind
 }
 
 make_common_folders() {
@@ -174,7 +175,7 @@ scrape_wallpapers() {
 
 openVPN() {
   # install openvpn for tunneling back to home network
-  sudo apt -y install openvpn
+  sudo apt -y --fix-missing install openvpn
   # runs with: sudo openvpn ~./location/of/ovpn-file.ovpn
   # launched by i3, see ~/.config/i3/config
 }
@@ -196,7 +197,7 @@ moonlight_stream() {
   wget http://archive.itimmer.nl/itimmer.gpg
   sudo apt-key add itimmer.gpg
   sudo apt update
-  sudo apt -y install moonlight-embedded
+  sudo apt -y --fix-missing install moonlight-embedded
   # don't forget to pair with target IP then stream using $:moonlight stream -1080 -30fps -app Steam
 }
 retropie() {
@@ -207,8 +208,8 @@ retropie() {
 }
 
 creative_suite() {
-  sudo apt -y install mixxx kdenlive blender audacity gimp fswebcam fluidsynth
-  #sudo apt -y install non-daw non-mixer non-sequencer non-session-manager
+  sudo apt -y --fix-missing install mixxx kdenlive blender audacity gimp fswebcam fluidsynth
+  #sudo apt -y --fix-missing install non-daw non-mixer non-sequencer non-session-manager
   # trying out reaper daw
   cd /opt/
   wget http://reaper.fm/files/6.x/reaper609_linux_armv7l.tar.xz
@@ -219,7 +220,7 @@ creative_suite() {
 
 cool_retro_term() {
   cd /opt/ 
-  sudo apt -y install build-essential qmlscene qt5-qmake qt5-default qtdeclarative5-dev qml-module-qtquick-controls \
+  sudo apt -y --fix-missing install build-essential qmlscene qt5-qmake qt5-default qtdeclarative5-dev qml-module-qtquick-controls \
   qml-module-qtgraphicaleffects qml-module-qtquick-dialogs qml-module-qtquick-localstorage qml-module-qtquick-window2 \
   qml-module-qt-labs-settings qml-module-qt-labs-folderlistmodel
   git clone --recursive https://github.com/Swordfish90/cool-retro-term.git
@@ -249,7 +250,7 @@ terminal_pipes() {
 #probs done installing NMmatrix  
 
 ascii_aquarium() {
-  sudo apt-get install -y libcurses-perl
+  sudo apt -y --fix-missing install libcurses-perl
   cd /opt/ 
   sudo wget http://search.cpan.org/CPAN/authors/id/K/KB/KBAUCOM/Term-Animation-2.4.tar.gz
   sudo tar -zxvf Term-Animation-2.4.tar.gz
@@ -297,10 +298,17 @@ copy_dotfiles() {
   cd $(dirname "$0")
   sudo git clone http://github.com/ghostbusker/dotfiles
   cd dotfiles
-  sudo cp -f -r .config /home/$TARGETUSER/
-  sudo cp -f -r .bashrc /home/$TARGETUSER/
-  sudo cp -f -r .conkyrc /home/$TARGETUSER/
-  sudo cp -f -r .profile /home/$TARGETUSER/
+
+  #THIS NEEDS TO BE FIXED SO THAT FILES ARE OVERWRITTEN IN CASE OF CONFLICT
+  sudo mv -f .config /home/$TARGETUSER/
+  sudo mv -f .bashrc /home/$TARGETUSER/
+  sudo mv -f .conkyrc /home/$TARGETUSER/
+  sudo mv -f .profile /home/$TARGETUSER/
+  sudo mv -f .watermark /home/$TARGETUSER/
+  sudo mv -f .Xresources /home/$TARGETUSER/
+
+  # Not a dotfile but can be used to set local console fonts
+  #sudo mv -f console-setup /etc/default/console-setup
 
   # this next part made all the difference, chome and a bunch of other apps were broken otherwise
   # take ownership and set permissions of user folder:
@@ -311,10 +319,11 @@ copy_dotfiles() {
   sudo umask 0027
 }
 
-delete_user_pi() {
-  sudo pkill -u pi
-  #sudo userdel --remove-all-files pi
-}
+#delete_user_pi() {
+#  sudo pkill -u pi
+#  #sudo userdel --remove-all-files pi
+## removed this line from MODULES menu list: "delete_user_pi" "Delete User Pi? *DANGEROUS*" OFF \
+#}
 
 show_helpfull_info() {
   printf "\nCurrent /boot/config.txt settings: \n"
@@ -341,7 +350,7 @@ show_helpfull_info() {
 MODULES=$(whiptail \
   --backtitle "ghostbusker's dotfiles installer" \
   --title "Choose your own adventure" \
-  --checklist "Modules:" 0 0 22\
+  --checklist "Modules:" 0 0 21\
   --notags \
   --fullbuttons \
   --nocancel \
@@ -367,7 +376,7 @@ MODULES=$(whiptail \
   "auto_hotspot" "Autohotspot" OFF \
   "log2Ram" "Install Log2RAM" OFF\
   "copy_dotfiles" "Copy dotfiles to target user home Directory" ON \
-  "delete_user_pi" "Delete User Pi? *DANGEROUS*" OFF 3>&1 1>&2 2>&3)
+  3>&1 1>&2 2>&3)
 
 ### NOT WOKRING ### RUNS UNDER ALL CONDITIONS
 # set a target user if not creating new user 
@@ -385,7 +394,7 @@ START=$SECONDS
 
 # prepare apt and git for installing a bunch of apps
 sudo apt update 
-sudo apt -y install git
+sudo apt -y --fix-missing install git
 sudo git config --global color.ui auto
 
 # magic loop that calls each fucntion, anounces its name, executes it, and logs the output
