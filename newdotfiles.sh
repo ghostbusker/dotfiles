@@ -102,7 +102,7 @@ desktop_from_scratch () {
   #installing apps that will be part of desktop composition and daily use
   sudo apt -y --fix-missing install i3blocks feh compton clipit arandr mpv florence dunst nemo conky dhcpcd-gtk wpagui
   #installing wifi and bluetooth tools"
-  sudo apt -y --fix-missing install pi-bluetooth blueman bluealsa network-manager
+  sudo apt -y --fix-missing install pi-bluetooth blueman bluealsa network-manager nm-tray
 }
 
 favorite_apps() {
@@ -414,3 +414,11 @@ show_helpfull_info | tee -a -i $TEMPLOG
 sudo mv $TEMPLOG $(dirname "$0")
 
 exit
+
+
+##notes
+still doesnt pass username varialbe correcly or something in the first couple of interactions,
+needs to have menus stremlined to take place before? modules run?
+
+still asked me to enter password 2x AFTER the whiptail menu when setting new encrypted user pass
+

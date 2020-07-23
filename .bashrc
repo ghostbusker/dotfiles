@@ -11,7 +11,7 @@ esac
 #the ghstbskr section of the file, *ahem*
 
 #figlet ghstbskr | lolcat
-neofetch --ascii "~/.watermark"
+neofetch --ascii ~/.watermark
 
 #im going to add these to ~/.bash_aliases
 #alias ls='ls -F '
