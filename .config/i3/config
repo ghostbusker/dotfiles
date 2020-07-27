@@ -24,11 +24,12 @@ exec watch -n 900 wget -O /tmp/weather.png https://s.w-x.co/staticmaps/wu/wxtype
 
 #hoping that moving this closer to top of file makes it work better.
 for_window [class="florence"] floating enable
+for_window [class="tilda"] floating enable
 
 ############Invisible background apps###############
 #get the clipboard manager and OSK running (and floating!)
 #exec --no-startup-id tilda --config ~/.config/tilda
-exec --no-startup-id tilda ~/.config/tilda
+exec --no-startup-id tilda
 exec --no-startup-id clipit --daemon
 exec --no-startup-id dunst
 exec --no-startup-id dhcpcd-gtk
@@ -37,7 +38,7 @@ exec --no-startup-id blueman-applet
 exec --no-startup-id florence --use-config=.config/florence.conf
 
 #launch ovpn and connect
-exec --no-startup-id openvpn ~./location/of/ovpn-file.ovpn
+#exec --no-startup-id openvpn ~./location/of/ovpn-file.ovpn
 
 # switch to workspace with urgent window automatically
 for_window [urgent=latest] focus
@@ -68,7 +69,7 @@ exec chromium-browser
 
 # (Being a command-line utility, i3-msg does not support startup notifications,
 #  hence the exec --no-startup-id.)
-# (Starting iceweasel with i3’s exec command is important in order to make i3
+# (Starting iceweasel with i3â€™s exec command is important in order to make i3
 #  create a startup notification context, without which the iceweasel window(s)
 #  cannot be matched onto the workspace on which the command was started.)
 # exec --no-startup-id i3-msg 'workspace $ws3; exec chromium-browser; workspace $ws1'
@@ -119,7 +120,7 @@ client.background       #CCFFCC
 bindsym $mod+Return exec xterm
 
 # start dmenu (a program launcher) with prefered colors
-bindsym $mod+d exec "dmenu_run -nf '#C0CCC0' -nb '#336633' -sb '#CC3300' -sf '#f0fff0' -fn 'monospace-10' -p 'run > '"
+bindsym $mod+d exec "dmenu_run -i -l 6 -nf '#C0CCC0' -nb '#336633' -sb '#CC3300' -sf '#f0fff0' -fn 'ocra bold-10' -p 'run > '"
 
 # run script to toggle compton transpancy on all windows.
 bindsym $mod+F12 exec ~/.config/scripts/compton_toggle.sh
@@ -132,8 +133,8 @@ for_window [class="^.*"] border pixel 2
 gaps inner 15 
 gaps outer 15
 
-bindsym $mod+z		gaps outer current plus 5
-bindsym $mod+Shift+z	gaps outer current minus 5
+bindsym $mod+z          gaps outer current plus 5
+bindsym $mod+Shift+z    gaps outer current minus 5
 
 ####################Fonts #################################
 # Font for window titles. Will also be used by the bar unless a different font
@@ -163,6 +164,7 @@ floating_modifier $mod
 
 # enter fullscreen mode for the focused container
 bindsym $mod+f fullscreen toggle
+bindsym $mod+F11 fullscreen toggle
 
 # kill focused window
 bindsym $mod+Shift+q kill
@@ -254,10 +256,10 @@ bindsym $mod+Tab workspace back_and_forth
 mode "resize" {
         # These bindings trigger as soon as you enter the resize mode
 
-        # Pressing left will shrink the window’s width.
-        # Pressing right will grow the window’s width.
-        # Pressing up will shrink the window’s height.
-        # Pressing down will grow the window’s height.
+        # Pressing left will shrink the windowâ€™s width.
+        # Pressing right will grow the windowâ€™s width.
+        # Pressing up will shrink the windowâ€™s height.
+        # Pressing down will grow the windowâ€™s height.
         bindsym h resize shrink width 10 px or 10 ppt
         bindsym j resize grow height 10 px or 10 ppt
         bindsym k resize shrink height 10 px or 10 ppt

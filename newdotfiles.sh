@@ -417,8 +417,8 @@ exit
 
 
 ##notes
-still doesnt pass username varialbe correcly or something in the first couple of interactions,
-needs to have menus stremlined to take place before? modules run?
+#still doesnt pass username varialbe correcly or something in the first couple of interactions,
+#needs to have menus stremlined to take place before? modules run?
 
-still asked me to enter password 2x AFTER the whiptail menu when setting new encrypted user pass
+#still asked me to enter password 2x AFTER the whiptail menu when setting new encrypted user pass
 
