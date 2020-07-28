@@ -314,7 +314,7 @@ copy_dotfiles() {
   # take ownership and set permissions of user folder:
   sudo -u $TARGETUSER chmod 750 -R /home/$TARGETUSER/
   # AAAAAANNDDD ITS BROKEN
-  sudo chown -R $TARGETUSER:$TARGETUSER /home/$TARGETUSER/
+  sudo chown -R $TARGETUSER /home/$TARGETUSER/
   #umask command not found according to lastest raspbian release
   sudo umask 0027
 }
