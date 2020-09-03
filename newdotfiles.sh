@@ -109,8 +109,8 @@ favorite_apps() {
   #This is going to get an implementation and organization overhaul
   echo "installer: installing favorite apps and tools"
   echo "installing termnial upgrade + terminal candy"
-  sudo apt -y --fix-missing install xterm locate tilda neovim ranger trash-cli neofetch figlet lolcat cmatrix hollywood \
-  funny-manpages caca-utils libaa-bin thefuck howdoi cowsay fortune
+  sudo apt -y --fix-missing install xterm locate tilda neovim ranger trash-cli neofetch figlet lolcat cmatrix
+  sudo apt -y --fix-missing install hollywood funny-manpages caca-utils libaa-bin thefuck howdoi cowsay fortune
   echo "installing vanity fonts"
   sudo apt -y --fix-missing install fonts-ocr-a
   sudo fc-cache -f -v 
