@@ -3,7 +3,7 @@
 #New Dotfiles setup for minimalist i3 desktop
 sudo apt update -y && sudo apt dist-upgrade -y
 sudo apt install -y tmux git bpytop nmap nethogs wpagui
-sudo apt install -y xorg xinit i3-wm i3blocks parcellite volumeicon-alsa compton feh nm-tray pavucontrol alsa-tools
+sudo apt install -y xorg xinit i3-wm i3blocks parcellite volumeicon-alsa compton feh nm-tray pavucontrol alsa-tools dmenu
 sudo apt install -y firefox-esr remmina thonny
 sudo apt install -y arandr mpv florence xterm locate tilda neovim ranger trash-cli neofetch figlet lolcat cmatrix pi-bluetooth blueman bluealsa network-manager nm-tray wireguard-tools
 
